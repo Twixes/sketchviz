@@ -16,7 +16,8 @@
     "motion": "^12.23.26",
     "next": "16.1.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "simplex-noise": "^4.0.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

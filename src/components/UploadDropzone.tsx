@@ -2,6 +2,7 @@
 
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createNoise2D } from "simplex-noise";
 
 const ACCEPTED_MIME_TYPES = [
   "image/png",
@@ -76,9 +77,15 @@ export function UploadDropzone({
     setIsReady(false);
     const size = 180;
     const durationMs = 800;
+    const noise2D = createNoise2D();
     const noise = new Uint8Array(size * size);
+    const scale = 0.05; // Controls frequency of the noise pattern
     for (let i = 0; i < noise.length; i += 1) {
-      noise[i] = Math.floor(Math.random() * 256);
+      const x = i % size;
+      const y = Math.floor(i / size);
+      // Simplex noise returns values in [-1, 1], normalize to [0, 255]
+      const value = noise2D(x * scale, y * scale);
+      noise[i] = Math.floor(((value + 1) / 2) * 256);
     }
 
     const canvas = document.createElement("canvas");
@@ -150,13 +157,13 @@ export function UploadDropzone({
         className={[
           "group relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden text-center transition",
           frame
-            ? "rounded-3xl border border-dashed border-black/10 bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]"
+            ? "rounded-3xl bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]"
             : "rounded-3xl px-6 py-12",
           isDragging
             ? "border-pink-400 bg-pink-50/80"
             : frame
               ? "hover:border-black/30"
-              : "border border-dashed border-black/20",
+              : "",
           className ?? "",
         ].join(" ")}
         style={aspectRatio ? { aspectRatio } : undefined}
