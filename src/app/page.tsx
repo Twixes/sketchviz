@@ -178,7 +178,7 @@ export default function Home() {
             <img
               src="/icon.png"
               alt="SketchViz"
-              className="size-20 -m-3"
+              className="size-16 -m-1"
             />
             <div>
               <p className="text-base font-semibold tracking-tight text-black">
