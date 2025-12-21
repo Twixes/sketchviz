@@ -219,14 +219,14 @@ export function UploadDropzone({
                 Drop your SketchUp render
               </p>
               <p className="text-sm text-black/60">
-                PNG, JPG, WEBP, HEIC, or HEIF · up to 20MB
+                PNG, JPG, WEBP, HEIC, or HEIF – up to 20MB
               </p>
             </div>
             <div className="flex items-center gap-3">
               <span className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white">
                 {isBusy ? "Generating..." : "Choose file"}
               </span>
-              <span className="text-xs text-black/40">No account required</span>
+              <span className="text-xs text-black/40">Try for free upon signup</span>
             </div>
           </>
         )}

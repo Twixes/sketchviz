@@ -33,6 +33,7 @@ export default function Home() {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [lightConditions, setLightConditions] = useState<"sunny" | "overcast" | null>(null);
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
+  const uploadPromiseRef = useRef<Promise<string | null> | null>(null);
 
   const acceptedFormats = useMemo(
     () =>
@@ -52,10 +53,10 @@ export default function Home() {
     };
   }, [inputSrc]);
 
-  // Sync isBusy with uploading or generating states
+  // Sync isBusy with generating state only (not uploading)
   useEffect(() => {
-    setIsBusy(isUploading || isGenerating);
-  }, [isUploading, isGenerating]);
+    setIsBusy(isGenerating);
+  }, [isGenerating]);
 
   const handleReset = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -85,20 +86,29 @@ export default function Home() {
     setBlobUrl(null);
     setIsUploading(true);
 
-    try {
-      // Upload file to Vercel Blob
-      const blob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload',
-      });
+    // Store the upload promise so handleGenerate can wait for it
+    const uploadPromise = (async (): Promise<string | null> => {
+      try {
+        // Upload file to Vercel Blob
+        const blob = await upload(file.name, file, {
+          access: 'public',
+          handleUploadUrl: '/api/upload',
+        });
 
-      setBlobUrl(blob.url);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong.";
-      setError(message);
-    } finally {
-      setIsUploading(false);
-    }
+        setBlobUrl(blob.url);
+        return blob.url;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Something went wrong.";
+        setError(message);
+        return null;
+      } finally {
+        setIsUploading(false);
+        uploadPromiseRef.current = null;
+      }
+    })();
+
+    uploadPromiseRef.current = uploadPromise;
+    await uploadPromise;
   }, [acceptedFormats]);
 
   const handleSignIn = useCallback(async () => {
@@ -142,7 +152,19 @@ export default function Home() {
   }, []);
 
   const handleGenerate = useCallback(async () => {
-    if (!blobUrl) return;
+    let currentBlobUrl = blobUrl;
+
+    // Wait for upload to finish if it's still in progress
+    if (uploadPromiseRef.current) {
+      const uploadedUrl = await uploadPromiseRef.current;
+      if (!uploadedUrl) {
+        // Upload failed
+        return;
+      }
+      currentBlobUrl = uploadedUrl;
+    }
+
+    if (!currentBlobUrl) return;
 
     setError(null);
     setOutputSrc(null);
@@ -156,7 +178,7 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          blobUrl,
+          blobUrl: currentBlobUrl,
           outside_light_conditions: lightConditions,
         }),
       });
@@ -239,9 +261,9 @@ export default function Home() {
               >
                 <div className="space-y-8">
                   <h1 className="text-4xl font-semibold leading-tight text-black sm:text-5xl">
-                    Transform{" "}
-                    <span className="gradient-title">SketchUp renders</span> into
-                    presentation-ready visuals.
+                    Transform your{" "}
+                    <span className="outline-title">SketchUp renders</span> into{" "}
+                    <span className="gradient-title">photorealistic visuals</span>.
                   </h1>
                   <p className="max-w-xl text-lg text-black/70">
                     Upload a render and get polished, photorealistic output with
@@ -315,7 +337,8 @@ export default function Home() {
               outputSrc={outputSrc}
               frame={false}
               className={[
-                "min-h-[320px] border border-dashed border-black/20 bg-white/85",
+                "min-h-[320px] border bg-white/85",
+                !inputSrc ? 'border-dashed border-black/20' : 'border-black/40',
                 focusUpload
                   ? "shadow-[0_40px_90px_-50px_rgba(12,12,12,0.65)]"
                   : "",
@@ -375,18 +398,16 @@ export default function Home() {
 
                   <button
                     onClick={!session ? handleSignIn : handleGenerate}
-                    disabled={isUploading || isGenerating || status === "loading"}
+                    disabled={isGenerating || status === "loading"}
                     className={[
                       "rounded-xl px-6 py-3 text-sm font-semibold transition-all",
-                      isUploading || isGenerating || status === "loading"
+                      isGenerating || status === "loading"
                         ? "cursor-not-allowed bg-black/20 text-black/40"
                         : "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
                     ].join(" ")}
                   >
                     {isGenerating
                       ? "Generating..."
-                      : isUploading
-                      ? "Uploading..."
                       : status === "loading"
                       ? "Loading..."
                       : !session
