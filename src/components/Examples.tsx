@@ -39,6 +39,7 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
       const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
       const x = e.clientX - rect.left;
       const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
       console.log({ label, mouseClientX: e.clientX, rectLeft: rect.left, x, percent });
