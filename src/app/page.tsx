@@ -6,6 +6,7 @@ import { upload } from "@vercel/blob/client";
 import * as Select from "@radix-ui/react-select";
 
 import { UploadDropzone } from "@/components/UploadDropzone";
+import { Examples } from "@/components/Examples";
 
 const ACCEPTED_MIME_TYPES = [
   "image/png",
@@ -37,6 +38,7 @@ export default function Home() {
       ).join(", "),
     [],
   );
+
   const focusUpload = Boolean(inputSrc);
 
   useEffect(() => {
@@ -133,10 +135,34 @@ export default function Home() {
 
   return (
     <div className="memphis-shell min-h-screen">
+      {/* Background Memphis shapes - fixed to viewport, won't affect layout */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <motion.div
+          animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          className="absolute left-[10%] top-[20%] h-48 w-48 rounded-full bg-[color:var(--accent-sun)] opacity-20 blur-2xl"
+        />
+        <motion.div
+          animate={{ rotate: -360, y: [0, 50, 0] }}
+          transition={{ duration: 35, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-[15%] top-[60%] h-64 w-64 rotate-12 border-8 border-black/10 bg-white/50"
+        />
+        <motion.div
+          animate={{ rotate: 360, x: [0, 30, 0] }}
+          transition={{ duration: 40, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[20%] left-[5%] h-40 w-40 rounded-3xl bg-black/5"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-[5%] top-[10%] h-32 w-32 rounded-full border-4 border-[color:var(--accent-sun)] opacity-40"
+        />
+      </div>
+
       <motion.main
         layout
         transition={LAYOUT_TRANSITION}
-        className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 pb-24 pt-14 lg:px-10"
+        className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-14 lg:px-10"
       >
         <motion.header
           initial={false}
@@ -147,11 +173,13 @@ export default function Home() {
           <a
             href="/"
             onClick={handleReset}
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-4 cursor-pointer"
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-black text-sm font-semibold text-white">
-              SV
-            </span>
+            <img
+              src="/icon.png"
+              alt="SketchViz"
+              className="size-20 -m-3"
+            />
             <div>
               <p className="text-base font-semibold tracking-tight text-black">
                 SketchViz
@@ -159,14 +187,6 @@ export default function Home() {
               <p className="text-xs text-black/50">AI visualization studio</p>
             </div>
           </a>
-          <div className="hidden items-center gap-3 text-xs text-black/50 sm:flex">
-            <span className="rounded-full border border-black/10 bg-white/80 px-3 py-1">
-              Gemini 3 Pro
-            </span>
-            <span className="rounded-full border border-black/10 bg-white/80 px-3 py-1">
-              Instant preview
-            </span>
-          </div>
         </motion.header>
 
         <motion.section
@@ -190,27 +210,24 @@ export default function Home() {
                 transition={FADE_TRANSITION}
                 className="flex flex-col gap-8"
               >
-                <div className="space-y-6">
-                  <p className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-black/60">
-                    SketchUp to photoreal
-                  </p>
+                <div className="space-y-8">
                   <h1 className="text-4xl font-semibold leading-tight text-black sm:text-5xl">
-                    Turn your{" "}
+                    Transform{" "}
                     <span className="gradient-title">SketchUp renders</span> into
-                    magazine-ready visuals.
+                    presentation-ready visuals.
                   </h1>
                   <p className="max-w-xl text-lg text-black/70">
-                    SketchViz upgrades raw architectural renders into polished 3D
-                    visualizations with balanced lighting, richer materials, and
-                    interior-design-level polish.
+                    Upload a render and get polished, photorealistic output with
+                    refined lighting, realistic materials, and professional depth—ready
+                    for decks, portfolios, and clients.
                   </p>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">
                   {[
-                    { label: "Lightning fast", value: "30 sec avg" },
-                    { label: "AI lighting", value: "Natural glow" },
-                    { label: "File formats", value: acceptedFormats },
+                    { label: "Speed", value: "~30 seconds", detail: "From upload to photoreal" },
+                    { label: "Materials", value: "Real-world finish", detail: "Refined surfaces & textures" },
+                    { label: "Lighting", value: "Natural depth", detail: "Balanced ambient glow" },
                   ].map((item) => (
                     <div
                       key={item.label}
@@ -221,6 +238,9 @@ export default function Home() {
                       </p>
                       <p className="text-sm font-semibold text-black">
                         {item.value}
+                      </p>
+                      <p className="mt-1 text-xs text-black/50">
+                        {item.detail}
                       </p>
                     </div>
                   ))}
@@ -239,8 +259,27 @@ export default function Home() {
               focusUpload ? "max-w-3xl" : "",
             ].join(" ")}
           >
-            <div className="absolute -left-10 -top-10 hidden h-24 w-24 rounded-full bg-[color:var(--accent-sun)] opacity-80 blur-0 lg:block" />
-            <div className="absolute -bottom-8 right-10 hidden h-16 w-16 rotate-12 rounded-2xl border-2 border-black/70 bg-white lg:block" />
+            {/* Enhanced Memphis decorative shapes */}
+            <motion.div
+              animate={{ scale: [1, 1.15, 1], rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute -left-12 -top-12 hidden h-36 w-36 rounded-full bg-[color:var(--accent-sun)] opacity-90 shadow-[0_0_60px_rgba(255,215,0,0.4)] lg:block"
+            />
+            <motion.div
+              animate={{ y: [0, -15, 0], rotate: [0, 10, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -right-8 top-1/4 hidden h-20 w-20 rounded-full border-4 border-[color:var(--accent-sun)] bg-white/80 lg:block"
+            />
+            <motion.div
+              animate={{ x: [0, 10, 0], rotate: [0, -180, -360] }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              className="absolute -left-6 bottom-1/4 hidden h-16 w-16 bg-black/10 lg:block"
+            />
+            <motion.div
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute right-0 top-0 hidden h-12 w-12 -translate-y-1/2 translate-x-1/2 rounded-full bg-black/20 lg:block"
+            />
             <UploadDropzone
               onFileSelected={handleFileSelected}
               isBusy={isBusy}
@@ -264,7 +303,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={FADE_TRANSITION}
-                  className="mt-6 flex flex-col gap-4"
+                  className="mt-6 flex flex-col gap-4 z-10"
                 >
                   <div className="flex items-center gap-4">
                     <label className="text-sm font-semibold text-black">
@@ -322,64 +361,10 @@ export default function Home() {
                 </motion.div>
               )}
             </AnimatePresence>
-            <AnimatePresence initial={false}>
-              {!focusUpload ? (
-                <motion.div
-                  key="how"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={FADE_TRANSITION}
-                  className="mt-6 grid gap-3 rounded-2xl border border-black/10 bg-white/80 p-4 text-sm text-black/60"
-                >
-                  <p className="font-semibold text-black">How it works</p>
-                  <p>
-                    Upload a render, we send it to Gemini 3 Pro Image Preview, and
-                    reveal the photoreal version instantly.
-                  </p>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
           </motion.div>
         </motion.section>
 
-        <AnimatePresence initial={false}>
-          {!focusUpload ? (
-            <motion.section
-              key="features"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -24 }}
-              transition={FADE_TRANSITION}
-              className="grid gap-6 md:grid-cols-3"
-            >
-              {[
-                {
-                  title: "Material realism",
-                  copy: "Diffuse, glossy, and metal surfaces are rebalanced for real-world finish.",
-                },
-                {
-                  title: "Interior styling",
-                  copy: "Adds tasteful ambient lighting and spatial depth for design-forward visuals.",
-                },
-                {
-                  title: "Clean output",
-                  copy: "Perfect for decks, listings, and client-facing presentations.",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-3xl border border-black/10 bg-white/75 p-6 shadow-[0_24px_60px_-45px_rgba(12,12,12,0.5)]"
-                >
-                  <h3 className="text-lg font-semibold text-black">
-                    {item.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-black/60">{item.copy}</p>
-                </div>
-              ))}
-            </motion.section>
-          ) : null}
-        </AnimatePresence>
+        {!focusUpload ? <Examples /> : null}
       </motion.main>
     </div>
   );
