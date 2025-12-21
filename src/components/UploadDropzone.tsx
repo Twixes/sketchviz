@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { useUploadStore } from "@/stores/upload-store";
+import { UploadIcon } from "@radix-ui/react-icons";
 
 type UploadDropzoneProps = {
   onFileSelected: (file: File) => void;
@@ -217,7 +218,7 @@ export function UploadDropzone({
         ) : (
           <>
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-black text-white shadow-[0_10px_25px_-15px_rgba(0,0,0,0.5)]">
-              <span className="text-xs font-semibold tracking-[0.3em]">UP</span>
+              <UploadIcon className="size-6" />
             </div>
             <div className="space-y-2">
               <p className="text-xl font-semibold text-black">

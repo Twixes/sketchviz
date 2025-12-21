@@ -11,6 +11,7 @@ import { FunkyBackground } from "@/components/FunkyBackground";
 import { useUploadStore } from "@/stores/upload-store";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
+import { EnterIcon, ExitIcon } from '@radix-ui/react-icons'
 
 const LAYOUT_TRANSITION = { type: "spring", stiffness: 160, damping: 22 } as const;
 const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
@@ -138,14 +139,19 @@ export default function Home() {
               <p className="text-xs text-black/50">AI visualization studio</p>
             </div>
           </a>
-          {session && (
+          {session ? (
             <button
               onClick={handleSignOut}
-              className="rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
+              className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
             >
-              Log out
+               <ExitIcon/> Log out
             </button>
-          )}
+          ) : <button
+              onClick={handleSignIn}
+              className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
+            >
+               <EnterIcon/> Log in
+            </button>}
         </motion.header>
 
         <motion.section
@@ -177,8 +183,7 @@ export default function Home() {
                   </h1>
                   <p className="max-w-xl text-lg text-black/70">
                     Upload a render and get polished, photorealistic output with
-                    refined lighting, realistic materials, and professional depth—ready
-                    for decks, portfolios, and clients.
+                    refined lighting, realistic materials, and professional depth.
                   </p>
                 </div>
 
