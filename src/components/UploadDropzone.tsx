@@ -70,6 +70,23 @@ export function UploadDropzone({
   }, [inputSrc]);
 
   useEffect(() => {
+    const handlePaste = (event: ClipboardEvent) => {
+      const items = event.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.kind === "file" && ACCEPTED_MIME_TYPES.includes(item.type)) {
+          event.preventDefault();
+          handleFile(item.getAsFile() ?? null);
+        }
+      }
+    };
+    document.addEventListener("paste", handlePaste);
+    return () => {
+      document.removeEventListener("paste", handlePaste);
+    };
+  }, [handleFile]);
+
+  useEffect(() => {
     const outputEl = outputRef.current;
     if (!outputEl || !outputSrc) return;
 
@@ -216,7 +233,7 @@ export function UploadDropzone({
             </div>
             <div className="space-y-2">
               <p className="text-xl font-semibold text-black">
-                Drop your SketchUp render
+                Drop or paste your SketchUp render
               </p>
               <p className="text-sm text-black/60">
                 PNG, JPG, WEBP, HEIC, or HEIF – up to 20MB
