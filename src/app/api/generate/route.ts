@@ -2,15 +2,7 @@ import { NextResponse } from "next/server";
 import { del } from "@vercel/blob";
 
 import { generateVisualizationImage } from "@/lib/gemini";
-
-const ACCEPTED_MIME_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/heic",
-  "image/heif",
-];
-const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
 
 export const runtime = "nodejs";
 
@@ -49,7 +41,7 @@ export async function POST(request: Request) {
     const contentType = blobResponse.headers.get("content-type");
     const contentLength = blobResponse.headers.get("content-length");
 
-    if (!contentType || !ACCEPTED_MIME_TYPES.includes(contentType)) {
+    if (!contentType || !ACCEPTED_MIME_TYPES.includes(contentType as any)) {
       return NextResponse.json(
         {
           error: "Unsupported image format.",

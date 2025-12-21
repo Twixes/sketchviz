@@ -1,14 +1,6 @@
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
-
-const ACCEPTED_MIME_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'image/heic',
-  'image/heif',
-];
-const MAX_UPLOAD_BYTES = 20 * 1024 * 1024; // 20 MB
+import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from '@/lib/constants';
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;

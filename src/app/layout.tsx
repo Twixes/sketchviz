@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/auth";
 import { SessionProvider } from "@/components/SessionProvider";
+import { QueryProvider } from "@/components/QueryProvider";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -26,7 +27,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} antialiased`}>
-        <SessionProvider session={session}>{children}</SessionProvider>
+        <QueryProvider>
+          <SessionProvider session={session}>{children}</SessionProvider>
+        </QueryProvider>
       </body>
     </html>
   );

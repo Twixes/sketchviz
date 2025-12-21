@@ -1,115 +1,53 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { upload } from "@vercel/blob/client";
 import * as Select from "@radix-ui/react-select";
 import { useSession, signIn, signOut } from "next-auth/react";
 
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { Examples } from "@/components/Examples";
 import { FunkyBackground } from "@/components/FunkyBackground";
+import { useUploadStore } from "@/stores/upload-store";
+import { useUploadMutation } from "@/hooks/use-upload-mutation";
+import { useGenerateMutation } from "@/hooks/use-generate-mutation";
 
-const ACCEPTED_MIME_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/heic",
-  "image/heif",
-];
-const MAX_UPLOAD_MB = 20;
-const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
 const LAYOUT_TRANSITION = { type: "spring", stiffness: 160, damping: 22 } as const;
 const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 export default function Home() {
   const { data: session, status, update } = useSession();
-  const [inputSrc, setInputSrc] = useState<string | null>(null);
-  const [outputSrc, setOutputSrc] = useState<string | null>(null);
-  const [isBusy, setIsBusy] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-  const [lightConditions, setLightConditions] = useState<"sunny" | "overcast" | null>(null);
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
-  const uploadPromiseRef = useRef<Promise<string | null> | null>(null);
 
-  const acceptedFormats = useMemo(
-    () =>
-      ACCEPTED_MIME_TYPES.map((type) =>
-        type.replace("image/", "").toUpperCase(),
-      ).join(", "),
-    [],
+  // Zustand store
+  const {
+    inputSrc,
+    blobUrl,
+    lightConditions,
+    isGenerating,
+    focusUpload,
+    setLightConditions,
+    reset,
+  } = useUploadStore();
+
+  // TanStack Query mutations
+  const uploadMutation = useUploadMutation();
+  const generateMutation = useGenerateMutation();
+
+  const handleReset = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      reset();
+    },
+    [reset]
   );
 
-  const focusUpload = Boolean(inputSrc);
-
-  useEffect(() => {
-    return () => {
-      if (inputSrc?.startsWith("blob:")) {
-        URL.revokeObjectURL(inputSrc);
-      }
-    };
-  }, [inputSrc]);
-
-  // Sync isBusy with generating state only (not uploading)
-  useEffect(() => {
-    setIsBusy(isGenerating);
-  }, [isGenerating]);
-
-  const handleReset = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    setInputSrc(null);
-    setOutputSrc(null);
-    setError(null);
-    setBlobUrl(null);
-    setLightConditions(null);
-  }, []);
-
-  const handleFileSelected = useCallback(async (file: File) => {
-    setError(null);
-
-    if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
-      setError(`Unsupported format. Use ${acceptedFormats}.`);
-      return;
-    }
-
-    if (file.size > MAX_UPLOAD_BYTES) {
-      setError(`File too large. Max ${MAX_UPLOAD_MB}MB.`);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    setInputSrc(objectUrl);
-    setOutputSrc(null);
-    setBlobUrl(null);
-    setIsUploading(true);
-
-    // Store the upload promise so handleGenerate can wait for it
-    const uploadPromise = (async (): Promise<string | null> => {
-      try {
-        // Upload file to Vercel Blob
-        const blob = await upload(file.name, file, {
-          access: 'public',
-          handleUploadUrl: '/api/upload',
-        });
-
-        setBlobUrl(blob.url);
-        return blob.url;
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Something went wrong.";
-        setError(message);
-        return null;
-      } finally {
-        setIsUploading(false);
-        uploadPromiseRef.current = null;
-      }
-    })();
-
-    uploadPromiseRef.current = uploadPromise;
-    await uploadPromise;
-  }, [acceptedFormats]);
+  const handleFileSelected = useCallback(
+    async (file: File) => {
+      await uploadMutation.mutateAsync({ file });
+    },
+    [uploadMutation]
+  );
 
   const handleSignIn = useCallback(async () => {
     const width = 500;
@@ -152,51 +90,23 @@ export default function Home() {
   }, []);
 
   const handleGenerate = useCallback(async () => {
+    // Wait for upload to finish if it's still in progress
     let currentBlobUrl = blobUrl;
 
-    // Wait for upload to finish if it's still in progress
-    if (uploadPromiseRef.current) {
-      const uploadedUrl = await uploadPromiseRef.current;
-      if (!uploadedUrl) {
-        // Upload failed
-        return;
-      }
+    if (uploadMutation.isPending) {
+      const uploadedUrl = await uploadMutation.mutateAsync(
+        uploadMutation.variables!
+      );
       currentBlobUrl = uploadedUrl;
     }
 
     if (!currentBlobUrl) return;
 
-    setError(null);
-    setOutputSrc(null);
-    setIsGenerating(true);
-
-    try {
-      // Send blob URL to generation endpoint
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          blobUrl: currentBlobUrl,
-          outside_light_conditions: lightConditions,
-        }),
-      });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload?.error || "Generation failed.");
-      }
-
-      setOutputSrc(payload.outputImage as string);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong.";
-      setError(message);
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [blobUrl, lightConditions]);
+    await generateMutation.mutateAsync({
+      blobUrl: currentBlobUrl,
+      lightConditions,
+    });
+  }, [blobUrl, lightConditions, uploadMutation, generateMutation]);
 
   return (
     <FunkyBackground>
@@ -331,10 +241,6 @@ export default function Home() {
             />
             <UploadDropzone
               onFileSelected={handleFileSelected}
-              isBusy={isBusy}
-              error={error}
-              inputSrc={inputSrc}
-              outputSrc={outputSrc}
               frame={false}
               className={[
                 "min-h-[320px] border bg-white/85",

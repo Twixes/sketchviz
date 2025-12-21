@@ -3,34 +3,22 @@
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
-
-const ACCEPTED_MIME_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/heic",
-  "image/heif",
-];
+import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
+import { useUploadStore } from "@/stores/upload-store";
 
 type UploadDropzoneProps = {
   onFileSelected: (file: File) => void;
-  isBusy: boolean;
-  error?: string | null;
-  inputSrc?: string | null;
-  outputSrc?: string | null;
   frame?: boolean;
   className?: string;
 };
 
 export function UploadDropzone({
   onFileSelected,
-  isBusy,
-  error,
-  inputSrc,
-  outputSrc,
   frame = true,
   className,
 }: UploadDropzoneProps) {
+  // Get state from Zustand store
+  const { isBusy, error, inputSrc, outputSrc } = useUploadStore();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const outputRef = useRef<HTMLImageElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -74,7 +62,7 @@ export function UploadDropzone({
       const items = event.clipboardData?.items;
       if (!items) return;
       for (const item of items) {
-        if (item.kind === "file" && ACCEPTED_MIME_TYPES.includes(item.type)) {
+        if (item.kind === "file" && ACCEPTED_MIME_TYPES.includes(item.type as any)) {
           event.preventDefault();
           handleFile(item.getAsFile() ?? null);
         }
