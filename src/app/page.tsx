@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { upload } from "@vercel/blob/client";
 import * as Select from "@radix-ui/react-select";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { Examples } from "@/components/Examples";
@@ -21,6 +22,7 @@ const LAYOUT_TRANSITION = { type: "spring", stiffness: 160, damping: 22 } as con
 const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 export default function Home() {
+  const { data: session, status, update } = useSession();
   const [inputSrc, setInputSrc] = useState<string | null>(null);
   const [outputSrc, setOutputSrc] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
@@ -97,6 +99,46 @@ export default function Home() {
       setIsUploading(false);
     }
   }, [acceptedFormats]);
+
+  const handleSignIn = useCallback(async () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      '/auth/signin',
+      'Google Sign In',
+      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+    );
+
+    if (!popup) {
+      // Fallback if popup was blocked
+      await signIn("google");
+      return;
+    }
+
+    // Poll for popup closure and session changes
+    const checkInterval = setInterval(async () => {
+      if (popup.closed) {
+        clearInterval(checkInterval);
+        // Refresh session without page reload
+        await update();
+      }
+    }, 500);
+
+    // Cleanup interval after 5 minutes (timeout)
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      if (!popup.closed) {
+        popup.close();
+      }
+    }, 5 * 60 * 1000);
+  }, [update]);
+
+  const handleSignOut = useCallback(async () => {
+    await signOut();
+  }, []);
 
   const handleGenerate = useCallback(async () => {
     if (!blobUrl) return;
@@ -187,6 +229,14 @@ export default function Home() {
               <p className="text-xs text-black/50">AI visualization studio</p>
             </div>
           </a>
+          {session && (
+            <button
+              onClick={handleSignOut}
+              className="rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
+            >
+              Log out
+            </button>
+          )}
         </motion.header>
 
         <motion.section
@@ -347,16 +397,24 @@ export default function Home() {
                   </div>
 
                   <button
-                    onClick={handleGenerate}
-                    disabled={isUploading || isGenerating}
+                    onClick={!session ? handleSignIn : handleGenerate}
+                    disabled={isUploading || isGenerating || status === "loading"}
                     className={[
                       "rounded-xl px-6 py-3 text-sm font-semibold transition-all",
-                      isUploading || isGenerating
+                      isUploading || isGenerating || status === "loading"
                         ? "cursor-not-allowed bg-black/20 text-black/40"
                         : "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
                     ].join(" ")}
                   >
-                    {isGenerating ? "Generating..." : isUploading ? "Uploading..." : "Generate"}
+                    {isGenerating
+                      ? "Generating..."
+                      : isUploading
+                      ? "Uploading..."
+                      : status === "loading"
+                      ? "Loading..."
+                      : !session
+                      ? "Log in with Google"
+                      : "Generate"}
                   </button>
                 </motion.div>
               )}
