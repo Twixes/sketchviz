@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 
 const EXAMPLES = [
@@ -30,27 +30,33 @@ interface ExampleItemProps {
 function ExampleItem({ before, after, label }: ExampleItemProps) {
   const [revealPercent, setRevealPercent] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
+  
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  useEffect(() => {
     if (!isDragging) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setRevealPercent(percent);
-  };
-
-  const handleMouseDown = () => setIsDragging(true);
-  const handleMouseUp = () => setIsDragging(false);
-  const handleMouseLeave = () => setIsDragging(false);
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      const rect = containerRef.current?.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+      console.log({ label, mouseClientX: e.clientX, rectLeft: rect.left, x, percent });
+      setRevealPercent(percent);
+    };
+    const handleMouseUp = () => setIsDragging(false);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
 
   return (
-    <div className="flex select-none flex-col gap-3">
+    <div className="flex select-none flex-col gap-3" ref={containerRef}>
       <div
         className="relative aspect-[4/3] cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)]"
-        onMouseMove={handleMouseMove}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
+        onMouseDown={() => setIsDragging(true)}
       >
         {/* Before image (base layer - left side) */}
         <img
