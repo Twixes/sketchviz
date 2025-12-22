@@ -1,6 +1,7 @@
 "use client";
 
-import { UploadIcon } from "@radix-ui/react-icons";
+import { Half1Icon, Half2Icon, UploadIcon } from "@radix-ui/react-icons";
+import clsx from "clsx";
 import Image from "next/image";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -25,15 +26,9 @@ export function UploadDropzone({
   const outputRef = useRef<HTMLImageElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [isComparing, setIsComparing] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
   const accept = useMemo(() => ACCEPTED_MIME_TYPES.join(","), []);
-  const labels = useMemo(
-    () => ({
-      input: "SketchUp render",
-      output: "Photorealistic result",
-    }),
-    [],
-  );
 
   const handleFile = useCallback(
     (file: File | null) => {
@@ -157,6 +152,17 @@ export function UploadDropzone({
     [],
   );
 
+  const handleCompareStart = useCallback(
+    (event: React.MouseEvent | React.TouchEvent) => {
+      event.stopPropagation();
+      setIsComparing(true);
+    },
+    [],
+  );
+  const handleCompareEnd = useCallback(() => {
+    setIsComparing(false);
+  }, []);
+
   return (
     <div className="relative w-full">
       {isBusy ? <div className="loading-ring" aria-hidden /> : null}
@@ -190,31 +196,58 @@ export function UploadDropzone({
         }}
       >
         {inputSrc ? (
-          <>
+          <div>
             <img
               src={inputSrc}
-              alt={labels.input}
+              alt="Original"
               onLoad={handleInputLoad}
               className="absolute inset-0 h-full w-full object-cover"
             />
             <img
               ref={outputRef}
               src={outputSrc ?? inputSrc}
-              alt={labels.output}
+              alt="Result"
               className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300"
+              style={isComparing ? { visibility: "hidden" } : undefined}
             />
-            <div className="absolute left-4 top-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-black shadow-sm">
-              {labels.input}
-            </div>
-            {outputSrc ? (
-              <div className="absolute right-4 top-4 rounded-full bg-black px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                {isReady ? labels.output : "Rendering..."}
+            {outputSrc && (
+              <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
+                <div
+                  className={clsx(
+                    "rounded-full px-3 py-1 text-xs font-semibold shadow-sm",
+                    !isComparing
+                      ? "bg-black/80 text-white"
+                      : "bg-white/80 text-black",
+                  )}
+                >
+                  {isComparing
+                    ? "Original"
+                    : isReady
+                      ? "Result"
+                      : "Rendering..."}
+                </div>
+                {isReady ? (
+                  <button
+                    type="button"
+                    onMouseDown={handleCompareStart}
+                    onMouseUp={handleCompareEnd}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    title="Compare with original"
+                    className={clsx(
+                      "flex items-center justify-center rounded-full p-1.5 shadow-sm hover:rotate-45 cursor-pointer",
+                      !isComparing
+                        ? "bg-black/80 text-white"
+                        : "bg-white/80 text-black",
+                    )}
+                  >
+                    <Half2Icon className="size-4" />
+                  </button>
+                ) : null}
               </div>
-            ) : null}
-            <div className="absolute bottom-4 left-4 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-black shadow-sm">
-              Click to replace
-            </div>
-          </>
+            )}
+          </div>
         ) : (
           <>
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-black text-white shadow-[0_10px_25px_-15px_rgba(0,0,0,0.5)]">

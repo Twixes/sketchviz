@@ -14,13 +14,17 @@ export async function generateVisualizationImage(params: {
   mediaType: string;
   filename?: string;
   outsideLightConditions?: "sunny" | "overcast" | null;
+  editDescription?: string | null;
 }): Promise<GeneratedImage> {
-  // Build the prompt based on light conditions
+  // Build the prompt based on light conditions and edit description
   let prompt = BASE_PROMPT;
   if (params.outsideLightConditions === "sunny") {
     prompt += " with sunny outdoor lighting";
   } else if (params.outsideLightConditions === "overcast") {
     prompt += " with overcast outdoor lighting";
+  }
+  if (params.editDescription) {
+    prompt += `. ${params.editDescription}`;
   }
   const model = google(MODEL_ID);
   const result = await model.doGenerate({

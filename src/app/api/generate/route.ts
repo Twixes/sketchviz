@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { blobUrl, outside_light_conditions } = body;
+  const { blobUrl, outside_light_conditions, edit_description } = body;
 
   if (!blobUrl || typeof blobUrl !== "string") {
     return NextResponse.json({ error: "Missing blob URL." }, { status: 400 });
@@ -25,6 +25,18 @@ export async function POST(request: Request) {
         error:
           "Invalid outside_light_conditions. Must be 'sunny', 'overcast', or null.",
       },
+      { status: 400 },
+    );
+  }
+
+  // Validate edit_description if provided
+  if (
+    edit_description !== undefined &&
+    edit_description !== null &&
+    typeof edit_description !== "string"
+  ) {
+    return NextResponse.json(
+      { error: "Invalid edit_description. Must be a string or null." },
       { status: 400 },
     );
   }
@@ -70,6 +82,7 @@ export async function POST(request: Request) {
       mediaType: contentType,
       filename,
       outsideLightConditions: outside_light_conditions,
+      editDescription: edit_description,
     });
 
     // Delete the temporary blob after processing

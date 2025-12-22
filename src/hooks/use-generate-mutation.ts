@@ -4,6 +4,7 @@ import { useUploadStore } from "@/stores/upload-store";
 interface GenerateParams {
   blobUrl: string;
   lightConditions: "sunny" | "overcast" | null;
+  editDescription: string | null;
 }
 
 interface GenerateResponse {
@@ -18,6 +19,7 @@ export function useGenerateMutation() {
     mutationFn: async ({
       blobUrl,
       lightConditions,
+      editDescription,
     }: GenerateParams): Promise<string> => {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -27,6 +29,7 @@ export function useGenerateMutation() {
         body: JSON.stringify({
           blobUrl,
           outside_light_conditions: lightConditions,
+          edit_description: editDescription,
         }),
       });
 

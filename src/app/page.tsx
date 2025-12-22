@@ -30,9 +30,11 @@ export default function Home() {
     inputSrc,
     blobUrl,
     lightConditions,
+    editDescription,
     isGenerating,
     focusUpload,
     setLightConditions,
+    setEditDescription,
     reset,
   } = useUploadStore();
 
@@ -117,8 +119,15 @@ export default function Home() {
     await generateMutation.mutateAsync({
       blobUrl: currentBlobUrl,
       lightConditions,
+      editDescription,
     });
-  }, [blobUrl, lightConditions, uploadMutation, generateMutation]);
+  }, [
+    blobUrl,
+    lightConditions,
+    editDescription,
+    uploadMutation,
+    generateMutation,
+  ]);
 
   return (
     <FunkyBackground>
@@ -296,9 +305,9 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={FADE_TRANSITION}
-                  className="mt-6 flex flex-col gap-4 z-10"
+                  className="mt-3 flex flex-col gap-3 z-10"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <label
                       htmlFor="light-conditions"
                       className="text-sm font-semibold text-black"
@@ -346,6 +355,21 @@ export default function Home() {
                     </Select.Root>
                   </div>
 
+                  <textarea
+                    id="edit-description"
+                    value={editDescription ?? ""}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                        e.preventDefault();
+                        handleGenerate();
+                      }
+                    }}
+                    onChange={(e) => setEditDescription(e.target.value || null)}
+                    placeholder="Request edits (optional)"
+                    rows={2}
+                    className="rounded-xl border border-black/20 bg-white px-4 py-2 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-none"
+                  />
+
                   <button
                     type="submit"
                     onClick={!user ? handleSignIn : handleGenerate}
@@ -358,14 +382,14 @@ export default function Home() {
                     ].join(" ")}
                   >
                     {isGenerating ? (
-                      "Generating..."
+                      "Visualizing…"
                     ) : !user ? (
                       <>
                         <EnterIcon /> Log in with Google to complete
                         visualization
                       </>
                     ) : (
-                      "Generate"
+                      "Visualize"
                     )}
                   </button>
                 </motion.div>

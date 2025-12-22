@@ -11,6 +11,7 @@ interface UploadState {
   // UI state
   error: string | null;
   lightConditions: LightConditions;
+  editDescription: string | null;
 
   // Loading states
   isUploading: boolean;
@@ -26,6 +27,7 @@ interface UploadState {
   setBlobUrl: (url: string | null) => void;
   setError: (error: string | null) => void;
   setLightConditions: (conditions: LightConditions) => void;
+  setEditDescription: (description: string | null) => void;
   setIsUploading: (isUploading: boolean) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   reset: () => void;
@@ -37,6 +39,7 @@ const initialState = {
   blobUrl: null,
   error: null,
   lightConditions: null as LightConditions,
+  editDescription: null,
   isUploading: false,
   isGenerating: false,
 };
@@ -67,6 +70,7 @@ export const useUploadStore = create<UploadState>((set, get) => ({
   setBlobUrl: (url) => set({ blobUrl: url }),
   setError: (error) => set({ error }),
   setLightConditions: (conditions) => set({ lightConditions: conditions }),
+  setEditDescription: (description) => set({ editDescription: description }),
   setIsUploading: (isUploading) => set({ isUploading }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),
 

@@ -32,6 +32,9 @@ importers:
       '@vercel/blob':
         specifier: ^2.0.0
         version: 2.0.0
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
       motion:
         specifier: ^12.23.26
         version: 12.23.26(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -1481,6 +1484,10 @@ packages:
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+
+  clsx@2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
 
   commander@7.2.0:
     resolution: {integrity: sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==}
@@ -3605,6 +3612,8 @@ snapshots:
   caniuse-lite@1.0.30001761: {}
 
   client-only@0.0.1: {}
+
+  clsx@2.1.1: {}
 
   commander@7.2.0: {}
 
