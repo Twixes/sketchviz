@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { LightConditions } from "@/lib/schemas";
+import type { IndoorLight, OutdoorLight } from "@/lib/schemas";
 
 interface UploadState {
   // Image sources
@@ -9,7 +9,8 @@ interface UploadState {
 
   // UI state
   error: string | null;
-  lightConditions: LightConditions;
+  outdoorLight: OutdoorLight;
+  indoorLight: IndoorLight;
   editDescription: string | null;
 
   // Loading states
@@ -25,7 +26,8 @@ interface UploadState {
   setOutputSrc: (src: string | null) => void;
   setBlobUrl: (url: string | null) => void;
   setError: (error: string | null) => void;
-  setLightConditions: (conditions: LightConditions) => void;
+  setOutdoorLight: (light: OutdoorLight) => void;
+  setIndoorLight: (light: IndoorLight) => void;
   setEditDescription: (description: string | null) => void;
   setIsUploading: (isUploading: boolean) => void;
   setIsGenerating: (isGenerating: boolean) => void;
@@ -37,7 +39,8 @@ const initialState = {
   outputSrc: null,
   blobUrl: null,
   error: null,
-  lightConditions: null as LightConditions,
+  outdoorLight: null as OutdoorLight,
+  indoorLight: null as IndoorLight,
   editDescription: null,
   isUploading: false,
   isGenerating: false,
@@ -68,7 +71,8 @@ export const useUploadStore = create<UploadState>((set, get) => ({
   setOutputSrc: (src) => set({ outputSrc: src }),
   setBlobUrl: (url) => set({ blobUrl: url }),
   setError: (error) => set({ error }),
-  setLightConditions: (conditions) => set({ lightConditions: conditions }),
+  setOutdoorLight: (light) => set({ outdoorLight: light }),
+  setIndoorLight: (light) => set({ indoorLight: light }),
   setEditDescription: (description) => set({ editDescription: description }),
   setIsUploading: (isUploading) => set({ isUploading }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),

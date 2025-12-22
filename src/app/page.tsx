@@ -4,8 +4,8 @@ import {
   DotFilledIcon,
   EnterIcon,
   ExitIcon,
+  LightningBoltIcon,
   MagicWandIcon,
-  MoonIcon,
   StarIcon,
   SunIcon,
 } from "@radix-ui/react-icons";
@@ -38,11 +38,13 @@ export default function Home() {
   const {
     inputSrc,
     blobUrl,
-    lightConditions,
+    outdoorLight,
+    indoorLight,
     editDescription,
     isGenerating,
     focusUpload,
-    setLightConditions,
+    setOutdoorLight,
+    setIndoorLight,
     setEditDescription,
     reset,
   } = useUploadStore();
@@ -127,12 +129,14 @@ export default function Home() {
 
     await generateMutation.mutateAsync({
       blobUrl: currentBlobUrl,
-      lightConditions,
+      outdoorLight,
+      indoorLight,
       editDescription,
     });
   }, [
     blobUrl,
-    lightConditions,
+    outdoorLight,
+    indoorLight,
     editDescription,
     uploadMutation,
     generateMutation,
@@ -315,62 +319,115 @@ export default function Home() {
                   transition={FADE_TRANSITION}
                   className="mt-3 flex flex-col gap-3 z-10"
                 >
-                  <div className="flex items-center gap-2">
-                    <label
-                      htmlFor="light-conditions"
-                      className="text-sm font-semibold text-black"
-                    >
-                      Light conditions:
-                    </label>
-                    <Select.Root
-                      value={lightConditions ?? "auto"}
-                      onValueChange={(value) =>
-                        setLightConditions(
-                          value === "auto"
-                            ? null
-                            : (value as "sunny" | "overcast" | "night"),
-                        )
-                      }
-                    >
-                      <Select.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-[140px]">
-                        <Select.Value />
-                        <Select.Icon className="text-black/60">▼</Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Content className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-lg">
-                          <Select.Viewport className="p-1">
-                            <Select.Item
-                              value="auto"
-                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                            >
-                              <MagicWandIcon className="size-4" />
-                              <Select.ItemText>Auto</Select.ItemText>
-                            </Select.Item>
-                            <Select.Item
-                              value="sunny"
-                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                            >
-                              <SunIcon className="size-4" />
-                              <Select.ItemText>Sunny</Select.ItemText>
-                            </Select.Item>
-                            <Select.Item
-                              value="overcast"
-                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                            >
-                              <DotFilledIcon className="size-4" />
-                              <Select.ItemText>Overcast</Select.ItemText>
-                            </Select.Item>
-                            <Select.Item
-                              value="night"
-                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                            >
-                              <StarIcon className="size-4" />
-                              <Select.ItemText>Night</Select.ItemText>
-                            </Select.Item>
-                          </Select.Viewport>
-                        </Select.Content>
-                      </Select.Portal>
-                    </Select.Root>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor="outdoor-light"
+                        className="text-sm font-semibold text-black"
+                      >
+                        Outdoor light:
+                      </label>
+                      <Select.Root
+                        value={outdoorLight ?? "auto"}
+                        onValueChange={(value) =>
+                          setOutdoorLight(
+                            value === "auto"
+                              ? null
+                              : (value as "sunny" | "overcast" | "night"),
+                          )
+                        }
+                      >
+                        <Select.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+                          <Select.Value />
+                          <Select.Icon className="text-black/60">▼</Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Content className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-lg">
+                            <Select.Viewport className="p-1">
+                              <Select.Item
+                                value="auto"
+                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              >
+                                <MagicWandIcon className="size-4" />
+                                <Select.ItemText>Auto</Select.ItemText>
+                              </Select.Item>
+                              <Select.Item
+                                value="sunny"
+                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              >
+                                <SunIcon className="size-4" />
+                                <Select.ItemText>Sunny</Select.ItemText>
+                              </Select.Item>
+                              <Select.Item
+                                value="overcast"
+                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              >
+                                <DotFilledIcon className="size-4" />
+                                <Select.ItemText>Overcast</Select.ItemText>
+                              </Select.Item>
+                              <Select.Item
+                                value="night"
+                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              >
+                                <StarIcon className="size-4" />
+                                <Select.ItemText>Night</Select.ItemText>
+                              </Select.Item>
+                            </Select.Viewport>
+                          </Select.Content>
+                        </Select.Portal>
+                      </Select.Root>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor="indoor-light"
+                        className="text-sm font-semibold text-black"
+                      >
+                        Indoor lighting:
+                      </label>
+                      <Select.Root
+                        value={indoorLight ?? "auto"}
+                        onValueChange={(value) =>
+                          setIndoorLight(
+                            value === "auto"
+                              ? null
+                              : (value as "all_off" | "all_on"),
+                          )
+                        }
+                      >
+                        <Select.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+                          <Select.Value />
+                          <Select.Icon className="text-black/60">▼</Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Content className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-lg">
+                            <Select.Viewport className="p-1">
+                              <Select.Item
+                                value="auto"
+                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              >
+                                <MagicWandIcon className="size-4" />
+                                <Select.ItemText>Auto</Select.ItemText>
+                              </Select.Item>
+                              <Select.Item
+                                value="all_off"
+                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              >
+                                <DotFilledIcon className="size-4" />
+                                <Select.ItemText>All off</Select.ItemText>
+                              </Select.Item>
+                              <Select.Item
+                                value="all_on"
+                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              >
+                                <LightningBoltIcon className="size-4" />
+                                <Select.ItemText>All on</Select.ItemText>
+                              </Select.Item>
+                            </Select.Viewport>
+                          </Select.Content>
+                        </Select.Portal>
+                      </Select.Root>
+                    </div>
                   </div>
 
                   <textarea

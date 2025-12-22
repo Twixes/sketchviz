@@ -1,16 +1,22 @@
 import { z } from "zod";
 
-// Light conditions schema
-export const lightConditionsSchema = z
+// Outdoor light schema
+export const outdoorLightSchema = z
   .enum(["sunny", "overcast", "night"])
   .nullable();
 
-export type LightConditions = z.infer<typeof lightConditionsSchema>;
+export type OutdoorLight = z.infer<typeof outdoorLightSchema>;
+
+// Indoor light schema
+export const indoorLightSchema = z.enum(["all_off", "all_on"]).nullable();
+
+export type IndoorLight = z.infer<typeof indoorLightSchema>;
 
 // Generate request schema
 export const generateRequestSchema = z.object({
   blobUrl: z.string().min(1, "Missing blob URL."),
-  outside_light_conditions: lightConditionsSchema.optional(),
+  outdoor_light: outdoorLightSchema.optional(),
+  indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
 });
 

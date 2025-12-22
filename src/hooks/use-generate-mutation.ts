@@ -1,9 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
+import type { IndoorLight, OutdoorLight } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
 interface GenerateParams {
   blobUrl: string;
-  lightConditions: "sunny" | "overcast" | "night" | null;
+  outdoorLight: OutdoorLight;
+  indoorLight: IndoorLight;
   editDescription: string | null;
 }
 
@@ -18,7 +20,8 @@ export function useGenerateMutation() {
   return useMutation({
     mutationFn: async ({
       blobUrl,
-      lightConditions,
+      outdoorLight,
+      indoorLight,
       editDescription,
     }: GenerateParams): Promise<string> => {
       const response = await fetch("/api/generate", {
@@ -28,7 +31,8 @@ export function useGenerateMutation() {
         },
         body: JSON.stringify({
           blobUrl,
-          outside_light_conditions: lightConditions,
+          outdoor_light: outdoorLight,
+          indoor_light: indoorLight,
           edit_description: editDescription,
         }),
       });

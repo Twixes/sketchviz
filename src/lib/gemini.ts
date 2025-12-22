@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import type { LightConditions } from "./schemas";
+import type { IndoorLight, OutdoorLight } from "./schemas";
 
 const MODEL_ID = "gemini-3-pro-image-preview";
 const BASE_PROMPT =
@@ -14,18 +14,29 @@ export async function generateVisualizationImage(params: {
   base64Data: string;
   mediaType: string;
   filename?: string;
-  outsideLightConditions?: LightConditions;
+  outdoorLight?: OutdoorLight;
+  indoorLight?: IndoorLight;
   editDescription?: string | null;
 }): Promise<GeneratedImage> {
   // Build the prompt based on light conditions and edit description
   let prompt = BASE_PROMPT;
-  if (params.outsideLightConditions === "sunny") {
+
+  // Handle outdoor lighting
+  if (params.outdoorLight === "sunny") {
     prompt += " with sunny outdoor lighting";
-  } else if (params.outsideLightConditions === "overcast") {
+  } else if (params.outdoorLight === "overcast") {
     prompt += " with overcast outdoor lighting";
-  } else if (params.outsideLightConditions === "night") {
+  } else if (params.outdoorLight === "night") {
     prompt += " with night-time outdoor lighting";
   }
+
+  // Handle indoor lighting
+  if (params.indoorLight === "all_off") {
+    prompt += ", all indoor lights are off";
+  } else if (params.indoorLight === "all_on") {
+    prompt += ", all indoor lights are on";
+  }
+
   if (params.editDescription) {
     prompt += `. ${params.editDescription}`;
   }

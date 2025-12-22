@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: firstError.message }, { status: 400 });
   }
 
-  const { blobUrl, outside_light_conditions, edit_description } =
+  const { blobUrl, outdoor_light, indoor_light, edit_description } =
     validation.data;
 
   try {
@@ -59,7 +59,8 @@ export async function POST(request: Request) {
       base64Data,
       mediaType: contentType,
       filename,
-      outsideLightConditions: outside_light_conditions,
+      outdoorLight: outdoor_light,
+      indoorLight: indoor_light,
       editDescription: edit_description,
     });
 
