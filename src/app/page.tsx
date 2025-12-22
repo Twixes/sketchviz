@@ -1,6 +1,14 @@
 "use client";
 
-import { EnterIcon, ExitIcon } from "@radix-ui/react-icons";
+import {
+  DotFilledIcon,
+  EnterIcon,
+  ExitIcon,
+  MagicWandIcon,
+  MoonIcon,
+  StarIcon,
+  SunIcon,
+} from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
@@ -320,7 +328,7 @@ export default function Home() {
                         setLightConditions(
                           value === "auto"
                             ? null
-                            : (value as "sunny" | "overcast"),
+                            : (value as "sunny" | "overcast" | "night"),
                         )
                       }
                     >
@@ -333,21 +341,31 @@ export default function Home() {
                           <Select.Viewport className="p-1">
                             <Select.Item
                               value="auto"
-                              className="relative flex cursor-pointer items-center rounded-lg px-8 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
                             >
+                              <MagicWandIcon className="size-4" />
                               <Select.ItemText>Auto</Select.ItemText>
                             </Select.Item>
                             <Select.Item
                               value="sunny"
-                              className="relative flex cursor-pointer items-center rounded-lg px-8 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
                             >
+                              <SunIcon className="size-4" />
                               <Select.ItemText>Sunny</Select.ItemText>
                             </Select.Item>
                             <Select.Item
                               value="overcast"
-                              className="relative flex cursor-pointer items-center rounded-lg px-8 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
                             >
+                              <DotFilledIcon className="size-4" />
                               <Select.ItemText>Overcast</Select.ItemText>
+                            </Select.Item>
+                            <Select.Item
+                              value="night"
+                              className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
+                            >
+                              <StarIcon className="size-4" />
+                              <Select.ItemText>Night</Select.ItemText>
                             </Select.Item>
                           </Select.Viewport>
                         </Select.Content>

@@ -3,7 +3,7 @@ import { useUploadStore } from "@/stores/upload-store";
 
 interface GenerateParams {
   blobUrl: string;
-  lightConditions: "sunny" | "overcast" | null;
+  lightConditions: "sunny" | "overcast" | "night" | null;
   editDescription: string | null;
 }
 

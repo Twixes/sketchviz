@@ -1,4 +1,5 @@
 import { google } from "@ai-sdk/google";
+import type { LightConditions } from "./schemas";
 
 const MODEL_ID = "gemini-3-pro-image-preview";
 const BASE_PROMPT =
@@ -13,7 +14,7 @@ export async function generateVisualizationImage(params: {
   base64Data: string;
   mediaType: string;
   filename?: string;
-  outsideLightConditions?: "sunny" | "overcast" | null;
+  outsideLightConditions?: LightConditions;
   editDescription?: string | null;
 }): Promise<GeneratedImage> {
   // Build the prompt based on light conditions and edit description
@@ -22,6 +23,8 @@ export async function generateVisualizationImage(params: {
     prompt += " with sunny outdoor lighting";
   } else if (params.outsideLightConditions === "overcast") {
     prompt += " with overcast outdoor lighting";
+  } else if (params.outsideLightConditions === "night") {
+    prompt += " with night-time outdoor lighting";
   }
   if (params.editDescription) {
     prompt += `. ${params.editDescription}`;

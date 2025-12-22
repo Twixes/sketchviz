@@ -2,44 +2,22 @@ import { del } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
 import { generateVisualizationImage } from "@/lib/gemini";
+import { generateRequestSchema } from "@/lib/schemas";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const { blobUrl, outside_light_conditions, edit_description } = body;
 
-  if (!blobUrl || typeof blobUrl !== "string") {
-    return NextResponse.json({ error: "Missing blob URL." }, { status: 400 });
+  // Validate request body with Zod
+  const validation = generateRequestSchema.safeParse(body);
+  if (!validation.success) {
+    const firstError = validation.error.issues[0];
+    return NextResponse.json({ error: firstError.message }, { status: 400 });
   }
 
-  // Validate outside_light_conditions if provided
-  if (
-    outside_light_conditions !== undefined &&
-    outside_light_conditions !== null &&
-    outside_light_conditions !== "sunny" &&
-    outside_light_conditions !== "overcast"
-  ) {
-    return NextResponse.json(
-      {
-        error:
-          "Invalid outside_light_conditions. Must be 'sunny', 'overcast', or null.",
-      },
-      { status: 400 },
-    );
-  }
-
-  // Validate edit_description if provided
-  if (
-    edit_description !== undefined &&
-    edit_description !== null &&
-    typeof edit_description !== "string"
-  ) {
-    return NextResponse.json(
-      { error: "Invalid edit_description. Must be a string or null." },
-      { status: 400 },
-    );
-  }
+  const { blobUrl, outside_light_conditions, edit_description } =
+    validation.data;
 
   try {
     // Fetch the file from Vercel Blob

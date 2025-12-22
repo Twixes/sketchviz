@@ -1,6 +1,5 @@
 import { create } from "zustand";
-
-export type LightConditions = "sunny" | "overcast" | null;
+import type { LightConditions } from "@/lib/schemas";
 
 interface UploadState {
   // Image sources
