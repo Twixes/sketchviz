@@ -8,6 +8,7 @@ interface GenerateParams {
 
 interface GenerateResponse {
   outputImage: string;
+  error?: string;
 }
 
 export function useGenerateMutation() {
@@ -32,7 +33,7 @@ export function useGenerateMutation() {
       const payload: GenerateResponse = await response.json();
 
       if (!response.ok) {
-        throw new Error((payload as any)?.error || "Generation failed.");
+        throw new Error(payload.error || "Generation failed.");
       }
 
       return payload.outputImage;

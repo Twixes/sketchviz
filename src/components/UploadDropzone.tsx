@@ -1,11 +1,12 @@
 "use client";
 
+import { UploadIcon } from "@radix-ui/react-icons";
+import Image from "next/image";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { useUploadStore } from "@/stores/upload-store";
-import { UploadIcon } from "@radix-ui/react-icons";
 
 type UploadDropzoneProps = {
   onFileSelected: (file: File) => void;
@@ -63,7 +64,7 @@ export function UploadDropzone({
       const items = event.clipboardData?.items;
       if (!items) return;
       for (const item of items) {
-        if (item.kind === "file" && ACCEPTED_MIME_TYPES.includes(item.type as any)) {
+        if (item.kind === "file" && ACCEPTED_MIME_TYPES.includes(item.type)) {
           event.preventDefault();
           handleFile(item.getAsFile() ?? null);
         }
@@ -159,6 +160,7 @@ export function UploadDropzone({
   return (
     <div className="relative w-full">
       {isBusy ? <div className="loading-ring" aria-hidden /> : null}
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
         className={[
           "group relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden text-center transition",
@@ -180,8 +182,6 @@ export function UploadDropzone({
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
-        role="button"
-        tabIndex={0}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -225,14 +225,14 @@ export function UploadDropzone({
                 Drop or paste your SketchUp render
               </p>
               <p className="text-sm text-black/60">
-                PNG, JPG, WEBP, HEIC, or HEIF – up to 20MB
+                PNG, JPG, WEBP, HEIC, or HEIF – up to 20 MB
               </p>
             </div>
             <div className="flex items-center gap-3">
               <span className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white">
                 {isBusy ? "Generating..." : "Choose file"}
               </span>
-              <span className="text-xs text-black/40">Try for free upon signup</span>
+              <span className="text-xs text-black/40">Try for free</span>
             </div>
           </>
         )}
@@ -245,9 +245,7 @@ export function UploadDropzone({
           onChange={(event) => handleFile(event.target.files?.[0] ?? null)}
         />
       </div>
-      {error ? (
-        <p className="mt-3 text-sm text-red-600">{error}</p>
-      ) : null}
+      {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
     </div>
   );
 }

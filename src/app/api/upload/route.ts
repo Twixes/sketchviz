@@ -1,6 +1,6 @@
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
-import { NextResponse } from 'next/server';
-import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from '@/lib/constants';
+import { type HandleUploadBody, handleUpload } from "@vercel/blob/client";
+import { NextResponse } from "next/server";
+import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -9,7 +9,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (pathname, clientPayload) => {
+      onBeforeGenerateToken: async (_pathname, _clientPayload) => {
         // Generate token with file constraints
         // Validation will happen in the generate endpoint
         return {
@@ -20,7 +20,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       onUploadCompleted: async ({ blob }) => {
         // File has been uploaded successfully
-        console.log('Blob uploaded:', blob.url);
+        console.log("Blob uploaded:", blob.url);
       },
     });
 
@@ -28,7 +28,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

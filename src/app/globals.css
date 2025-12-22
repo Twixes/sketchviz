@@ -1,169 +1,202 @@
 @import "tailwindcss";
 
 :root {
-    --background: #fdf7ef;
-    --foreground: #111111;
-    --accent-coral: #ff6b6b;
-    --accent-cobalt: #295bff;
-    --accent-mint: #16c79a;
-    --accent-sun: #ffd166;
-    --accent-ink: #121212;
+  --background: #fdf7ef;
+  --foreground: #111111;
+  --accent-coral: #ff6b6b;
+  --accent-cobalt: #295bff;
+  --accent-mint: #16c79a;
+  --accent-sun: #ffd166;
+  --accent-ink: #121212;
 }
 
 @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-outfit);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-outfit);
 }
 
 body {
-    min-height: 100%;
-    background: radial-gradient(900px 500px at 85% -10%, rgba(255, 107, 107, 0.18), transparent 60%),
-        radial-gradient(700px 520px at -10% 20%, rgba(41, 91, 255, 0.16), transparent 60%),
-        linear-gradient(180deg, #fdf7ef 0%, #fff9f2 100%);
-    color: var(--foreground);
-    font-family: var(--font-outfit), "Outfit", system-ui, sans-serif;
+  min-height: 100%;
+  background:
+    radial-gradient(
+      900px 500px at 85% -10%,
+      rgba(255, 107, 107, 0.18),
+      transparent 60%
+    ),
+    radial-gradient(
+      700px 520px at -10% 20%,
+      rgba(41, 91, 255, 0.16),
+      transparent 60%
+    ), linear-gradient(180deg, #fdf7ef 0%, #fff9f2 100%);
+  color: var(--foreground);
+  font-family: var(--font-outfit), "Outfit", system-ui, sans-serif;
 }
 
 .memphis-shell {
-    position: relative;
-    overflow: hidden;
+  position: relative;
+  overflow: hidden;
 }
 
 .memphis-shell::before {
-    content: "";
-    position: absolute;
-    inset: -14rem;
-    background-image: radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.08) 1px, transparent 0),
-        radial-gradient(circle at 30% 30%, rgba(255, 107, 107, 0.2), transparent 55%),
-        radial-gradient(circle at 70% 70%, rgba(22, 199, 154, 0.15), transparent 55%);
-    background-size: 22px 22px, 900px 900px, 800px 800px;
-    opacity: 0.8;
-    pointer-events: none;
-    z-index: 0;
+  content: "";
+  position: absolute;
+  inset: -14rem;
+  background-image:
+    radial-gradient(
+      circle at 1px 1px,
+      rgba(17, 17, 17, 0.08) 1px,
+      transparent 0
+    ),
+    radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 107, 107, 0.2),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 70% 70%,
+      rgba(22, 199, 154, 0.15),
+      transparent 55%
+    );
+  background-size:
+    22px 22px,
+    900px 900px,
+    800px 800px;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .memphis-shell > * {
-    position: relative;
-    z-index: 1;
+  position: relative;
+  z-index: 1;
 }
 
 @supports (--webkit-text-stroke: 1px var(--accent-ink)) {
-    .outline-title {
-        -webkit-text-stroke: 1.25px var(--accent-ink);
-        -webkit-text-fill-color: transparent;
-    }
+  .outline-title {
+    -webkit-text-stroke: 1.25px var(--accent-ink);
+    -webkit-text-fill-color: transparent;
+  }
 }
 
 .gradient-title {
+  background: linear-gradient(
+    120deg,
+    var(--accent-ink) 0%,
+    var(--accent-cobalt) 26%,
+    var(--accent-coral) 76%,
+    var(--accent-sun) 100%
+  );
+  @supports (background: linear-gradient(in oklch, red, blue)) {
+    /* If possible, we use oklch blending, which allows for a far livelier gradient */
     background: linear-gradient(
-        120deg,
-        var(--accent-ink) 0%,
-        var(--accent-cobalt) 26%,
-        var(--accent-coral) 76%,
-        var(--accent-sun) 100%
+      120deg in oklch,
+      var(--accent-cobalt) 0%,
+      var(--accent-coral) 50%,
+      var(--accent-sun) 100%
     );
-    @supports (background: linear-gradient(in oklch, red, blue)) {
-        /* If possible, we use oklch blending, which allows for a far livelier gradient */
-        background: linear-gradient(
-            120deg in oklch,
-            var(--accent-cobalt) 0%,
-            var(--accent-coral) 50%,
-            var(--accent-sun) 100%
-        );
-    }
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  }
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .loading-ring {
-    --ring-size: 6px;
-    --ring-radius: 1.5rem;
-    position: absolute;
-    inset: calc(-1 * var(--ring-size));
-    border-radius: calc(var(--ring-radius) + var(--ring-size));
-    padding: var(--ring-size);
-    background: conic-gradient(from -90deg, #000 0deg, #000 var(--ring-progress), transparent var(--ring-progress));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    box-sizing: border-box;
-    animation: ring-progress 3600s ease-in-out infinite;
-    opacity: 0.75;
-    pointer-events: none;
+  --ring-size: 6px;
+  --ring-radius: 1.5rem;
+  position: absolute;
+  inset: calc(-1 * var(--ring-size));
+  border-radius: calc(var(--ring-radius) + var(--ring-size));
+  padding: var(--ring-size);
+  background: conic-gradient(
+    from -90deg,
+    #000 0deg,
+    #000 var(--ring-progress),
+    transparent var(--ring-progress)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  box-sizing: border-box;
+  animation: ring-progress 3600s ease-in-out infinite;
+  opacity: 0.75;
+  pointer-events: none;
 }
 
 @property --ring-progress {
-    syntax: "<angle>";
-    inherits: false;
-    initial-value: 0deg;
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 @keyframes ring-progress {
-    0% {
-        --ring-progress: 0deg;
-    }
-    /* 3s / 3600s = 0.0833% */
-    0.08% {
-        /* 3 seconds */
-        --ring-progress: 240deg;
-    }
-    0.17% {
-        /* 6 seconds */
-        --ring-progress: 270deg;
-    }
-    0.33% {
-        /* 12 seconds */
-        --ring-progress: 290deg;
-    }
-    0.67% {
-        /* 24 seconds */
-        --ring-progress: 310deg;
-    }
-    1.11% {
-        /* 40 seconds */
-        --ring-progress: 330deg;
-    }
-    1.67% {
-        /* 60 seconds */
-        --ring-progress: 340deg;
-    }
-    2.5% {
-        /* 90 seconds */
-        --ring-progress: 345deg;
-    }
-    5% {
-        /* 180 seconds */
-        --ring-progress: 348deg;
-    }
-    10% {
-        /* 360 seconds */
-        --ring-progress: 352deg;
-    }
-    20% {
-        /* 720 seconds */
-        --ring-progress: 355deg;
-    }
-    30% {
-        /* 1080 seconds */
-        --ring-progress: 356.5deg;
-    }
-    50% {
-        /* 1800 seconds */
-        --ring-progress: 358deg;
-    }
-    75% {
-        /* 2700 seconds */
-        --ring-progress: 359deg;
-    }
-    90% {
-        /* 3240 seconds */
-        --ring-progress: 359.5deg;
-    }
-    100% {
-        /* 3600 seconds */
-        --ring-progress: 360deg;
-    }
+  0% {
+    --ring-progress: 0deg;
+  }
+  /* 3s / 3600s = 0.0833% */
+  0.08% {
+    /* 3 seconds */
+    --ring-progress: 240deg;
+  }
+  0.17% {
+    /* 6 seconds */
+    --ring-progress: 270deg;
+  }
+  0.33% {
+    /* 12 seconds */
+    --ring-progress: 290deg;
+  }
+  0.67% {
+    /* 24 seconds */
+    --ring-progress: 310deg;
+  }
+  1.11% {
+    /* 40 seconds */
+    --ring-progress: 330deg;
+  }
+  1.67% {
+    /* 60 seconds */
+    --ring-progress: 340deg;
+  }
+  2.5% {
+    /* 90 seconds */
+    --ring-progress: 345deg;
+  }
+  5% {
+    /* 180 seconds */
+    --ring-progress: 348deg;
+  }
+  10% {
+    /* 360 seconds */
+    --ring-progress: 352deg;
+  }
+  20% {
+    /* 720 seconds */
+    --ring-progress: 355deg;
+  }
+  30% {
+    /* 1080 seconds */
+    --ring-progress: 356.5deg;
+  }
+  50% {
+    /* 1800 seconds */
+    --ring-progress: 358deg;
+  }
+  75% {
+    /* 2700 seconds */
+    --ring-progress: 359deg;
+  }
+  90% {
+    /* 3240 seconds */
+    --ring-progress: 359.5deg;
+  }
+  100% {
+    /* 3600 seconds */
+    --ring-progress: 360deg;
+  }
 }

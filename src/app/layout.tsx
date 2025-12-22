@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { auth } from "@/auth";
-import { SessionProvider } from "@/components/SessionProvider";
 import { QueryProvider } from "@/components/QueryProvider";
+import { SessionProvider } from "@/components/SessionProvider";
 
 const outfit = Outfit({
   variable: "--font-outfit",

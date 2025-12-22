@@ -19,6 +19,6 @@ export const MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024;
  */
 export function getAcceptedFormatsString(): string {
   return ACCEPTED_MIME_TYPES.map((type) =>
-    type.replace("image/", "").toUpperCase()
+    type.replace("image/", "").toUpperCase(),
   ).join(", ");
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 const EXAMPLES = [
   {
@@ -31,8 +32,8 @@ interface ExampleItemProps {
 function ExampleItem({ before, after, label, index }: ExampleItemProps) {
   const [revealPercent, setRevealPercent] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
-  
-  const containerRef = useRef<HTMLDivElement>(null)
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isDragging) return;
@@ -42,7 +43,6 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
       if (!rect) return;
       const x = e.clientX - rect.left;
       const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
-      console.log({ label, mouseClientX: e.clientX, rectLeft: rect.left, x, percent });
       setRevealPercent(percent);
     };
     const handleMouseUp = () => setIsDragging(false);
@@ -55,17 +55,26 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
   }, [isDragging]);
 
   return (
-    <motion.div initial={{ opacity: 0 , y: 20}} animate={{ opacity: 1 , y: 0 }} transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.05 }} className="flex select-none flex-col gap-3" ref={containerRef}>
-      <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.05 }}
+      className="flex select-none flex-col gap-3"
+      ref={containerRef}
+    >
+      <button
         className="relative aspect-[4/3] cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)]"
         onMouseDown={() => setIsDragging(true)}
+        type="button"
       >
         {/* Before image (base layer - left side) */}
-        <img
+        <Image
           src={before}
           alt="Before"
           className="absolute inset-0 h-full w-full object-cover"
           draggable={false}
+          width={300}
+          height={300}
         />
 
         {/* After image (revealed on right side) */}
@@ -75,11 +84,13 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
             clipPath: `polygon(${revealPercent}% 0%, 100% 0%, 100% 100%, ${revealPercent}% 100%)`,
           }}
         >
-          <img
+          <Image
             src={after}
             alt="After"
             className="h-full w-full object-cover"
             draggable={false}
+            width={300}
+            height={300}
           />
         </div>
 
@@ -104,18 +115,18 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
         >
           ← Drag →
         </div>
-      </div>
+      </button>
 
-      <p className="whitespace-nowrap text-center text-sm font-medium text-black/70">{label}</p>
+      <p className="whitespace-nowrap text-center text-sm font-medium text-black/70">
+        {label}
+      </p>
     </motion.div>
   );
 }
 
 export function Examples() {
   return (
-    <motion.section
-      className="grid gap-6 sm:grid-cols-3"
-    >
+    <motion.section className="grid gap-6 sm:grid-cols-3">
       {EXAMPLES.map((example, index) => (
         <ExampleItem
           key={example.label}

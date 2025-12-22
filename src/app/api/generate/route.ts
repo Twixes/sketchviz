@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
 import { del } from "@vercel/blob";
-
-import { generateVisualizationImage } from "@/lib/gemini";
+import { NextResponse } from "next/server";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
+import { generateVisualizationImage } from "@/lib/gemini";
 
 export const runtime = "nodejs";
 
@@ -11,10 +10,7 @@ export async function POST(request: Request) {
   const { blobUrl, outside_light_conditions } = body;
 
   if (!blobUrl || typeof blobUrl !== "string") {
-    return NextResponse.json(
-      { error: "Missing blob URL." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Missing blob URL." }, { status: 400 });
   }
 
   // Validate outside_light_conditions if provided
@@ -25,7 +21,10 @@ export async function POST(request: Request) {
     outside_light_conditions !== "overcast"
   ) {
     return NextResponse.json(
-      { error: "Invalid outside_light_conditions. Must be 'sunny', 'overcast', or null." },
+      {
+        error:
+          "Invalid outside_light_conditions. Must be 'sunny', 'overcast', or null.",
+      },
       { status: 400 },
     );
   }
@@ -41,7 +40,7 @@ export async function POST(request: Request) {
     const contentType = blobResponse.headers.get("content-type");
     const contentLength = blobResponse.headers.get("content-length");
 
-    if (!contentType || !ACCEPTED_MIME_TYPES.includes(contentType as any)) {
+    if (!contentType || !ACCEPTED_MIME_TYPES.includes(contentType)) {
       return NextResponse.json(
         {
           error: "Unsupported image format.",
@@ -51,7 +50,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (contentLength && parseInt(contentLength) > MAX_UPLOAD_BYTES) {
+    if (contentLength && Number(contentLength) > MAX_UPLOAD_BYTES) {
       return NextResponse.json(
         { error: "File too large. Max 20MB." },
         { status: 413 },
@@ -63,7 +62,8 @@ export async function POST(request: Request) {
     const base64Data = buffer.toString("base64");
 
     // Extract filename from URL
-    const filename = blobUrl.split("/").pop()?.split("?")[0] || "sketchup-render";
+    const filename =
+      blobUrl.split("/").pop()?.split("?")[0] || "sketchup-render";
 
     const result = await generateVisualizationImage({
       base64Data,

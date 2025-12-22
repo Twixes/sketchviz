@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { upload } from "@vercel/blob/client";
-import { useUploadStore } from "@/stores/upload-store";
 import {
   ACCEPTED_MIME_TYPES,
+  getAcceptedFormatsString,
   MAX_UPLOAD_BYTES,
   MAX_UPLOAD_MB,
-  getAcceptedFormatsString,
 } from "@/lib/constants";
+import { useUploadStore } from "@/stores/upload-store";
 
 interface UploadFileParams {
   file: File;
@@ -19,9 +19,9 @@ export function useUploadMutation() {
   return useMutation({
     mutationFn: async ({ file }: UploadFileParams): Promise<string> => {
       // Validate file type
-      if (!ACCEPTED_MIME_TYPES.includes(file.type as any)) {
+      if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
         throw new Error(
-          `Unsupported format. Use ${getAcceptedFormatsString()}.`
+          `Unsupported format. Use ${getAcceptedFormatsString()}.`,
         );
       }
 

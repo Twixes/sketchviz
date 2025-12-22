@@ -1,19 +1,24 @@
 "use client";
 
-import { useCallback, useRef } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { EnterIcon, ExitIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
-import { useSession, signIn, signOut } from "next-auth/react";
-
-import { UploadDropzone } from "@/components/UploadDropzone";
+import { AnimatePresence, motion } from "motion/react";
+import Image from "next/image";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useCallback, useRef } from "react";
 import { Examples } from "@/components/Examples";
 import { FunkyBackground } from "@/components/FunkyBackground";
-import { useUploadStore } from "@/stores/upload-store";
-import { useUploadMutation } from "@/hooks/use-upload-mutation";
+import { UploadDropzone } from "@/components/UploadDropzone";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
-import { EnterIcon, ExitIcon } from '@radix-ui/react-icons'
+import { useUploadMutation } from "@/hooks/use-upload-mutation";
+import GoogleIcon from "@/icons/google.svg";
+import { useUploadStore } from "@/stores/upload-store";
 
-const LAYOUT_TRANSITION = { type: "spring", stiffness: 160, damping: 22 } as const;
+const LAYOUT_TRANSITION = {
+  type: "spring",
+  stiffness: 160,
+  damping: 22,
+} as const;
 const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 export default function Home() {
@@ -40,14 +45,14 @@ export default function Home() {
       e.preventDefault();
       reset();
     },
-    [reset]
+    [reset],
   );
 
   const handleFileSelected = useCallback(
     async (file: File) => {
       await uploadMutation.mutateAsync({ file });
     },
-    [uploadMutation]
+    [uploadMutation],
   );
 
   const handleSignIn = useCallback(async () => {
@@ -57,9 +62,9 @@ export default function Home() {
     const top = window.screenY + (window.outerHeight - height) / 2;
 
     const popup = window.open(
-      '/auth/signin',
-      'Google Sign In',
-      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+      "/auth/signin",
+      "Google Sign In",
+      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`,
     );
 
     if (!popup) {
@@ -78,12 +83,15 @@ export default function Home() {
     }, 500);
 
     // Cleanup interval after 5 minutes (timeout)
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      if (!popup.closed) {
-        popup.close();
-      }
-    }, 5 * 60 * 1000);
+    setTimeout(
+      () => {
+        clearInterval(checkInterval);
+        if (!popup.closed) {
+          popup.close();
+        }
+      },
+      5 * 60 * 1000,
+    );
   }, [update]);
 
   const handleSignOut = useCallback(async () => {
@@ -96,7 +104,7 @@ export default function Home() {
 
     if (uploadMutation.isPending) {
       const uploadedUrl = await uploadMutation.mutateAsync(
-        uploadMutation.variables!
+        uploadMutation.variables,
       );
       currentBlobUrl = uploadedUrl;
     }
@@ -127,10 +135,12 @@ export default function Home() {
             onClick={handleReset}
             className="flex items-center gap-4 cursor-pointer"
           >
-            <img
+            <Image
               src="/icon.png"
               alt="SketchViz"
               className="size-16 -m-1"
+              width={64}
+              height={64}
             />
             <div>
               <p className="text-base font-semibold tracking-tight text-black">
@@ -141,17 +151,21 @@ export default function Home() {
           </a>
           {session ? (
             <button
+              type="button"
               onClick={handleSignOut}
               className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
             >
-               <ExitIcon/> Log out
+              <ExitIcon /> Log out
             </button>
-          ) : <button
+          ) : (
+            <button
+              type="button"
               onClick={handleSignIn}
               className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
             >
-               <EnterIcon/> Log in
-            </button>}
+              <GoogleIcon className="size-[15px]" /> Log in with Google
+            </button>
+          )}
         </motion.header>
 
         <motion.section
@@ -179,19 +193,35 @@ export default function Home() {
                   <h1 className="text-4xl font-semibold leading-tight text-black sm:text-5xl">
                     Transform your{" "}
                     <span className="outline-title">SketchUp renders</span> into{" "}
-                    <span className="gradient-title">photorealistic visuals</span>.
+                    <span className="gradient-title">
+                      photorealistic visuals
+                    </span>
+                    .
                   </h1>
                   <p className="max-w-xl text-lg text-black/70">
                     Upload a render and get polished, photorealistic output with
-                    refined lighting, realistic materials, and professional depth.
+                    refined lighting, realistic materials, and professional
+                    depth.
                   </p>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">
                   {[
-                    { label: "Speed", value: "~30 seconds", detail: "From upload to photoreal" },
-                    { label: "Materials", value: "Real-world finish", detail: "Refined surfaces & textures" },
-                    { label: "Lighting", value: "Natural depth", detail: "Balanced ambient glow" },
+                    {
+                      label: "Speed",
+                      value: "~30 seconds",
+                      detail: "From upload to photoreal",
+                    },
+                    {
+                      label: "Materials",
+                      value: "Real-world finish",
+                      detail: "Refined surfaces & textures",
+                    },
+                    {
+                      label: "Lighting",
+                      value: "Natural depth",
+                      detail: "Balanced ambient glow",
+                    },
                   ].map((item) => (
                     <div
                       key={item.label}
@@ -218,10 +248,9 @@ export default function Home() {
             layout
             transition={LAYOUT_TRANSITION}
             animate={focusUpload ? { scale: 1.03 } : { scale: 1 }}
-            className={[
-              "relative w-full",
-              focusUpload ? "max-w-3xl" : "",
-            ].join(" ")}
+            className={["relative w-full", focusUpload ? "max-w-3xl" : ""].join(
+              " ",
+            )}
           >
             {/* Enhanced Memphis decorative shapes */}
             <motion.div
@@ -249,7 +278,7 @@ export default function Home() {
               frame={false}
               className={[
                 "min-h-[320px] border bg-white/85",
-                !inputSrc ? 'border-dashed border-black/20' : 'border-black/40',
+                !inputSrc ? "border-dashed border-black/20" : "border-black/40",
                 focusUpload
                   ? "shadow-[0_40px_90px_-50px_rgba(12,12,12,0.65)]"
                   : "",
@@ -267,13 +296,20 @@ export default function Home() {
                   className="mt-6 flex flex-col gap-4 z-10"
                 >
                   <div className="flex items-center gap-4">
-                    <label className="text-sm font-semibold text-black">
+                    <label
+                      htmlFor="light-conditions"
+                      className="text-sm font-semibold text-black"
+                    >
                       Light conditions:
                     </label>
                     <Select.Root
                       value={lightConditions ?? "auto"}
                       onValueChange={(value) =>
-                        setLightConditions(value === "auto" ? null : value as "sunny" | "overcast")
+                        setLightConditions(
+                          value === "auto"
+                            ? null
+                            : (value as "sunny" | "overcast"),
+                        )
                       }
                     >
                       <Select.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-[140px]">
@@ -308,22 +344,28 @@ export default function Home() {
                   </div>
 
                   <button
+                    type="submit"
                     onClick={!session ? handleSignIn : handleGenerate}
                     disabled={isGenerating || status === "loading"}
                     className={[
-                      "rounded-xl px-6 py-3 text-sm font-semibold transition-all",
+                      "flex items-center gap-2 justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all",
                       isGenerating || status === "loading"
                         ? "cursor-not-allowed bg-black/20 text-black/40"
                         : "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
                     ].join(" ")}
                   >
-                    {isGenerating
-                      ? "Generating..."
-                      : status === "loading"
-                      ? "Loading..."
-                      : !session
-                      ? "Log in with Google"
-                      : "Generate"}
+                    {isGenerating ? (
+                      "Generating..."
+                    ) : status === "loading" ? (
+                      "Loading..."
+                    ) : !session ? (
+                      <>
+                        <EnterIcon /> Log in with Google to complete
+                        visualization
+                      </>
+                    ) : (
+                      "Generate"
+                    )}
                   </button>
                 </motion.div>
               )}

@@ -15,10 +15,11 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
           },
           mutations: {
             retry: 2, // Retry failed mutations twice
-            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+            retryDelay: (attemptIndex) =>
+              Math.min(1000 * 2 ** attemptIndex, 30000),
           },
         },
-      })
+      }),
   );
 
   return (

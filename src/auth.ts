@@ -19,7 +19,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return baseUrl;
     },
-    authorized({ request, auth }) {
+    authorized() {
       // Allow all requests to pass through - we'll handle auth in the UI
       return true;
     },

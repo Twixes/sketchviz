@@ -52,7 +52,11 @@ export async function generateVisualizationImage(params: {
       part.mediaType.startsWith("image/"),
   );
 
-  if (!imagePart || imagePart.type !== "file" || typeof imagePart.data !== "string") {
+  if (
+    !imagePart ||
+    imagePart.type !== "file" ||
+    typeof imagePart.data !== "string"
+  ) {
     throw new Error("No image returned by Gemini.");
   }
 
