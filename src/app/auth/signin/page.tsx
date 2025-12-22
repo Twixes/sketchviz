@@ -1,12 +1,18 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SignInPage() {
   useEffect(() => {
+    const supabase = createClient();
     // Automatically trigger Google sign-in when this page loads
-    signIn("google", { callbackUrl: "/auth/callback" });
+    supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
   }, []);
 
   return (

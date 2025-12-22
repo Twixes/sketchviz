@@ -2,6 +2,17 @@
  * Shared constants for file upload and validation
  */
 
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      NEXT_PUBLIC_SUPABASE_URL: string;
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+      BLOB_READ_WRITE_TOKEN: string;
+      GOOGLE_GENERATIVE_AI_API_KEY: string;
+    }
+  }
+}
+
 export const ACCEPTED_MIME_TYPES: string[] = [
   "image/png",
   "image/jpeg",

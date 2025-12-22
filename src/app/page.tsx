@@ -4,10 +4,10 @@ import { EnterIcon, ExitIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { signIn, signOut, useSession } from "next-auth/react";
 import { useCallback, useRef } from "react";
 import { Examples } from "@/components/Examples";
 import { FunkyBackground } from "@/components/FunkyBackground";
+import { useSession } from "@/components/SessionProvider";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
@@ -22,7 +22,7 @@ const LAYOUT_TRANSITION = {
 const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 export default function Home() {
-  const { data: session, status, update } = useSession();
+  const { user, supabase } = useSession();
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
 
   // Zustand store
@@ -69,16 +69,19 @@ export default function Home() {
 
     if (!popup) {
       // Fallback if popup was blocked
-      await signIn("google");
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
       return;
     }
 
-    // Poll for popup closure and session changes
-    const checkInterval = setInterval(async () => {
+    // Poll for popup closure - session will be updated automatically via auth state change listener
+    const checkInterval = setInterval(() => {
       if (popup.closed) {
         clearInterval(checkInterval);
-        // Refresh session without page reload
-        await update();
       }
     }, 500);
 
@@ -92,11 +95,11 @@ export default function Home() {
       },
       5 * 60 * 1000,
     );
-  }, [update]);
+  }, [supabase]);
 
   const handleSignOut = useCallback(async () => {
-    await signOut();
-  }, []);
+    await supabase.auth.signOut();
+  }, [supabase]);
 
   const handleGenerate = useCallback(async () => {
     // Wait for upload to finish if it's still in progress
@@ -149,7 +152,7 @@ export default function Home() {
               <p className="text-xs text-black/50">AI visualization studio</p>
             </div>
           </a>
-          {session ? (
+          {user ? (
             <button
               type="button"
               onClick={handleSignOut}
@@ -189,7 +192,7 @@ export default function Home() {
                 transition={FADE_TRANSITION}
                 className="flex flex-col gap-8"
               >
-                <div className="space-y-8">
+                <div className="space-y-6">
                   <h1 className="text-4xl font-semibold leading-tight text-black sm:text-5xl">
                     Transform your{" "}
                     <span className="outline-title">SketchUp renders</span> into{" "}
@@ -345,20 +348,18 @@ export default function Home() {
 
                   <button
                     type="submit"
-                    onClick={!session ? handleSignIn : handleGenerate}
-                    disabled={isGenerating || status === "loading"}
+                    onClick={!user ? handleSignIn : handleGenerate}
+                    disabled={isGenerating}
                     className={[
                       "flex items-center gap-2 justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all",
-                      isGenerating || status === "loading"
+                      isGenerating
                         ? "cursor-not-allowed bg-black/20 text-black/40"
                         : "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
                     ].join(" ")}
                   >
                     {isGenerating ? (
                       "Generating..."
-                    ) : status === "loading" ? (
-                      "Loading..."
-                    ) : !session ? (
+                    ) : !user ? (
                       <>
                         <EnterIcon /> Log in with Google to complete
                         visualization
