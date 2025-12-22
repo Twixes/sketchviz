@@ -168,7 +168,7 @@ export function UploadDropzone({
       {isBusy ? <div className="loading-ring" aria-hidden /> : null}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
-        className={[
+        className={clsx([
           "group relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden text-center transition",
           frame
             ? "rounded-3xl bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]"
@@ -178,8 +178,8 @@ export function UploadDropzone({
             : frame
               ? "hover:border-black/30"
               : "",
-          className ?? "",
-        ].join(" ")}
+          className,
+        ])}
         style={aspectRatio ? { aspectRatio } : undefined}
         onClick={() => inputRef.current?.click()}
         onDragOver={(event) => {

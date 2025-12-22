@@ -2,6 +2,7 @@
 
 import { EnterIcon, ExitIcon } from "@radix-ui/react-icons";
 import * as Select from "@radix-ui/react-select";
+import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useCallback, useRef } from "react";
@@ -183,12 +184,12 @@ export default function Home() {
         <motion.section
           layout
           transition={LAYOUT_TRANSITION}
-          className={[
+          className={clsx([
             "grid gap-12",
             focusUpload
               ? "min-h-[60vh] place-items-center"
               : "items-center lg:grid-cols-[1.05fr_0.95fr]",
-          ].join(" ")}
+          ])}
         >
           <AnimatePresence initial={false}>
             {!focusUpload ? (
@@ -260,9 +261,10 @@ export default function Home() {
             layout
             transition={LAYOUT_TRANSITION}
             animate={focusUpload ? { scale: 1.03 } : { scale: 1 }}
-            className={["relative w-full", focusUpload ? "max-w-3xl" : ""].join(
-              " ",
-            )}
+            className={clsx([
+              "relative w-full",
+              focusUpload ? "max-w-3xl" : "",
+            ])}
           >
             {/* Enhanced Memphis decorative shapes */}
             <motion.div
@@ -288,13 +290,11 @@ export default function Home() {
             <UploadDropzone
               onFileSelected={handleFileSelected}
               frame={false}
-              className={[
+              className={clsx([
                 "min-h-[320px] border bg-white/85",
                 !inputSrc ? "border-dashed border-black/20" : "border-black/40",
-                focusUpload
-                  ? "shadow-[0_40px_90px_-50px_rgba(12,12,12,0.65)]"
-                  : "",
-              ].join(" ")}
+                focusUpload && "shadow-[0_40px_90px_-50px_rgba(12,12,12,0.65)]",
+              ])}
             />
 
             <AnimatePresence initial={false}>
@@ -374,12 +374,12 @@ export default function Home() {
                     type="submit"
                     onClick={!user ? handleSignIn : handleGenerate}
                     disabled={isGenerating}
-                    className={[
+                    className={clsx([
                       "flex items-center gap-2 justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all",
                       isGenerating
                         ? "cursor-not-allowed bg-black/20 text-black/40"
                         : "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
-                    ].join(" ")}
+                    ])}
                   >
                     {isGenerating ? (
                       "Visualizing…"
