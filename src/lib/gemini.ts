@@ -23,11 +23,14 @@ export async function generateVisualizationImage(params: {
 
   // Handle outdoor lighting
   if (params.outdoorLight === "sunny") {
-    prompt += " with sunny outdoor lighting";
+    prompt += " with sunny outdoor light";
   } else if (params.outdoorLight === "overcast") {
-    prompt += " with overcast outdoor lighting";
+    prompt += " with overcast outdoor light";
   } else if (params.outdoorLight === "night") {
-    prompt += " with night-time outdoor lighting";
+    prompt += " with night-time outdoor light";
+  } else if (params.outdoorLight) {
+    // Custom outdoor lighting description
+    prompt += ` with outdoor light as follows: ${params.outdoorLight}`;
   }
 
   // Handle indoor lighting
@@ -35,6 +38,9 @@ export async function generateVisualizationImage(params: {
     prompt += ", all indoor lights are off";
   } else if (params.indoorLight === "all_on") {
     prompt += ", all indoor lights are on";
+  } else if (params.indoorLight) {
+    // Custom indoor lighting description
+    prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
   }
 
   if (params.editDescription) {

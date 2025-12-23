@@ -9,11 +9,12 @@ import {
   StarIcon,
   SunIcon,
 } from "@radix-ui/react-icons";
-import * as Select from "@radix-ui/react-select";
+import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useCallback, useRef } from "react";
+import Link from "next/link";
+import { useCallback, useRef, useState } from "react";
 import { Examples } from "@/components/Examples";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { useSession } from "@/components/SessionProvider";
@@ -33,6 +34,8 @@ const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 export default function Home() {
   const { user, supabase } = useSession();
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
+  const [outdoorLightOpen, setOutdoorLightOpen] = useState(false);
+  const [indoorLightOpen, setIndoorLightOpen] = useState(false);
 
   // Zustand store
   const {
@@ -304,7 +307,9 @@ export default function Home() {
               frame={false}
               className={clsx([
                 "min-h-[320px] border bg-white/85",
-                !inputSrc ? "border-dashed border-black/20" : "border-black/40",
+                !inputSrc
+                  ? "border-dashed border-black/20 hover:border-black/60 cursor-pointer"
+                  : "border-black/40",
                 focusUpload && "shadow-[0_40px_90px_-50px_rgba(12,12,12,0.65)]",
               ])}
             />
@@ -327,55 +332,109 @@ export default function Home() {
                       >
                         Outdoor light:
                       </label>
-                      <Select.Root
-                        value={outdoorLight ?? "auto"}
-                        onValueChange={(value) =>
-                          setOutdoorLight(
-                            value === "auto"
-                              ? null
-                              : (value as "sunny" | "overcast" | "night"),
-                          )
-                        }
+                      <Popover.Root
+                        open={outdoorLightOpen}
+                        onOpenChange={setOutdoorLightOpen}
                       >
-                        <Select.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
-                          <Select.Value />
-                          <Select.Icon className="text-black/60">▼</Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Content className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-lg">
-                            <Select.Viewport className="p-1">
-                              <Select.Item
-                                value="auto"
-                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                              >
+                        <Popover.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+                          <span className="flex items-center gap-2">
+                            {outdoorLight === null ? (
+                              <>
                                 <MagicWandIcon className="size-4" />
-                                <Select.ItemText>Auto</Select.ItemText>
-                              </Select.Item>
-                              <Select.Item
-                                value="sunny"
-                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                              >
+                                Auto
+                              </>
+                            ) : outdoorLight === "sunny" ? (
+                              <>
                                 <SunIcon className="size-4" />
-                                <Select.ItemText>Sunny</Select.ItemText>
-                              </Select.Item>
-                              <Select.Item
-                                value="overcast"
-                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                              >
+                                Sunny
+                              </>
+                            ) : outdoorLight === "overcast" ? (
+                              <>
                                 <DotFilledIcon className="size-4" />
-                                <Select.ItemText>Overcast</Select.ItemText>
-                              </Select.Item>
-                              <Select.Item
-                                value="night"
-                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                              >
+                                Overcast
+                              </>
+                            ) : outdoorLight === "night" ? (
+                              <>
                                 <StarIcon className="size-4" />
-                                <Select.ItemText>Night</Select.ItemText>
-                              </Select.Item>
-                            </Select.Viewport>
-                          </Select.Content>
-                        </Select.Portal>
-                      </Select.Root>
+                                Night
+                              </>
+                            ) : (
+                              outdoorLight
+                            )}
+                          </span>
+                          <span className="text-black/60">▼</span>
+                        </Popover.Trigger>
+                        <Popover.Portal>
+                          <Popover.Content
+                            className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-lg p-1 w-48"
+                            align="start"
+                            sideOffset={4}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOutdoorLight(null);
+                                setOutdoorLightOpen(false);
+                              }}
+                              className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                            >
+                              <MagicWandIcon className="size-4" />
+                              <span>Auto</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOutdoorLight("sunny");
+                                setOutdoorLightOpen(false);
+                              }}
+                              className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                            >
+                              <SunIcon className="size-4" />
+                              <span>Sunny</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOutdoorLight("overcast");
+                                setOutdoorLightOpen(false);
+                              }}
+                              className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                            >
+                              <DotFilledIcon className="size-4" />
+                              <span>Overcast</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOutdoorLight("night");
+                                setOutdoorLightOpen(false);
+                              }}
+                              className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                            >
+                              <StarIcon className="size-4" />
+                              <span>Night</span>
+                            </button>
+                            <div className="relative flex items-center gap-2 rounded-lg p-1 text-sm">
+                              <input
+                                type="text"
+                                value={
+                                  outdoorLight &&
+                                  !["sunny", "overcast", "night"].includes(
+                                    outdoorLight,
+                                  )
+                                    ? outdoorLight
+                                    : ""
+                                }
+                                onChange={(e) =>
+                                  setOutdoorLight(e.target.value || null)
+                                }
+                                placeholder="…or specify it in text"
+                                className="w-full rounded-lg border border-black/20 bg-white px-2 py-1.5 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20"
+                              />
+                            </div>
+                          </Popover.Content>
+                        </Popover.Portal>
+                      </Popover.Root>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -385,48 +444,91 @@ export default function Home() {
                       >
                         Indoor lighting:
                       </label>
-                      <Select.Root
-                        value={indoorLight ?? "auto"}
-                        onValueChange={(value) =>
-                          setIndoorLight(
-                            value === "auto"
-                              ? null
-                              : (value as "all_off" | "all_on"),
-                          )
-                        }
+                      <Popover.Root
+                        open={indoorLightOpen}
+                        onOpenChange={setIndoorLightOpen}
                       >
-                        <Select.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
-                          <Select.Value />
-                          <Select.Icon className="text-black/60">▼</Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Content className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-lg">
-                            <Select.Viewport className="p-1">
-                              <Select.Item
-                                value="auto"
-                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                              >
+                        <Popover.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+                          <span className="flex items-center gap-2">
+                            {indoorLight === null ? (
+                              <>
                                 <MagicWandIcon className="size-4" />
-                                <Select.ItemText>Auto</Select.ItemText>
-                              </Select.Item>
-                              <Select.Item
-                                value="all_off"
-                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                              >
-                                <DotFilledIcon className="size-4" />
-                                <Select.ItemText>All off</Select.ItemText>
-                              </Select.Item>
-                              <Select.Item
-                                value="all_on"
-                                className="relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10 data-[state=checked]:font-semibold"
-                              >
+                                Auto
+                              </>
+                            ) : indoorLight === "all_on" ? (
+                              <>
                                 <LightningBoltIcon className="size-4" />
-                                <Select.ItemText>All on</Select.ItemText>
-                              </Select.Item>
-                            </Select.Viewport>
-                          </Select.Content>
-                        </Select.Portal>
-                      </Select.Root>
+                                All on
+                              </>
+                            ) : indoorLight === "all_off" ? (
+                              <>
+                                <DotFilledIcon className="size-4" />
+                                All off
+                              </>
+                            ) : (
+                              indoorLight
+                            )}
+                          </span>
+                          <span className="text-black/60">▼</span>
+                        </Popover.Trigger>
+                        <Popover.Portal>
+                          <Popover.Content
+                            className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-lg p-1 w-48"
+                            align="start"
+                            sideOffset={4}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIndoorLight(null);
+                                setIndoorLightOpen(false);
+                              }}
+                              className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                            >
+                              <MagicWandIcon className="size-4" />
+                              <span>Auto</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIndoorLight("all_on");
+                                setIndoorLightOpen(false);
+                              }}
+                              className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                            >
+                              <LightningBoltIcon className="size-4" />
+                              <span>All on</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIndoorLight("all_off");
+                                setIndoorLightOpen(false);
+                              }}
+                              className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                            >
+                              <DotFilledIcon className="size-4" />
+                              <span>All off</span>
+                            </button>
+                            <div className="relative flex items-center gap-2 rounded-lg p-1 text-sm">
+                              <input
+                                type="text"
+                                value={
+                                  indoorLight &&
+                                  !["all_off", "all_on"].includes(indoorLight)
+                                    ? indoorLight
+                                    : ""
+                                }
+                                onChange={(e) =>
+                                  setIndoorLight(e.target.value || null)
+                                }
+                                placeholder="…or specify it in text"
+                                className="w-full rounded-lg border border-black/20 bg-white px-2 py-1.5 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20"
+                              />
+                            </div>
+                          </Popover.Content>
+                        </Popover.Portal>
+                      </Popover.Root>
                     </div>
                   </div>
 
@@ -440,7 +542,7 @@ export default function Home() {
                       }
                     }}
                     onChange={(e) => setEditDescription(e.target.value || null)}
-                    placeholder="Request edits (optional)"
+                    placeholder="Request edits or specify materials (optional)"
                     rows={2}
                     className="rounded-xl border border-black/20 bg-white px-4 py-2 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-none"
                   />

@@ -2,13 +2,15 @@ import { z } from "zod";
 
 // Outdoor light schema
 export const outdoorLightSchema = z
-  .enum(["sunny", "overcast", "night"])
+  .union([z.enum(["sunny", "overcast", "night"]), z.string().min(1)])
   .nullable();
 
 export type OutdoorLight = z.infer<typeof outdoorLightSchema>;
 
 // Indoor light schema
-export const indoorLightSchema = z.enum(["all_off", "all_on"]).nullable();
+export const indoorLightSchema = z
+  .union([z.enum(["all_off", "all_on"]), z.string().min(1)])
+  .nullable();
 
 export type IndoorLight = z.infer<typeof indoorLightSchema>;
 
