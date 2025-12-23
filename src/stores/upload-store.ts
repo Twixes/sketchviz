@@ -16,9 +16,9 @@ interface UploadState {
   // Loading states
   isUploading: boolean;
   isGenerating: boolean;
+  isBusyForUser: boolean;
 
   // Computed state
-  isBusy: boolean;
   focusUpload: boolean;
 
   // Actions
@@ -31,6 +31,7 @@ interface UploadState {
   setEditDescription: (description: string | null) => void;
   setIsUploading: (isUploading: boolean) => void;
   setIsGenerating: (isGenerating: boolean) => void;
+  setIsBusyForUser: (isBusy: boolean) => void;
   reset: () => void;
 }
 
@@ -44,15 +45,13 @@ const initialState = {
   editDescription: null,
   isUploading: false,
   isGenerating: false,
+  isBusyForUser: false,
 };
 
 export const useUploadStore = create<UploadState>((set, get) => ({
   ...initialState,
 
   // Computed values
-  get isBusy() {
-    return get().isGenerating;
-  },
   get focusUpload() {
     return Boolean(get().inputSrc);
   },
@@ -76,6 +75,7 @@ export const useUploadStore = create<UploadState>((set, get) => ({
   setEditDescription: (description) => set({ editDescription: description }),
   setIsUploading: (isUploading) => set({ isUploading }),
   setIsGenerating: (isGenerating) => set({ isGenerating }),
+  setIsBusyForUser: (isBusy) => set({ isBusyForUser: isBusy }),
 
   reset: () => {
     const { inputSrc } = get();

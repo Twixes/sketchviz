@@ -21,7 +21,7 @@ export function UploadDropzone({
   className,
 }: UploadDropzoneProps) {
   // Get state from Zustand store
-  const { isBusy, error, inputSrc, outputSrc } = useUploadStore();
+  const { isBusyForUser, error, inputSrc, outputSrc } = useUploadStore();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const outputRef = useRef<HTMLImageElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -32,10 +32,10 @@ export function UploadDropzone({
 
   const handleFile = useCallback(
     (file: File | null) => {
-      if (!file || isBusy) return;
+      if (!file || isBusyForUser) return;
       onFileSelected(file);
     },
-    [isBusy, onFileSelected],
+    [isBusyForUser, onFileSelected],
   );
 
   const onDrop = useCallback(
@@ -165,7 +165,7 @@ export function UploadDropzone({
 
   return (
     <div className="relative w-full">
-      {isBusy ? <div className="loading-ring" aria-hidden /> : null}
+      {isBusyForUser ? <div className="loading-ring" aria-hidden /> : null}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
         className={clsx([
@@ -214,7 +214,7 @@ export function UploadDropzone({
               <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
                 <div
                   className={clsx(
-                    "rounded-full px-3 py-1 text-xs font-semibold shadow-sm",
+                    "whitespace-nowrap rounded-lg px-2 py-1 text-xs font-semibold backdrop-blur-sm shadow-sm",
                     !isComparing
                       ? "bg-black/80 text-white"
                       : "bg-white/80 text-black",
@@ -236,7 +236,7 @@ export function UploadDropzone({
                     }}
                     title="Compare with original"
                     className={clsx(
-                      "flex items-center justify-center rounded-full p-1.5 shadow-sm hover:rotate-45 cursor-pointer",
+                      "flex rounded-full p-1 text-xs backdrop-blur-sm shadow-sm hover:rotate-45 cursor-pointer",
                       !isComparing
                         ? "bg-black/80 text-white"
                         : "bg-white/80 text-black",
@@ -263,7 +263,7 @@ export function UploadDropzone({
             </div>
             <div className="flex items-center gap-3">
               <span className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white">
-                {isBusy ? "Generating..." : "Choose file"}
+                {isBusyForUser ? "Generating..." : "Choose file"}
               </span>
               <span className="text-xs text-black/40">Try for free</span>
             </div>
@@ -274,7 +274,7 @@ export function UploadDropzone({
           type="file"
           accept={accept}
           className="hidden"
-          disabled={isBusy}
+          disabled={isBusyForUser}
           onChange={(event) => handleFile(event.target.files?.[0] ?? null)}
         />
       </div>

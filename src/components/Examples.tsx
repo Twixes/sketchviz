@@ -101,10 +101,10 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
         />
 
         {/* Labels */}
-        <div className="pointer-events-none absolute left-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+        <div className="pointer-events-none absolute left-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm shadow-sm">
           Before
         </div>
-        <div className="pointer-events-none absolute right-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+        <div className="pointer-events-none absolute right-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm shadow-sm">
           After
         </div>
 

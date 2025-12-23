@@ -324,7 +324,7 @@ export default function Home() {
                   transition={FADE_TRANSITION}
                   className="mt-3 flex flex-col gap-3 z-10"
                 >
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <div className="flex items-center gap-x-4 gap-y-2 whitespace-nowrap *:flex-1">
                     <div className="flex items-center gap-2">
                       <label
                         htmlFor="outdoor-light"
@@ -336,8 +336,8 @@ export default function Home() {
                         open={outdoorLightOpen}
                         onOpenChange={setOutdoorLightOpen}
                       >
-                        <Popover.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
-                          <span className="flex items-center gap-2">
+                        <Popover.Trigger className="inline-flex items-center justify-between gap-2 flex-1 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+                          <span className="flex items-center gap-2 truncate">
                             {outdoorLight === null ? (
                               <>
                                 <MagicWandIcon className="size-4" />
@@ -448,8 +448,8 @@ export default function Home() {
                         open={indoorLightOpen}
                         onOpenChange={setIndoorLightOpen}
                       >
-                        <Popover.Trigger className="inline-flex items-center justify-between gap-2 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
-                          <span className="flex items-center gap-2">
+                        <Popover.Trigger className="inline-flex items-center justify-between gap-2 flex-1 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+                          <span className="flex items-center gap-2 truncate">
                             {indoorLight === null ? (
                               <>
                                 <MagicWandIcon className="size-4" />
@@ -550,21 +550,23 @@ export default function Home() {
                   <button
                     type="submit"
                     onClick={!user ? handleSignIn : handleGenerate}
-                    disabled={isGenerating}
+                    disabled={isBusyForUser}
                     className={clsx([
                       "flex items-center gap-2 justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all",
-                      isGenerating
+                      isBusyForUser
                         ? "cursor-not-allowed bg-black/20 text-black/40"
                         : "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
                     ])}
                   >
-                    {isGenerating ? (
+                    {isBusyForUser ? (
                       "Visualizing…"
                     ) : !user ? (
                       <>
                         <EnterIcon /> Log in with Google to complete
                         visualization
                       </>
+                    ) : outputSrc ? (
+                      "Visualize again"
                     ) : (
                       "Visualize"
                     )}
