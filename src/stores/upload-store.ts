@@ -18,9 +18,6 @@ interface UploadState {
   isGenerating: boolean;
   isBusyForUser: boolean;
 
-  // Computed state
-  focusUpload: boolean;
-
   // Actions
   setInputSrc: (src: string | null) => void;
   setOutputSrc: (src: string | null) => void;
@@ -50,11 +47,6 @@ const initialState = {
 
 export const useUploadStore = create<UploadState>((set, get) => ({
   ...initialState,
-
-  // Computed values
-  get focusUpload() {
-    return Boolean(get().inputSrc);
-  },
 
   // Actions
   setInputSrc: (src) => {
