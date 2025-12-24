@@ -9,6 +9,7 @@ import {
   OUTDOOR_LIGHT_OPTIONS,
 } from "@/components/LightSelector";
 import { UploadDropzone } from "@/components/UploadDropzone";
+import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 
 const LAYOUT_TRANSITION = {
   type: "spring",
@@ -31,7 +32,6 @@ interface ControlPanelProps {
   onIndoorLightChange: (value: string | null) => void;
   onEditDescriptionChange: (value: string | null) => void;
   onGenerate: () => Promise<void>;
-  onSignIn: () => Promise<void>;
 }
 
 export function ControlPanel({
@@ -48,9 +48,9 @@ export function ControlPanel({
   onIndoorLightChange,
   onEditDescriptionChange,
   onGenerate,
-  onSignIn,
 }: ControlPanelProps) {
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
+  const handleSignIn = useSignInCallback();
 
   return (
     <motion.div
@@ -136,7 +136,7 @@ export function ControlPanel({
 
             <button
               type="submit"
-              onClick={!user ? onSignIn : onGenerate}
+              onClick={!user ? handleSignIn : onGenerate}
               disabled={isBusyForUser}
               className={clsx([
                 "flex items-center gap-2 justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all",

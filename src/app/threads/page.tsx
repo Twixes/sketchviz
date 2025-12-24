@@ -8,22 +8,18 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
+import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
-import type { UserParams } from "@/lib/schemas";
-
-interface Generation {
-  id: string;
-  input_url: string;
-  output_url: string | null;
-  user_params: UserParams;
-  created_at: string;
-}
 
 interface Thread {
   id: string;
   title: string;
   created_at: string;
-  generations: Generation[];
+  generation_count: number;
+  latest_generation: {
+    output_url: string | null;
+    input_url: string;
+  } | null;
 }
 
 const LAYOUT_TRANSITION = {
@@ -48,30 +44,44 @@ export default function ThreadsPage() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      // Fetch threads
+      const { data: threadsData, error: threadsError } = await supabase
         .from("threads")
-        .select(
-          `
-          id,
-          title,
-          created_at,
-          generations (
-            id,
-            input_url,
-            output_url,
-            user_params,
-            created_at
-          )
-        `,
-        )
+        .select("id, title, created_at")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Failed to fetch threads:", error);
-        throw error;
+      if (threadsError) {
+        console.error("Failed to fetch threads:", threadsError);
+        throw threadsError;
       }
 
-      return data as Thread[];
+      // For each thread, get generation count and latest generation
+      const threadsWithStats = await Promise.all(
+        threadsData.map(async (thread) => {
+          // Get generation count
+          const { count } = await supabase
+            .from("generations")
+            .select("*", { count: "exact", head: true })
+            .eq("thread_id", thread.id);
+
+          // Get latest generation for thumbnail
+          const { data: latestGeneration } = await supabase
+            .from("generations")
+            .select("output_url, input_url")
+            .eq("thread_id", thread.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          return {
+            ...thread,
+            generation_count: count || 0,
+            latest_generation: latestGeneration,
+          };
+        }),
+      );
+
+      return threadsWithStats as Thread[];
     },
     enabled: !!user,
   });
@@ -96,34 +106,7 @@ export default function ThreadsPage() {
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-14 lg:px-10"
       >
-        <motion.header className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={handleBackHome}
-            className="flex items-center gap-4 cursor-pointer"
-          >
-            <Image
-              src="/icon.png"
-              alt="SketchViz"
-              className="size-16 -m-1"
-              width={64}
-              height={64}
-            />
-            <div>
-              <p className="text-base font-semibold tracking-tight text-black">
-                SketchViz
-              </p>
-              <p className="text-xs text-black/50">AI visualization studio</p>
-            </div>
-          </button>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
-          >
-            <ExitIcon /> Log out
-          </button>
-        </motion.header>
+        <Header user={user} />
 
         <motion.section className="space-y-8">
           <div>
@@ -138,105 +121,55 @@ export default function ThreadsPage() {
               <p className="text-black/50">Loading threads...</p>
             </div>
           ) : threads && threads.length > 0 ? (
-            <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {threads.map((thread) => (
-                <motion.div
+                <motion.button
                   key={thread.id}
+                  type="button"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl border border-black/10 bg-white/75 p-6 shadow-sm"
+                  onClick={() => router.push(`/threads/${thread.id}`)}
+                  className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white/75 p-0 text-left shadow-sm transition-all hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
                 >
-                  <div className="mb-4 flex items-start justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold text-black">
-                        {thread.title}
-                      </h2>
-                      <p className="mt-1 text-sm text-black/50">
-                        {new Date(thread.created_at).toLocaleString()}
-                      </p>
+                  {/* Thumbnail */}
+                  {thread.latest_generation ? (
+                    <div className="aspect-video w-full overflow-hidden bg-black/5">
+                      <img
+                        src={
+                          thread.latest_generation.output_url ||
+                          thread.latest_generation.input_url
+                        }
+                        alt={thread.title}
+                        width={400}
+                        height={225}
+                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex aspect-video w-full items-center justify-center bg-black/5">
+                      <p className="text-sm text-black/40">No preview</p>
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold text-black line-clamp-2">
+                      {thread.title}
+                    </h2>
+                    <div className="mt-2 flex items-center gap-3 text-xs text-black/50">
+                      <span>
+                        {thread.generation_count}{" "}
+                        {thread.generation_count === 1
+                          ? "generation"
+                          : "generations"}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        {new Date(thread.created_at).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="space-y-4">
-                    {thread.generations?.map((generation) => (
-                      <div
-                        key={generation.id}
-                        className="rounded-xl border border-black/10 bg-white/50 p-4"
-                      >
-                        <div className="grid gap-4 md:grid-cols-2">
-                          {/* Input Image */}
-                          <div>
-                            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-black/40">
-                              Input
-                            </p>
-                            <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
-                              <img
-                                src={generation.input_url}
-                                alt="Input"
-                                className="h-auto w-full object-contain"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Output Image */}
-                          <div>
-                            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-black/40">
-                              Output
-                            </p>
-                            {generation.output_url ? (
-                              <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
-                                <img
-                                  src={generation.output_url}
-                                  alt="Output"
-                                  className="h-auto w-full object-contain"
-                                />
-                              </div>
-                            ) : (
-                              <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-black/20 bg-black/5">
-                                <p className="text-sm text-black/40">
-                                  No output generated
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Parameters */}
-                        {(generation.user_params.outdoor_light ||
-                          generation.user_params.indoor_light ||
-                          generation.user_params.edit_description) && (
-                          <div className="mt-4 space-y-2 rounded-lg bg-black/5 p-3">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-black/40">
-                              Parameters
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                              {generation.user_params.outdoor_light && (
-                                <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                  Outdoor:{" "}
-                                  {generation.user_params.outdoor_light}
-                                </span>
-                              )}
-                              {generation.user_params.indoor_light && (
-                                <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                  Indoor: {generation.user_params.indoor_light}
-                                </span>
-                              )}
-                            </div>
-                            {generation.user_params.edit_description && (
-                              <p className="text-sm text-black/70">
-                                {generation.user_params.edit_description}
-                              </p>
-                            )}
-                          </div>
-                        )}
-
-                        <p className="mt-3 text-xs text-black/40">
-                          {new Date(generation.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
+                </motion.button>
               ))}
             </div>
           ) : (

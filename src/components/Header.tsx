@@ -3,18 +3,21 @@ import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSignInCallback } from "@/hooks/use-sign-in-callback";
+import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import GoogleIcon from "@/icons/google.svg";
 
 const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 interface HeaderProps {
   user: User | null;
-  onReset: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-  onSignIn: () => Promise<void>;
-  onSignOut: () => Promise<void>;
+  onLogoClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export function Header({ user, onReset, onSignIn, onSignOut }: HeaderProps) {
+export function Header({ user, onLogoClick }: HeaderProps) {
+  const handleSignIn = useSignInCallback();
+  const handleSignOut = useSignOutCallback();
+
   return (
     <motion.header
       initial={false}
@@ -23,7 +26,7 @@ export function Header({ user, onReset, onSignIn, onSignOut }: HeaderProps) {
     >
       <a
         href="/"
-        onClick={onReset}
+        onClick={onLogoClick}
         className="flex items-center gap-4 cursor-pointer"
       >
         <Image
@@ -33,7 +36,7 @@ export function Header({ user, onReset, onSignIn, onSignOut }: HeaderProps) {
           width={64}
           height={64}
         />
-        <div>
+        <div className="text-left">
           <p className="text-base font-semibold tracking-tight text-black">
             SketchViz
           </p>
@@ -50,7 +53,7 @@ export function Header({ user, onReset, onSignIn, onSignOut }: HeaderProps) {
           </Link>
           <button
             type="button"
-            onClick={onSignOut}
+            onClick={handleSignOut}
             className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
           >
             <ExitIcon /> Log out
@@ -59,7 +62,7 @@ export function Header({ user, onReset, onSignIn, onSignOut }: HeaderProps) {
       ) : (
         <button
           type="button"
-          onClick={onSignIn}
+          onClick={handleSignIn}
           className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
         >
           <GoogleIcon className="size-[15px]" /> Log in with Google

@@ -10,6 +10,8 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { useSession } from "@/components/SessionProvider";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
+import { useSignInCallback } from "@/hooks/use-sign-in-callback";
+import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -59,52 +61,6 @@ export default function Home() {
     [uploadMutation],
   );
 
-  const handleSignIn = useCallback(async () => {
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    const popup = window.open(
-      "/auth/signin",
-      "Google Sign In",
-      `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`,
-    );
-
-    if (!popup) {
-      // Fallback if popup was blocked
-      await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      return;
-    }
-
-    // Poll for popup closure - session will be updated automatically via auth state change listener
-    const checkInterval = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkInterval);
-      }
-    }, 500);
-
-    // Cleanup interval after 5 minutes (timeout)
-    setTimeout(
-      () => {
-        clearInterval(checkInterval);
-        if (!popup.closed) {
-          popup.close();
-        }
-      },
-      5 * 60 * 1000,
-    );
-  }, [supabase]);
-
-  const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut();
-  }, [supabase]);
-
   const handleGenerate = useCallback(async () => {
     setIsBusyForUser(true);
     try {
@@ -146,12 +102,7 @@ export default function Home() {
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-14 lg:px-10"
       >
-        <Header
-          user={user}
-          onReset={handleReset}
-          onSignIn={handleSignIn}
-          onSignOut={handleSignOut}
-        />
+        <Header user={user} onLogoClick={handleReset} />
 
         <motion.section
           layout
@@ -181,7 +132,6 @@ export default function Home() {
             onIndoorLightChange={setIndoorLight}
             onEditDescriptionChange={setEditDescription}
             onGenerate={handleGenerate}
-            onSignIn={handleSignIn}
           />
         </motion.section>
 

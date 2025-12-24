@@ -1,10 +1,12 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs/promises";
+import { title } from "node:process";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { uuidv7 } from "zod";
+import { generateVisualizationImage, titleVisualizationImage } from "@/lib/ai";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
-import { generateVisualizationImage } from "@/lib/gemini";
 import { generateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
@@ -38,7 +40,7 @@ export async function POST(request: Request) {
     .from("threads")
     .insert({
       user_id: user.id,
-      title: `Generation ${new Date().toLocaleString()}`,
+      title: "",
     })
     .select("id")
     .single();
@@ -98,8 +100,12 @@ export async function POST(request: Request) {
     }
 
     const arrayBuffer = await blobResponse.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Data = buffer.toString("base64");
+    const imageBuffer = Buffer.from(arrayBuffer);
+
+    void updateThreadWithTitle(supabase, thread, {
+      buffer: imageBuffer,
+      mediaType: contentType,
+    }); // Update thread with title in background
 
     // Extract filename from URL
     const filename = blobUrl.split("/").pop()?.split("?")[0];
@@ -110,25 +116,17 @@ export async function POST(request: Request) {
     const filenameWithoutExt = filenameParts.slice(0, -1).join(".");
     const ext = filenameParts.at(-1);
 
-    let result: { data: string; mediaType: string };
-    if (!process.env.NODE_ENV === "development") {
-      result = await generateVisualizationImage({
-        base64Data,
-        mediaType: contentType,
-        filename,
-        outdoorLight: outdoor_light,
-        indoorLight: indoor_light,
-        editDescription: edit_description,
-      });
-    } else {
-      result = {
-        mediaType: "image/png",
-        data: await fs.readFile(`src/test-data/octocat-base64-png.txt`, "utf8"),
-      };
-    }
+    const result = await generateVisualizationImage({
+      imageBuffer,
+      mediaType: contentType,
+      filename,
+      outdoorLight: outdoor_light,
+      indoorLight: indoor_light,
+      editDescription: edit_description,
+    });
 
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
-    const blob = await put(outputFilename, Buffer.from(result.data, "base64"), {
+    const blob = await put(outputFilename, Buffer.from(result.uint8Array), {
       access: "public",
       contentType: result.mediaType,
     });
@@ -156,4 +154,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ error: message }, { status: 500 });
   }
+}
+
+/** Use Gemini Flash with "describe this image" prompt to generate title and update thread with it */
+async function updateThreadWithTitle(
+  supabase: SupabaseClient,
+  thread: { id: string },
+  image: {
+    buffer: Buffer;
+    mediaType: string;
+  },
+): Promise<void> {
+  const title = await titleVisualizationImage(image);
+  await supabase.from("threads").update({ title }).eq("id", thread.id);
 }
