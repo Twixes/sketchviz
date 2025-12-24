@@ -1,8 +1,12 @@
-import { del } from "@vercel/blob";
+import { execSync } from "node:child_process";
+import fs from "node:fs/promises";
+import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import { uuidv7 } from "zod";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
 import { generateVisualizationImage } from "@/lib/gemini";
 import { generateRequestSchema } from "@/lib/schemas";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -18,6 +22,52 @@ export async function POST(request: Request) {
 
   const { blobUrl, outdoor_light, indoor_light, edit_description } =
     validation.data;
+
+  // Get user session
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Cannot use this endpoint unauthenticated"); // TODO: Raise 401 specifically
+  }
+
+  // Create a new thread
+  const { data: thread, error: threadError } = await supabase
+    .from("threads")
+    .insert({
+      user_id: user.id,
+      title: `Generation ${new Date().toLocaleString()}`,
+    })
+    .select("id")
+    .single();
+
+  if (threadError) {
+    throw threadError;
+  }
+  const threadId = thread.id;
+
+  // Create a new generation record
+  const { data: generation, error: generationError } = await supabase
+    .from("generations")
+    .insert({
+      thread_id: threadId,
+      input_url: blobUrl,
+      output_url: null,
+      user_params: {
+        outdoor_light,
+        indoor_light,
+        edit_description,
+      },
+    })
+    .select("id")
+    .single();
+
+  if (generationError) {
+    throw generationError;
+  }
+  const generationId = generation.id;
 
   try {
     // Fetch the file from Vercel Blob
@@ -52,23 +102,53 @@ export async function POST(request: Request) {
     const base64Data = buffer.toString("base64");
 
     // Extract filename from URL
-    const filename =
-      blobUrl.split("/").pop()?.split("?")[0] || "sketchup-render";
+    const filename = blobUrl.split("/").pop()?.split("?")[0];
+    if (!filename) {
+      throw new Error("");
+    }
+    const filenameParts = filename.split(".");
+    const filenameWithoutExt = filenameParts.slice(0, -1).join(".");
+    const ext = filenameParts.at(-1);
 
-    const result = await generateVisualizationImage({
-      base64Data,
-      mediaType: contentType,
-      filename,
-      outdoorLight: outdoor_light,
-      indoorLight: indoor_light,
-      editDescription: edit_description,
+    let result: { data: string; mediaType: string };
+    if (!process.env.NODE_ENV === "development") {
+      result = await generateVisualizationImage({
+        base64Data,
+        mediaType: contentType,
+        filename,
+        outdoorLight: outdoor_light,
+        indoorLight: indoor_light,
+        editDescription: edit_description,
+      });
+    } else {
+      result = {
+        mediaType: "image/png",
+        data: await fs.readFile(`src/test-data/octocat-base64-png.txt`, "utf8"),
+      };
+    }
+
+    const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
+    const blob = await put(outputFilename, Buffer.from(result.data, "base64"), {
+      access: "public",
+      contentType: result.mediaType,
     });
 
-    // Delete the temporary blob after processing
-    await del(blobUrl);
+    // Update generation record with output URL if available
+    if (user && generationId) {
+      const { error: updateError } = await supabase
+        .from("generations")
+        .update({
+          output_url: blob.url,
+        })
+        .eq("id", generationId);
+
+      if (updateError) {
+        console.error("Failed to update generation:", updateError);
+      }
+    }
 
     return NextResponse.json({
-      outputImage: `data:${result.mediaType};base64,${result.data}`,
+      outputImage: blob.url,
     });
   } catch (error) {
     const message =

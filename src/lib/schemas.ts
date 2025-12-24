@@ -23,3 +23,6 @@ export const generateRequestSchema = z.object({
 });
 
 export type GenerateRequest = z.infer<typeof generateRequestSchema>;
+
+// User params stored in database (excludes blobUrl which is ephemeral)
+export type UserParams = Omit<GenerateRequest, "blobUrl">;

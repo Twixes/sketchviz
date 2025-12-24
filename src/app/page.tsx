@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ClockIcon,
   DotFilledIcon,
   EnterIcon,
   ExitIcon,
@@ -44,7 +45,9 @@ export default function Home() {
     outdoorLight,
     indoorLight,
     editDescription,
-    isGenerating,
+    isBusyForUser,
+    setIsBusyForUser,
+    outputSrc,
     focusUpload,
     setOutdoorLight,
     setIndoorLight,
@@ -118,24 +121,29 @@ export default function Home() {
   }, [supabase]);
 
   const handleGenerate = useCallback(async () => {
-    // Wait for upload to finish if it's still in progress
-    let currentBlobUrl = blobUrl;
+    setIsBusyForUser(true);
+    try {
+      // Wait for upload to finish if it's still in progress
+      let currentBlobUrl = blobUrl;
 
-    if (uploadMutation.isPending) {
-      const uploadedUrl = await uploadMutation.mutateAsync(
-        uploadMutation.variables,
-      );
-      currentBlobUrl = uploadedUrl;
+      if (uploadMutation.isPending) {
+        const uploadedUrl = await uploadMutation.mutateAsync(
+          uploadMutation.variables,
+        );
+        currentBlobUrl = uploadedUrl;
+      }
+
+      if (!currentBlobUrl) return;
+
+      await generateMutation.mutateAsync({
+        blobUrl: currentBlobUrl,
+        outdoorLight,
+        indoorLight,
+        editDescription,
+      });
+    } finally {
+      setIsBusyForUser(false);
     }
-
-    if (!currentBlobUrl) return;
-
-    await generateMutation.mutateAsync({
-      blobUrl: currentBlobUrl,
-      outdoorLight,
-      indoorLight,
-      editDescription,
-    });
   }, [
     blobUrl,
     outdoorLight,
@@ -143,6 +151,7 @@ export default function Home() {
     editDescription,
     uploadMutation,
     generateMutation,
+    setIsBusyForUser,
   ]);
 
   return (
@@ -178,13 +187,21 @@ export default function Home() {
             </div>
           </a>
           {user ? (
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
-            >
-              <ExitIcon /> Log out
-            </button>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/threads"
+                className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
+              >
+                <ClockIcon /> Past threads
+              </Link>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
+              >
+                <ExitIcon /> Log out
+              </button>
+            </div>
           ) : (
             <button
               type="button"
