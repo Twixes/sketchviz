@@ -12,7 +12,7 @@ const IMAGE_EDITING_BASE_PROMPT =
 
 const IMAGE_DESCRIPTION_MODEL = google("gemini-flash-lite-latest");
 const IMAGE_DESCRIPTION_PROMPT =
-  "Describe this SketchUp render in a brief title. Refer to a matching historical or contemporary style of design if it strongly matches the picture. Output plain text";
+  "Describe this SketchUp render in a brief title. Refer to a matching historical or contemporary style of design if relevant (but you must highlight which elements reflect this style). Output plain text";
 
 type GeneratedImage = {
   base64: string;
