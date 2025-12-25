@@ -2,16 +2,19 @@ import { EnterIcon } from "@radix-ui/react-icons";
 import type { User } from "@supabase/supabase-js";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   INDOOR_LIGHT_OPTIONS,
   LightSelector,
   OUTDOOR_LIGHT_OPTIONS,
 } from "@/components/LightSelector";
 import { ModelSelector } from "@/components/ModelSelector";
+import { ReferenceImageUpload } from "@/components/ReferenceImageUpload";
 import { UploadDropzone } from "@/components/UploadDropzone";
+import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import type { Model } from "@/lib/schemas";
+import { useUploadStore } from "@/stores/upload-store";
 
 const LAYOUT_TRANSITION = {
   type: "spring",
@@ -57,6 +60,89 @@ export function ControlPanel({
 }: ControlPanelProps) {
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
   const handleSignIn = useSignInCallback();
+  const referenceUploadMutation = useReferenceUploadMutation();
+  const {
+    referenceImages,
+    addReferenceImage,
+    updateReferenceImageBlobUrl,
+    removeReferenceImage,
+  } = useUploadStore();
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+  const handleReferenceImageDrop = async (file: File) => {
+    if (referenceImages.length >= 3) {
+      return;
+    }
+
+    // Create local preview immediately
+    const localSrc = URL.createObjectURL(file);
+
+    // Add to store with null blobUrl (loading state)
+    const imageIndex = referenceImages.length;
+    addReferenceImage(localSrc, null);
+
+    try {
+      // Upload to Vercel Blob
+      const blobUrl = await referenceUploadMutation.mutateAsync({ file });
+
+      // Update the blobUrl once upload completes
+      updateReferenceImageBlobUrl(imageIndex, blobUrl);
+    } catch (error) {
+      console.error("Failed to upload reference image:", error);
+      // Remove the failed upload
+      removeReferenceImage(imageIndex);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only set to false if we're leaving the textarea itself, not a child
+    if (e.currentTarget === e.target) {
+      setIsDraggingOver(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      void handleReferenceImageDrop(file);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      // Check if the item is an image
+      if (item.type.startsWith("image/")) {
+        e.preventDefault();
+
+        const file = item.getAsFile();
+        if (file) {
+          void handleReferenceImageDrop(file);
+        }
+        break;
+      }
+    }
+  };
 
   return (
     <motion.div
@@ -110,7 +196,7 @@ export function ControlPanel({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={FADE_TRANSITION}
-            className="relative mt-3 flex flex-col gap-3 z-10"
+            className="relative mt-6 flex flex-col gap-3 z-10"
           >
             <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap *:shrink">
               <LightSelector
@@ -130,20 +216,36 @@ export function ControlPanel({
               <ModelSelector value={model} onChange={onModelChange} />
             </div>
 
-            <textarea
-              id="edit-description"
-              value={editDescription ?? ""}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                  e.preventDefault();
-                  onGenerate();
+            <div className="flex relative">
+              <textarea
+                id="edit-description"
+                value={editDescription ?? ""}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    onGenerate();
+                  }
+                }}
+                onChange={(e) =>
+                  onEditDescriptionChange(e.target.value || null)
                 }
-              }}
-              onChange={(e) => onEditDescriptionChange(e.target.value || null)}
-              placeholder="Request edits or specify materials (optional)"
-              rows={2}
-              className="rounded-xl border border-black/20 bg-white px-4 py-2 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-none"
-            />
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onPaste={handlePaste}
+                placeholder="Request edits or specify materials (optional)"
+                rows={2}
+                className={clsx([
+                  "w-full rounded-xl border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-none transition-colors",
+                  referenceImages.length > 0 ? "pb-16" : "pb-6",
+                  isDraggingOver
+                    ? "border-black/60 bg-black/5"
+                    : "border-black/20",
+                ])}
+              />
+              <ReferenceImageUpload disabled={isBusyForUser} />
+            </div>
 
             <button
               type="submit"

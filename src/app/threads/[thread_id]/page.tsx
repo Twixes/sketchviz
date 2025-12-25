@@ -103,7 +103,7 @@ export default function ThreadDetailPage({
       <motion.main
         layout
         transition={LAYOUT_TRANSITION}
-        className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-14 lg:px-10"
+        className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
       >
         <Header user={user} />
 

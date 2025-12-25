@@ -29,6 +29,7 @@ export const generateRequestSchema = z.object({
   indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
   model: modelSchema.optional(),
+  reference_image_urls: z.array(z.string().url()).max(3).optional(),
 });
 
 export type GenerateRequest = z.infer<typeof generateRequestSchema>;

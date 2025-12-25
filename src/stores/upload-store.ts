@@ -6,11 +6,17 @@ import {
 } from "@/lib/constants";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 
+export interface ReferenceImage {
+  localSrc: string; // Local blob URL for preview
+  blobUrl: string | null; // Uploaded Vercel Blob URL (null while uploading)
+}
+
 interface UploadState {
   // Image sources
   inputSrc: string | null;
   outputSrc: string | null;
   blobUrl: string | null;
+  referenceImages: ReferenceImage[];
 
   // UI state
   error: string | null;
@@ -36,6 +42,9 @@ interface UploadState {
   setIsUploading: (isUploading: boolean) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setIsBusyForUser: (isBusy: boolean) => void;
+  addReferenceImage: (localSrc: string, blobUrl: string | null) => void;
+  updateReferenceImageBlobUrl: (index: number, blobUrl: string) => void;
+  removeReferenceImage: (index: number) => void;
   reset: () => void;
 }
 
@@ -43,6 +52,7 @@ const initialState = {
   inputSrc: null,
   outputSrc: null,
   blobUrl: null,
+  referenceImages: [] as ReferenceImage[],
   error: null,
   outdoorLight: null as OutdoorLight,
   indoorLight: null as IndoorLight,
@@ -81,12 +91,49 @@ export const useUploadStore = create<UploadState>()(
       setIsGenerating: (isGenerating) => set({ isGenerating }),
       setIsBusyForUser: (isBusy) => set({ isBusyForUser: isBusy }),
 
+      addReferenceImage: (localSrc, blobUrl) => {
+        const { referenceImages } = get();
+        if (referenceImages.length < 3) {
+          set({ referenceImages: [...referenceImages, { localSrc, blobUrl }] });
+        }
+      },
+
+      updateReferenceImageBlobUrl: (index, blobUrl) => {
+        const { referenceImages } = get();
+        const updatedImages = [...referenceImages];
+        if (updatedImages[index]) {
+          updatedImages[index] = { ...updatedImages[index], blobUrl };
+          set({ referenceImages: updatedImages });
+        }
+      },
+
+      removeReferenceImage: (index) => {
+        const { referenceImages } = get();
+        const imageToRemove = referenceImages[index];
+
+        // Clean up local blob URL
+        if (imageToRemove?.localSrc.startsWith("blob:")) {
+          URL.revokeObjectURL(imageToRemove.localSrc);
+        }
+
+        set({
+          referenceImages: referenceImages.filter((_, i) => i !== index),
+        });
+      },
+
       reset: () => {
-        const { inputSrc, model } = get();
+        const { inputSrc, referenceImages, model } = get();
 
         // Clean up blob URL
         if (inputSrc?.startsWith("blob:")) {
           URL.revokeObjectURL(inputSrc);
+        }
+
+        // Clean up reference image blob URLs
+        for (const refImage of referenceImages) {
+          if (refImage.localSrc.startsWith("blob:")) {
+            URL.revokeObjectURL(refImage.localSrc);
+          }
         }
 
         // Reset but preserve model selection

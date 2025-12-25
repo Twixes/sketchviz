@@ -200,3 +200,42 @@ body {
     --ring-progress: 360deg;
   }
 }
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@property --ring-rotation {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: -90deg;
+}
+
+@keyframes ring-spin {
+  from {
+    --ring-rotation: -90deg;
+  }
+  to {
+    --ring-rotation: 270deg;
+  }
+}
+
+@theme {
+  --animate-shimmer: shimmer 1.5s infinite;
+  --animate-spin: spin 1s linear infinite;
+  --animate-ring-spin: ring-spin 1s linear infinite;
+}

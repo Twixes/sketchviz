@@ -7,9 +7,6 @@ import {
 } from "./constants";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 
-const IMAGE_EDITING_BASE_PROMPT =
-  "Turn this Sketchup render into a realistic 3D visualization with full lighting";
-
 const IMAGE_DESCRIPTION_MODEL = google("gemini-flash-lite-latest");
 const IMAGE_DESCRIPTION_PROMPT =
   "Describe this SketchUp render in a brief title. Refer to a matching historical or contemporary style of design if relevant (but you must highlight which elements reflect this style). Output plain text";
@@ -28,6 +25,7 @@ export async function generateVisualizationImage(params: {
   indoorLight?: IndoorLight;
   editDescription?: string | null;
   model?: Model;
+  referenceImages?: Array<{ buffer: Buffer; mediaType: string }>;
 }): Promise<GeneratedImage> {
   if (process.env.SKIP_AI === "1") {
     const base64 = await fs.readFile(
@@ -42,7 +40,8 @@ export async function generateVisualizationImage(params: {
   }
 
   // Build the prompt based on light conditions and edit description
-  let prompt = IMAGE_EDITING_BASE_PROMPT;
+  let prompt =
+    "Turn this Sketchup render into a realistic 3D visualization with full lighting";
   // Handle outdoor lighting
   if (params.outdoorLight === "sunny") {
     prompt += " with sunny outdoor light";
@@ -64,9 +63,18 @@ export async function generateVisualizationImage(params: {
     // Custom indoor lighting description
     prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
   }
+  prompt +=
+    ". Use the last image of the first message as the base. Preserve the current perspective unless user asks otherwise. Use the other reference images provided for materials, textures, and items to use";
 
   if (params.editDescription) {
-    prompt += `. ${params.editDescription}`;
+    prompt += `. Specific user asks: ${params.editDescription}`;
+  }
+
+  // Add reference to provided reference images
+  if (params.referenceImages && params.referenceImages.length > 0) {
+    prompt += `. Use the ${params.referenceImages.length} reference image${
+      params.referenceImages.length > 1 ? "s" : ""
+    } provided for materials, textures, and style guidance`;
   }
 
   // Select the model, stripping the provider prefix (google/)
@@ -81,19 +89,34 @@ export async function generateVisualizationImage(params: {
     throw new Error(`Unsupported model provider: ${modelProvider}`);
   }
 
+  // Build content array with main image and reference images
+  const content: Array<
+    | { type: "text"; text: string }
+    | { type: "file"; data: Buffer; mediaType: string; filename?: string }
+  > = [{ type: "text", text: prompt }];
+
+  // Add reference images if provided
+  if (params.referenceImages && params.referenceImages.length > 0) {
+    for (const refImage of params.referenceImages) {
+      content.push({
+        type: "file",
+        data: refImage.buffer,
+        mediaType: refImage.mediaType,
+      });
+    }
+  }
+  content.push({
+    type: "file",
+    data: params.imageBuffer,
+    mediaType: params.mediaType,
+    filename: params.filename,
+  });
+
   const result = await imageEditingModel.doGenerate({
     prompt: [
       {
         role: "user",
-        content: [
-          { type: "text", text: prompt },
-          {
-            type: "file",
-            data: params.imageBuffer,
-            mediaType: params.mediaType,
-            filename: params.filename,
-          },
-        ],
+        content,
       },
     ],
     providerOptions: {

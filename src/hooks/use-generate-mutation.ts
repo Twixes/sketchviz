@@ -16,7 +16,8 @@ interface GenerateResponse {
 }
 
 export function useGenerateMutation() {
-  const { setOutputSrc, setError, setIsGenerating } = useUploadStore();
+  const { setOutputSrc, setError, setIsGenerating, referenceImages } =
+    useUploadStore();
 
   return useMutation({
     mutationFn: async ({
@@ -37,6 +38,9 @@ export function useGenerateMutation() {
           indoor_light: indoorLight,
           edit_description: editDescription,
           model,
+          reference_image_urls: referenceImages
+            .filter((img) => img.blobUrl !== null)
+            .map((img) => img.blobUrl),
         }),
       });
 

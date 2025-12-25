@@ -1,8 +1,7 @@
 "use client";
 
-import { Half1Icon, Half2Icon, UploadIcon } from "@radix-ui/react-icons";
+import { Half2Icon, UploadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
-import Image from "next/image";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
@@ -166,7 +165,7 @@ export function UploadDropzone({
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
         className={clsx([
-          "group relative flex w-full cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden text-center transition",
+          "group relative flex cursor-pointer flex-col items-center justify-center gap-4 max-h-[75vh] mx-auto overflow-hidden text-center transition",
           frame
             ? "rounded-3xl bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]"
             : "rounded-3xl px-6 py-12",

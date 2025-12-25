@@ -18,8 +18,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: firstError.message }, { status: 400 });
   }
 
-  const { blobUrl, outdoor_light, indoor_light, edit_description, model } =
-    validation.data;
+  const {
+    blobUrl,
+    outdoor_light,
+    indoor_light,
+    edit_description,
+    model,
+    reference_image_urls,
+  } = validation.data;
 
   // Get user session
   const supabase = await createClient();
@@ -104,6 +110,28 @@ export async function POST(request: Request) {
       mediaType: contentType,
     }); // Update thread with title in background
 
+    // Fetch reference images if provided
+    const referenceImageBuffers: Array<{
+      buffer: Buffer;
+      mediaType: string;
+    }> = [];
+
+    if (reference_image_urls && reference_image_urls.length > 0) {
+      for (const refUrl of reference_image_urls) {
+        const refResponse = await fetch(refUrl);
+        if (refResponse.ok) {
+          const refContentType = refResponse.headers.get("content-type");
+          if (refContentType && ACCEPTED_MIME_TYPES.includes(refContentType)) {
+            const refArrayBuffer = await refResponse.arrayBuffer();
+            referenceImageBuffers.push({
+              buffer: Buffer.from(refArrayBuffer),
+              mediaType: refContentType,
+            });
+          }
+        }
+      }
+    }
+
     // Extract filename from URL
     const filename = blobUrl.split("/").pop()?.split("?")[0];
     if (!filename) {
@@ -121,6 +149,7 @@ export async function POST(request: Request) {
       indoorLight: indoor_light,
       editDescription: edit_description,
       model,
+      referenceImages: referenceImageBuffers,
     });
 
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
