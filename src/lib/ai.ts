@@ -1,15 +1,18 @@
 import fs from "node:fs/promises";
 import { google } from "@ai-sdk/google";
-import { generateImage, generateText, ImageModel, LanguageModel } from "ai";
-import type { IndoorLight, OutdoorLight } from "./schemas";
+import { generateText, type LanguageModel } from "ai";
+import {
+  DEFAULT_IMAGE_EDITING_MODEL,
+  DEFAULT_MODEL_PROVIDER,
+} from "./constants";
+import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 
-const IMAGE_EDITING_MODEL = google("gemini-3-pro-image-preview");
 const IMAGE_EDITING_BASE_PROMPT =
   "Turn this Sketchup render into a realistic 3D visualization with full lighting";
 
 const IMAGE_DESCRIPTION_MODEL = google("gemini-flash-lite-latest");
 const IMAGE_DESCRIPTION_PROMPT =
-  "Describe this SketchUp render in a brief title. Refer to a matching historical or contemporary style of design if relevant. Output plain text";
+  "Describe this SketchUp render in a brief title. Refer to a matching historical or contemporary style of design if it strongly matches the picture. Output plain text";
 
 type GeneratedImage = {
   base64: string;
@@ -24,6 +27,7 @@ export async function generateVisualizationImage(params: {
   outdoorLight?: OutdoorLight;
   indoorLight?: IndoorLight;
   editDescription?: string | null;
+  model?: Model;
 }): Promise<GeneratedImage> {
   if (process.env.SKIP_AI === "1") {
     const base64 = await fs.readFile(
@@ -64,7 +68,20 @@ export async function generateVisualizationImage(params: {
   if (params.editDescription) {
     prompt += `. ${params.editDescription}`;
   }
-  const result = await IMAGE_EDITING_MODEL.doGenerate({
+
+  // Select the model, stripping the provider prefix (google/)
+  const [modelProvider, modelName] = params.model?.split("/") || [
+    DEFAULT_MODEL_PROVIDER,
+    DEFAULT_IMAGE_EDITING_MODEL,
+  ];
+  let imageEditingModel: LanguageModel;
+  if (modelProvider === "google") {
+    imageEditingModel = google(modelName);
+  } else {
+    throw new Error(`Unsupported model provider: ${modelProvider}`);
+  }
+
+  const result = await imageEditingModel.doGenerate({
     prompt: [
       {
         role: "user",

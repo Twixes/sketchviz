@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import type { IndoorLight, OutdoorLight } from "@/lib/schemas";
+import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
 interface GenerateParams {
@@ -7,6 +7,7 @@ interface GenerateParams {
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
   editDescription: string | null;
+  model?: Model;
 }
 
 interface GenerateResponse {
@@ -23,6 +24,7 @@ export function useGenerateMutation() {
       outdoorLight,
       indoorLight,
       editDescription,
+      model,
     }: GenerateParams): Promise<string> => {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -34,6 +36,7 @@ export function useGenerateMutation() {
           outdoor_light: outdoorLight,
           indoor_light: indoorLight,
           edit_description: editDescription,
+          model,
         }),
       });
 

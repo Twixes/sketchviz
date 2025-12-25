@@ -10,8 +10,6 @@ import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { useSession } from "@/components/SessionProvider";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
-import { useSignInCallback } from "@/hooks/use-sign-in-callback";
-import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -22,7 +20,7 @@ const LAYOUT_TRANSITION = {
 } as const;
 
 export default function Home() {
-  const { user, supabase } = useSession();
+  const { user } = useSession();
 
   // Zustand store
   const {
@@ -31,12 +29,14 @@ export default function Home() {
     outdoorLight,
     indoorLight,
     editDescription,
+    model,
     isBusyForUser,
     setIsBusyForUser,
     outputSrc,
     setOutdoorLight,
     setIndoorLight,
     setEditDescription,
+    setModel,
     reset,
   } = useUploadStore();
 
@@ -81,6 +81,7 @@ export default function Home() {
         outdoorLight,
         indoorLight,
         editDescription,
+        model,
       });
     } finally {
       setIsBusyForUser(false);
@@ -90,6 +91,7 @@ export default function Home() {
     outdoorLight,
     indoorLight,
     editDescription,
+    model,
     uploadMutation,
     generateMutation,
     setIsBusyForUser,
@@ -124,6 +126,7 @@ export default function Home() {
             outdoorLight={outdoorLight}
             indoorLight={indoorLight}
             editDescription={editDescription}
+            model={model}
             isBusyForUser={isBusyForUser}
             outputSrc={outputSrc}
             focusUpload={focusUpload}
@@ -131,6 +134,7 @@ export default function Home() {
             onOutdoorLightChange={setOutdoorLight}
             onIndoorLightChange={setIndoorLight}
             onEditDescriptionChange={setEditDescription}
+            onModelChange={setModel}
             onGenerate={handleGenerate}
           />
         </motion.section>

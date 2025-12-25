@@ -1,10 +1,6 @@
-import { execSync } from "node:child_process";
-import fs from "node:fs/promises";
-import { title } from "node:process";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
-import { uuidv7 } from "zod";
 import { generateVisualizationImage, titleVisualizationImage } from "@/lib/ai";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
 import { generateRequestSchema } from "@/lib/schemas";
@@ -22,7 +18,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: firstError.message }, { status: 400 });
   }
 
-  const { blobUrl, outdoor_light, indoor_light, edit_description } =
+  const { blobUrl, outdoor_light, indoor_light, edit_description, model } =
     validation.data;
 
   // Get user session
@@ -61,6 +57,7 @@ export async function POST(request: Request) {
         outdoor_light,
         indoor_light,
         edit_description,
+        model,
       },
     })
     .select("id")
@@ -123,6 +120,7 @@ export async function POST(request: Request) {
       outdoorLight: outdoor_light,
       indoorLight: indoor_light,
       editDescription: edit_description,
+      model,
     });
 
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;

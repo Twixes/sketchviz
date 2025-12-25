@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+// Model schema
+export const modelSchema = z.enum([
+  "google/gemini-3-pro-image-preview",
+  "google/gemini-2.5-flash-image-preview",
+]);
+
+export type Model = z.infer<typeof modelSchema>;
+
 // Outdoor light schema
 export const outdoorLightSchema = z
   .union([z.enum(["sunny", "overcast", "night"]), z.string().min(1)])
@@ -20,6 +28,7 @@ export const generateRequestSchema = z.object({
   outdoor_light: outdoorLightSchema.optional(),
   indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
+  model: modelSchema.optional(),
 });
 
 export type GenerateRequest = z.infer<typeof generateRequestSchema>;

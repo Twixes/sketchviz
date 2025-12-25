@@ -13,6 +13,9 @@ declare global {
   }
 }
 
+export const DEFAULT_MODEL_PROVIDER = "google";
+export const DEFAULT_IMAGE_EDITING_MODEL = "gemini-3-pro-image-preview";
+
 export const ACCEPTED_MIME_TYPES: string[] = [
   "image/png",
   "image/jpeg",

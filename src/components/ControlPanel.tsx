@@ -8,8 +8,10 @@ import {
   LightSelector,
   OUTDOOR_LIGHT_OPTIONS,
 } from "@/components/LightSelector";
+import { ModelSelector } from "@/components/ModelSelector";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
+import type { Model } from "@/lib/schemas";
 
 const LAYOUT_TRANSITION = {
   type: "spring",
@@ -24,6 +26,7 @@ interface ControlPanelProps {
   outdoorLight: string | null;
   indoorLight: string | null;
   editDescription: string | null;
+  model: Model;
   isBusyForUser: boolean;
   outputSrc: string | null;
   focusUpload: boolean;
@@ -31,6 +34,7 @@ interface ControlPanelProps {
   onOutdoorLightChange: (value: string | null) => void;
   onIndoorLightChange: (value: string | null) => void;
   onEditDescriptionChange: (value: string | null) => void;
+  onModelChange: (value: Model) => void;
   onGenerate: () => Promise<void>;
 }
 
@@ -40,6 +44,7 @@ export function ControlPanel({
   outdoorLight,
   indoorLight,
   editDescription,
+  model,
   isBusyForUser,
   outputSrc,
   focusUpload,
@@ -47,6 +52,7 @@ export function ControlPanel({
   onOutdoorLightChange,
   onIndoorLightChange,
   onEditDescriptionChange,
+  onModelChange,
   onGenerate,
 }: ControlPanelProps) {
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
@@ -120,6 +126,8 @@ export function ControlPanel({
                 options={INDOOR_LIGHT_OPTIONS}
                 onChange={onIndoorLightChange}
               />
+
+              <ModelSelector value={model} onChange={onModelChange} />
             </div>
 
             <textarea

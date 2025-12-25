@@ -75,7 +75,7 @@ export function LightSelector({
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className="relative flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
+                className="relative text-left flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm text-black outline-none hover:bg-black/5 focus:bg-black/10"
               >
                 <option.icon className="size-4" />
                 <span>{option.label}</span>

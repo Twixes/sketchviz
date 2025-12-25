@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowLeftIcon, ExitIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { type Usable, use, useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
@@ -91,17 +90,8 @@ export default function ThreadDetailPage({
     enabled: !!user && !!threadId,
   });
 
-  const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  }, [supabase, router]);
-
   const handleBackToThreads = useCallback(() => {
     router.push("/threads");
-  }, [router]);
-
-  const handleBackHome = useCallback(() => {
-    router.push("/");
   }, [router]);
 
   if (!user) {
@@ -207,7 +197,8 @@ export default function ThreadDetailPage({
                       {/* Parameters */}
                       {(generation.user_params.outdoor_light ||
                         generation.user_params.indoor_light ||
-                        generation.user_params.edit_description) && (
+                        generation.user_params.edit_description ||
+                        generation.user_params.model) && (
                         <div className="mt-4 space-y-2 rounded-lg bg-black/5 p-3">
                           <p className="text-xs font-semibold uppercase tracking-widest text-black/40">
                             Parameters
@@ -221,6 +212,11 @@ export default function ThreadDetailPage({
                             {generation.user_params.indoor_light && (
                               <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
                                 Indoor: {generation.user_params.indoor_light}
+                              </span>
+                            )}
+                            {generation.user_params.model && (
+                              <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
+                                AI model: {generation.user_params.model}
                               </span>
                             )}
                           </div>
