@@ -152,13 +152,10 @@ export function UploadDropzone({
     [],
   );
 
-  const handleCompareStart = useCallback(
-    (event: React.MouseEvent | React.TouchEvent) => {
-      event.stopPropagation();
-      setIsComparing(true);
-    },
-    [],
-  );
+  const handleCompareStart = useCallback((event: React.PointerEvent) => {
+    event.stopPropagation();
+    setIsComparing(true);
+  }, []);
   const handleCompareEnd = useCallback(() => {
     setIsComparing(false);
   }, []);
@@ -229,14 +226,14 @@ export function UploadDropzone({
                 {isReady ? (
                   <button
                     type="button"
-                    onMouseDown={handleCompareStart}
-                    onMouseUp={handleCompareEnd}
+                    onPointerDown={handleCompareStart}
+                    onPointerUp={handleCompareEnd}
                     onClick={(e) => {
                       e.stopPropagation();
                     }}
                     title="Compare with original"
                     className={clsx(
-                      "flex rounded-full p-1 text-xs backdrop-blur-sm shadow-sm hover:rotate-45 cursor-pointer",
+                      "flex rounded-full p-1 text-xs backdrop-blur-sm shadow-sm hover:rotate-45 cursor-pointer touch-none",
                       !isComparing
                         ? "bg-black/80 text-white"
                         : "bg-white/80 text-black",

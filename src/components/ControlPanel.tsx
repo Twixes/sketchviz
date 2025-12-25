@@ -58,7 +58,10 @@ export function ControlPanel({
       layout
       transition={LAYOUT_TRANSITION}
       animate={focusUpload ? { scale: 1.03 } : { scale: 1 }}
-      className={clsx(["relative w-full", focusUpload ? "max-w-5xl" : ""])}
+      className={clsx([
+        "relative w-full min-w-0",
+        focusUpload ? "max-w-5xl" : "",
+      ])}
     >
       {/* Enhanced Memphis decorative shapes */}
       <motion.div
@@ -103,7 +106,7 @@ export function ControlPanel({
             transition={FADE_TRANSITION}
             className="relative mt-3 flex flex-col gap-3 z-10"
           >
-            <div className="flex items-center gap-x-4 gap-y-2 whitespace-nowrap *:flex-1">
+            <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap *:shrink">
               <LightSelector
                 label="Outdoor light"
                 value={outdoorLight}

@@ -22,12 +22,12 @@ export function Header({ user, onLogoClick }: HeaderProps) {
     <motion.header
       initial={false}
       transition={FADE_TRANSITION}
-      className="flex items-center justify-between z-10"
+      className="flex flex-wrap items-center justify-between z-10 gap-4"
     >
       <a
         href="/"
         onClick={onLogoClick}
-        className="flex items-center gap-4 cursor-pointer"
+        className="flex items-center gap-4 cursor-pointer whitespace-nowrap"
       >
         <Image
           src="/icon.png"

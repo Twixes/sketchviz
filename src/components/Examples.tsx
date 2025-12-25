@@ -37,7 +37,7 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
 
   useEffect(() => {
     if (!isDragging) return;
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent) => {
       if (!isDragging) return;
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -45,12 +45,12 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
       const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
       setRevealPercent(percent);
     };
-    const handleMouseUp = () => setIsDragging(false);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    const handlePointerUp = () => setIsDragging(false);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
     };
   }, [isDragging]);
 
@@ -63,8 +63,8 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
       ref={containerRef}
     >
       <button
-        className="relative aspect-[4/3] cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)]"
-        onMouseDown={() => setIsDragging(true)}
+        className="relative aspect-[4/3] cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)] touch-none"
+        onPointerDown={() => setIsDragging(true)}
         type="button"
       >
         {/* Before image (base layer - left side) */}
