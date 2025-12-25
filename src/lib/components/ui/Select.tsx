@@ -1,0 +1,122 @@
+import * as Popover from "@radix-ui/react-popover";
+import { useState } from "react";
+
+export interface SelectOption<T> {
+  value: T;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description?: string;
+}
+
+interface SelectProps<T> {
+  label: string;
+  value: T;
+  options: SelectOption<T>[];
+  onChange: (value: T) => void;
+  allowCustomInput?: boolean;
+  customInputPlaceholder?: string;
+}
+
+export function Select<T extends string | null>({
+  label,
+  value,
+  options,
+  onChange,
+  allowCustomInput = false,
+  customInputPlaceholder = "…or specify it in text",
+}: SelectProps<T>) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Find the current option or determine if it's a custom value
+  const currentOption = options.find((opt) => opt.value === value);
+  const isCustomValue =
+    allowCustomInput &&
+    value !== null &&
+    !options.some((opt) => opt.value === value);
+  const customInputValue = isCustomValue ? (value as string) : "";
+  const fallbackOption = options[0];
+
+  return (
+    <div className="flex items-center gap-2">
+      <label htmlFor={label} className="text-sm font-semibold text-black">
+        {label}:
+      </label>
+      <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+        <Popover.Trigger className="inline-flex items-center justify-between gap-2 flex-1 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-150 hover:bg-black/5 hover:border-black/30 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+          <span id={label} className="flex items-center gap-2 truncate">
+            {currentOption ? (
+              <>
+                <currentOption.icon className="size-4 shrink-0" />
+                <span>{currentOption.label}</span>
+              </>
+            ) : isCustomValue ? (
+              value
+            ) : (
+              // Fallback to first option if no match
+              <>
+                <fallbackOption.icon className="size-4 shrink-0" />
+                <span>{fallbackOption.label}</span>
+              </>
+            )}
+          </span>
+          <span
+            className={`text-black/60 transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          >
+            ▼
+          </span>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-xl p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200"
+            align="start"
+            sideOffset={4}
+          >
+            {options.map((option) => {
+              const isSelected = option.value === value;
+              return (
+                <button
+                  key={String(option.value ?? "null")}
+                  type="button"
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                  }}
+                  className={`relative text-left flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none transition-transform duration-150 hover:bg-black/5 focus:bg-black/10 active:scale-[0.98] ${
+                    isSelected
+                      ? "bg-black/5 text-black font-medium"
+                      : "text-black"
+                  }`}
+                >
+                  <option.icon className="size-4 shrink-0 transition-transform duration-150 group-hover:scale-110" />
+                  <div className="flex flex-col items-start">
+                    <span className={option.description ? "font-medium" : ""}>
+                      {option.label}
+                    </span>
+                    {option.description && (
+                      <span className="text-xs text-black/50">
+                        {option.description}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+            {allowCustomInput && (
+              <div className="relative flex items-center gap-2 rounded-lg p-1 text-sm">
+                <input
+                  type="text"
+                  value={customInputValue}
+                  onChange={(e) => onChange((e.target.value || null) as T)}
+                  placeholder={customInputPlaceholder}
+                  className="w-full rounded-lg border border-black/20 bg-white px-2 py-1.5 text-sm text-black placeholder:text-black/40 transition-transform duration-150 hover:border-black/30 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40"
+                />
+              </div>
+            )}
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+    </div>
+  );
+}
