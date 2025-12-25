@@ -1,3 +1,4 @@
+import { CheckIcon } from "@radix-ui/react-icons";
 import * as Popover from "@radix-ui/react-popover";
 import { useState } from "react";
 
@@ -83,23 +84,35 @@ export function Select<T extends string | null>({
                     onChange(option.value);
                     setIsOpen(false);
                   }}
-                  className={`relative text-left flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none transition-transform duration-150 hover:bg-black/5 focus:bg-black/10 active:scale-[0.98] ${
+                  data-selected={isSelected}
+                  className={`group relative text-left flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 pr-8 text-sm outline-none transition-all duration-150 ${
                     isSelected
-                      ? "bg-black/5 text-black font-medium"
-                      : "text-black"
-                  }`}
+                      ? "bg-black text-white"
+                      : "text-black hover:bg-black/5 focus-visible:bg-black/5"
+                  } active:scale-[0.98]`}
                 >
-                  <option.icon className="size-4 shrink-0 transition-transform duration-150 group-hover:scale-110" />
-                  <div className="flex flex-col items-start">
+                  <option.icon
+                    className={`size-4 shrink-0 transition-transform duration-150 ${
+                      isSelected ? "" : "group-hover:scale-110"
+                    }`}
+                  />
+                  <div className="flex flex-col items-start flex-1">
                     <span className={option.description ? "font-medium" : ""}>
                       {option.label}
                     </span>
                     {option.description && (
-                      <span className="text-xs text-black/50">
+                      <span
+                        className={`text-xs ${
+                          isSelected ? "text-white/70" : "text-black/50"
+                        }`}
+                      >
                         {option.description}
                       </span>
                     )}
                   </div>
+                  {isSelected && (
+                    <CheckIcon className="absolute right-3 size-4 text-white" />
+                  )}
                 </button>
               );
             })}
