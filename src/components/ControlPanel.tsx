@@ -3,6 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState } from "react";
+import { AspectRatioSelector } from "@/components/AspectRatioSelector";
 import {
   INDOOR_LIGHT_OPTIONS,
   LightSelector,
@@ -13,6 +14,7 @@ import { ReferenceImageUpload } from "@/components/ReferenceImageUpload";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
+import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { Model } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -30,6 +32,7 @@ interface ControlPanelProps {
   indoorLight: string | null;
   editDescription: string | null;
   model: Model;
+  aspectRatio: AspectRatio | null;
   isBusyForUser: boolean;
   outputSrc: string | null;
   focusUpload: boolean;
@@ -38,6 +41,7 @@ interface ControlPanelProps {
   onIndoorLightChange: (value: string | null) => void;
   onEditDescriptionChange: (value: string | null) => void;
   onModelChange: (value: Model) => void;
+  onAspectRatioChange: (value: AspectRatio | null) => void;
   onGenerate: () => Promise<void>;
 }
 
@@ -48,6 +52,7 @@ export function ControlPanel({
   indoorLight,
   editDescription,
   model,
+  aspectRatio,
   isBusyForUser,
   outputSrc,
   focusUpload,
@@ -56,6 +61,7 @@ export function ControlPanel({
   onIndoorLightChange,
   onEditDescriptionChange,
   onModelChange,
+  onAspectRatioChange,
   onGenerate,
 }: ControlPanelProps) {
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
@@ -205,14 +211,17 @@ export function ControlPanel({
                 options={OUTDOOR_LIGHT_OPTIONS}
                 onChange={onOutdoorLightChange}
               />
-
               <LightSelector
                 label="Indoor lighting"
                 value={indoorLight}
                 options={INDOOR_LIGHT_OPTIONS}
                 onChange={onIndoorLightChange}
               />
-
+              <AspectRatioSelector
+                value={aspectRatio}
+                onChange={onAspectRatioChange}
+                hasReferenceImages={referenceImages.length > 0}
+              />
               <ModelSelector value={model} onChange={onModelChange} />
             </div>
 

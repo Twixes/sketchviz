@@ -30,6 +30,7 @@ export default function Home() {
     indoorLight,
     editDescription,
     model,
+    aspectRatio,
     isBusyForUser,
     setIsBusyForUser,
     outputSrc,
@@ -37,6 +38,7 @@ export default function Home() {
     setIndoorLight,
     setEditDescription,
     setModel,
+    setAspectRatio,
     reset,
   } = useUploadStore();
 
@@ -82,6 +84,7 @@ export default function Home() {
         indoorLight,
         editDescription,
         model,
+        aspectRatio,
       });
     } finally {
       setIsBusyForUser(false);
@@ -92,6 +95,7 @@ export default function Home() {
     indoorLight,
     editDescription,
     model,
+    aspectRatio,
     uploadMutation,
     generateMutation,
     setIsBusyForUser,
@@ -127,6 +131,7 @@ export default function Home() {
             indoorLight={indoorLight}
             editDescription={editDescription}
             model={model}
+            aspectRatio={aspectRatio}
             isBusyForUser={isBusyForUser}
             outputSrc={outputSrc}
             focusUpload={focusUpload}
@@ -135,6 +140,7 @@ export default function Home() {
             onIndoorLightChange={setIndoorLight}
             onEditDescriptionChange={setEditDescription}
             onModelChange={setModel}
+            onAspectRatioChange={setAspectRatio}
             onGenerate={handleGenerate}
           />
         </motion.section>

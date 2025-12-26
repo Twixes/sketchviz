@@ -1,7 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import sharp from "sharp";
 import { generateVisualizationImage, titleVisualizationImage } from "@/lib/ai";
+import { calculateCropDimensions } from "@/lib/aspect-ratio";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
 import { generateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
@@ -25,6 +27,7 @@ export async function POST(request: Request) {
     edit_description,
     model,
     reference_image_urls,
+    aspect_ratio,
   } = validation.data;
 
   // Get user session
@@ -64,6 +67,7 @@ export async function POST(request: Request) {
         indoor_light,
         edit_description,
         model,
+        aspect_ratio,
       },
     })
     .select("id")
@@ -103,7 +107,34 @@ export async function POST(request: Request) {
     }
 
     const arrayBuffer = await blobResponse.arrayBuffer();
-    const imageBuffer = Buffer.from(arrayBuffer);
+    let imageBuffer: Buffer = Buffer.from(arrayBuffer);
+
+    // Crop image if aspect ratio is specified
+    if (aspect_ratio) {
+      const sharpImage = sharp(imageBuffer);
+      const metadata = await sharpImage.metadata();
+
+      if (!metadata.width || !metadata.height) {
+        throw new Error("Unable to read image dimensions.");
+      }
+
+      const cropDimensions = calculateCropDimensions({
+        imageWidth: metadata.width,
+        imageHeight: metadata.height,
+        targetRatio: aspect_ratio,
+      });
+
+      imageBuffer = Buffer.from(
+        await sharpImage
+          .extract({
+            left: cropDimensions.left,
+            top: cropDimensions.top,
+            width: cropDimensions.width,
+            height: cropDimensions.height,
+          })
+          .toBuffer(),
+      );
+    }
 
     void updateThreadWithTitle(supabase, thread, {
       buffer: imageBuffer,
@@ -150,6 +181,7 @@ export async function POST(request: Request) {
       editDescription: edit_description,
       model,
       referenceImages: referenceImageBuffers,
+      aspectRatio: aspect_ratio,
     });
 
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;

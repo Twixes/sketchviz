@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { type AspectRatio, findClosestAspectRatio } from "@/lib/aspect-ratio";
 import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
@@ -17,6 +18,7 @@ interface UploadState {
   outputSrc: string | null;
   blobUrl: string | null;
   referenceImages: ReferenceImage[];
+  inputImageDimensions: { width: number; height: number } | null;
 
   // UI state
   error: string | null;
@@ -24,6 +26,7 @@ interface UploadState {
   indoorLight: IndoorLight;
   editDescription: string | null;
   model: Model;
+  aspectRatio: AspectRatio | null;
 
   // Loading states
   isUploading: boolean;
@@ -39,6 +42,10 @@ interface UploadState {
   setIndoorLight: (light: IndoorLight) => void;
   setEditDescription: (description: string | null) => void;
   setModel: (model: Model) => void;
+  setAspectRatio: (ratio: AspectRatio | null) => void;
+  setInputImageDimensions: (
+    dimensions: { width: number; height: number } | null,
+  ) => void;
   setIsUploading: (isUploading: boolean) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setIsBusyForUser: (isBusy: boolean) => void;
@@ -53,11 +60,13 @@ const initialState = {
   outputSrc: null,
   blobUrl: null,
   referenceImages: [] as ReferenceImage[],
+  inputImageDimensions: null,
   error: null,
   outdoorLight: null as OutdoorLight,
   indoorLight: null as IndoorLight,
   editDescription: null,
   model: `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}` as Model,
+  aspectRatio: null as AspectRatio | null,
   isUploading: false,
   isGenerating: false,
   isBusyForUser: false,
@@ -87,14 +96,31 @@ export const useUploadStore = create<UploadState>()(
       setEditDescription: (description) =>
         set({ editDescription: description }),
       setModel: (model: Model) => set({ model }),
+      setAspectRatio: (ratio: AspectRatio | null) =>
+        set({ aspectRatio: ratio }),
+      setInputImageDimensions: (dimensions) =>
+        set({ inputImageDimensions: dimensions }),
       setIsUploading: (isUploading) => set({ isUploading }),
       setIsGenerating: (isGenerating) => set({ isGenerating }),
       setIsBusyForUser: (isBusy) => set({ isBusyForUser: isBusy }),
 
       addReferenceImage: (localSrc, blobUrl) => {
-        const { referenceImages } = get();
+        const { referenceImages, inputImageDimensions, aspectRatio } = get();
         if (referenceImages.length < 3) {
           set({ referenceImages: [...referenceImages, { localSrc, blobUrl }] });
+
+          // If this is the first reference image and we have input dimensions,
+          // auto-select the closest aspect ratio
+          if (
+            referenceImages.length === 0 &&
+            inputImageDimensions &&
+            !aspectRatio
+          ) {
+            const imageRatio =
+              inputImageDimensions.width / inputImageDimensions.height;
+            const closestRatio = findClosestAspectRatio(imageRatio);
+            set({ aspectRatio: closestRatio });
+          }
         }
       },
 
@@ -116,9 +142,13 @@ export const useUploadStore = create<UploadState>()(
           URL.revokeObjectURL(imageToRemove.localSrc);
         }
 
-        set({
-          referenceImages: referenceImages.filter((_, i) => i !== index),
-        });
+        const updatedImages = referenceImages.filter((_, i) => i !== index);
+        set({ referenceImages: updatedImages });
+
+        // If all reference images are removed, reset aspect ratio to null (Preserve)
+        if (updatedImages.length === 0) {
+          set({ aspectRatio: null });
+        }
       },
 
       reset: () => {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ASPECT_RATIOS } from "./aspect-ratio";
 
 // Model schema
 export const modelSchema = z.enum([
@@ -7,6 +8,11 @@ export const modelSchema = z.enum([
 ]);
 
 export type Model = z.infer<typeof modelSchema>;
+
+// Aspect ratio schema
+export const aspectRatioSchema = z.enum(ASPECT_RATIOS);
+
+export type AspectRatioType = z.infer<typeof aspectRatioSchema>;
 
 // Outdoor light schema
 export const outdoorLightSchema = z
@@ -22,15 +28,34 @@ export const indoorLightSchema = z
 
 export type IndoorLight = z.infer<typeof indoorLightSchema>;
 
-// Generate request schema
-export const generateRequestSchema = z.object({
+// Generate request schema with conditional aspect_ratio validation
+const generateRequestSchemaBase = z.object({
   blobUrl: z.string().min(1, "Missing blob URL."),
   outdoor_light: outdoorLightSchema.optional(),
   indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
   model: modelSchema.optional(),
   reference_image_urls: z.array(z.string().url()).max(3).optional(),
+  aspect_ratio: aspectRatioSchema.nullable().default(null).optional(),
 });
+
+export const generateRequestSchema = generateRequestSchemaBase.superRefine(
+  (data, ctx) => {
+    // If reference images are provided, aspect_ratio is required
+    if (
+      data.reference_image_urls &&
+      data.reference_image_urls.length > 0 &&
+      !data.aspect_ratio
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Aspect ratio is required when reference images are provided, due to Gemini limitations.",
+        path: ["aspect_ratio"],
+      });
+    }
+  },
+);
 
 export type GenerateRequest = z.infer<typeof generateRequestSchema>;
 

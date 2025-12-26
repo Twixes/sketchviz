@@ -1,5 +1,6 @@
 import { CheckIcon } from "@radix-ui/react-icons";
 import * as Popover from "@radix-ui/react-popover";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { useState } from "react";
 
 export interface SelectOption<T> {
@@ -7,6 +8,7 @@ export interface SelectOption<T> {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   description?: string;
+  disabledReason?: string;
 }
 
 interface SelectProps<T> {
@@ -76,24 +78,31 @@ export function Select<T extends string | null>({
           >
             {options.map((option) => {
               const isSelected = option.value === value;
-              return (
+              const isDisabled = !!option.disabledReason;
+
+              const button = (
                 <button
                   key={String(option.value ?? "null")}
                   type="button"
                   onClick={() => {
-                    onChange(option.value);
-                    setIsOpen(false);
+                    if (!isDisabled) {
+                      onChange(option.value);
+                      setIsOpen(false);
+                    }
                   }}
+                  disabled={isDisabled}
                   data-selected={isSelected}
-                  className={`group relative text-left flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-2 pr-8 text-sm outline-none transition-all duration-150 ${
-                    isSelected
-                      ? "bg-black text-white"
-                      : "text-black hover:bg-black/5 focus-visible:bg-black/5"
-                  } active:scale-[0.98]`}
+                  className={`group relative text-left flex w-full items-center gap-2 rounded-lg px-3 py-2 pr-8 text-sm outline-none transition-all duration-150 ${
+                    isDisabled
+                      ? "cursor-not-allowed opacity-50"
+                      : isSelected
+                        ? "bg-black text-white cursor-pointer"
+                        : "text-black hover:bg-black/5 focus-visible:bg-black/5 cursor-pointer active:scale-[0.98]"
+                  }`}
                 >
                   <option.icon
                     className={`size-4 shrink-0 transition-transform duration-150 ${
-                      isSelected ? "" : "group-hover:scale-110"
+                      isSelected || isDisabled ? "" : "group-hover:scale-110"
                     }`}
                   />
                   <div className="flex flex-col items-start flex-1">
@@ -115,6 +124,28 @@ export function Select<T extends string | null>({
                   )}
                 </button>
               );
+
+              // Wrap in tooltip if disabled and has tooltip text
+              if (option.disabledReason) {
+                return (
+                  <Tooltip.Provider key={String(option.value ?? "null")}>
+                    <Tooltip.Root delayDuration={200}>
+                      <Tooltip.Trigger asChild>{button}</Tooltip.Trigger>
+                      <Tooltip.Portal>
+                        <Tooltip.Content
+                          className="z-50 rounded-lg bg-black px-3 py-2 text-xs text-white shadow-lg max-w-xs"
+                          sideOffset={5}
+                        >
+                          {option.disabledReason}
+                          <Tooltip.Arrow className="fill-black" />
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                );
+              }
+
+              return button;
             })}
             {allowCustomInput && (
               <div className="relative flex items-center gap-2 rounded-lg p-1 text-sm">

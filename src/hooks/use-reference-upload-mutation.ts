@@ -17,7 +17,7 @@ export function useReferenceUploadMutation() {
       // Validate file type
       if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
         throw new Error(
-          `Unsupported format. Use ${getAcceptedFormatsString()}.`,
+          `Unsupported format: ${file.type}. Use ${getAcceptedFormatsString()}.`,
         );
       }
 

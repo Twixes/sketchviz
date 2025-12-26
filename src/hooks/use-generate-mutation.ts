@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -8,6 +9,7 @@ interface GenerateParams {
   indoorLight: IndoorLight;
   editDescription: string | null;
   model?: Model;
+  aspectRatio?: AspectRatio | null;
 }
 
 interface GenerateResponse {
@@ -26,6 +28,7 @@ export function useGenerateMutation() {
       indoorLight,
       editDescription,
       model,
+      aspectRatio,
     }: GenerateParams): Promise<string> => {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -38,6 +41,7 @@ export function useGenerateMutation() {
           indoor_light: indoorLight,
           edit_description: editDescription,
           model,
+          aspect_ratio: aspectRatio,
           reference_image_urls: referenceImages
             .filter((img) => img.blobUrl !== null)
             .map((img) => img.blobUrl),

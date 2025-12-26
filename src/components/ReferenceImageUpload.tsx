@@ -67,7 +67,7 @@ export function ReferenceImageUpload({ disabled }: ReferenceImageUploadProps) {
     <>
       <div
         className={clsx(
-          "absolute bottom-2 left-2 right-2 flex items-center gap-2 flex-wrap",
+          "absolute bottom-2 left-0 mx-2 flex items-center gap-2 flex-wrap",
           referenceImages.length > 0 && "px-1 pb-1",
         )}
       >
@@ -133,24 +133,15 @@ function ReferenceImagePreview({
   return (
     <div className="relative group">
       <div className="relative flex">
-        <button
-          type="button"
-          onClick={onClick}
-          className="size-16 rounded-lg border border-black/20 overflow-hidden relative cursor-zoom-in transition-all hover:ring-2 hover:ring-black/30 hover:ring-offset-1"
-          aria-label="View reference image full size"
-        >
-          <img
-            src={image.localSrc}
-            alt="Reference"
-            className="size-full object-cover"
-          />
-        </button>
         <div
-          className="absolute transition-all rounded-[11px] pointer-events-none"
+          className={clsx(
+            "absolute transition-all pointer-events-none",
+            isUploading
+              ? "-inset-[3px] p-0.5 rounded-[11px]"
+              : "inset-0 p-0 rounded-lg",
+          )}
           style={{
             background: `conic-gradient(from var(--ring-rotation), #000 0deg, #000 144deg, transparent 144deg)`,
-            inset: isUploading ? "-3px" : "0px",
-            padding: isUploading ? "3px" : "0px",
             WebkitMask:
               "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             WebkitMaskComposite: "xor",
@@ -159,6 +150,18 @@ function ReferenceImagePreview({
             animation: "var(--animate-ring-spin)",
           }}
         />
+        <button
+          type="button"
+          onClick={onClick}
+          className="size-16 rounded-lg border border-black/20 overflow-hidden relative cursor-zoom-in transition-all hover:ring-2 hover:ring-black/30 hover:ring-offset-1 cursor-zoom-in"
+          aria-label="View reference image full size"
+        >
+          <img
+            src={image.localSrc}
+            alt="Reference"
+            className="size-full object-cover"
+          />
+        </button>
       </div>
       <button
         type="button"
@@ -186,7 +189,7 @@ function ImageModal({ image, onClose }: ImageModalProps) {
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xl p-4">
       <button
         type="button"
         onClick={onClose}
@@ -199,7 +202,7 @@ function ImageModal({ image, onClose }: ImageModalProps) {
         <img
           src={image.localSrc}
           alt="Reference full view"
-          className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+          className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-xl"
         />
       </div>
     </div>,

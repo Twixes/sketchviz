@@ -219,6 +219,13 @@ export default function ThreadDetailPage({
                                 AI model: {generation.user_params.model}
                               </span>
                             )}
+                            {generation.user_params.aspect_ratio && (
+                              <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
+                                Aspect ratio:{" "}
+                                {generation.user_params.aspect_ratio ||
+                                  "Preserve"}
+                              </span>
+                            )}
                           </div>
                           {generation.user_params.edit_description && (
                             <p className="text-sm text-black/70">

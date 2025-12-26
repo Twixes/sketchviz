@@ -5,6 +5,7 @@ import clsx from "clsx";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
+import { parseAspectRatio } from "@/lib/aspect-ratio";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -20,7 +21,14 @@ export function UploadDropzone({
   className,
 }: UploadDropzoneProps) {
   // Get state from Zustand store
-  const { isBusyForUser, error, inputSrc, outputSrc } = useUploadStore();
+  const {
+    isBusyForUser,
+    error,
+    inputSrc,
+    outputSrc,
+    setInputImageDimensions,
+    aspectRatio: selectedAspectRatio,
+  } = useUploadStore();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const outputRef = useRef<HTMLImageElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -50,8 +58,9 @@ export function UploadDropzone({
   useEffect(() => {
     if (!inputSrc) {
       setAspectRatio(null);
+      setInputImageDimensions(null);
     }
-  }, [inputSrc]);
+  }, [inputSrc, setInputImageDimensions]);
 
   useEffect(() => {
     const handlePaste = (event: ClipboardEvent) => {
@@ -146,9 +155,13 @@ export function UploadDropzone({
       const { naturalWidth, naturalHeight } = event.currentTarget;
       if (naturalWidth && naturalHeight) {
         setAspectRatio(naturalWidth / naturalHeight);
+        setInputImageDimensions({
+          width: naturalWidth,
+          height: naturalHeight,
+        });
       }
     },
-    [],
+    [setInputImageDimensions],
   );
 
   const handleCompareStart = useCallback((event: React.PointerEvent) => {
@@ -159,13 +172,17 @@ export function UploadDropzone({
     setIsComparing(false);
   }, []);
 
+  // Calculate the display aspect ratio
+  const displayAspectRatio = selectedAspectRatio
+    ? parseAspectRatio(selectedAspectRatio)
+    : aspectRatio;
+
   return (
     <div className="relative w-full">
-      {isBusyForUser ? <div className="loading-ring" aria-hidden /> : null}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
         className={clsx([
-          "group relative flex cursor-pointer flex-col items-center justify-center gap-4 max-h-[75vh] mx-auto overflow-hidden text-center transition",
+          "group relative flex cursor-pointer flex-col items-center justify-center gap-4 max-h-[75vh] mx-auto text-center transition",
           frame
             ? "rounded-3xl bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]"
             : "rounded-3xl px-6 py-12",
@@ -176,7 +193,9 @@ export function UploadDropzone({
               : "",
           className,
         ])}
-        style={aspectRatio ? { aspectRatio } : undefined}
+        style={
+          displayAspectRatio ? { aspectRatio: displayAspectRatio } : undefined
+        }
         onClick={() => inputRef.current?.click()}
         onDragOver={(event) => {
           event.preventDefault();
@@ -191,19 +210,20 @@ export function UploadDropzone({
           }
         }}
       >
+        {isBusyForUser ? <div className="loading-ring" aria-hidden /> : null}
         {inputSrc ? (
           <div>
             <img
               src={inputSrc}
               alt="Original"
               onLoad={handleInputLoad}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover rounded-3xl"
             />
             <img
               ref={outputRef}
               src={outputSrc ?? inputSrc}
               alt="Result"
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300"
+              className="absolute inset-0 h-full w-full object-cover rounded-3xl opacity-0 transition-opacity duration-300"
               style={isComparing ? { visibility: "hidden" } : undefined}
             />
             {outputSrc && (

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import { google } from "@ai-sdk/google";
 import { generateText, type LanguageModel } from "ai";
+import type { AspectRatio } from "./aspect-ratio";
 import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
@@ -26,6 +27,7 @@ export async function generateVisualizationImage(params: {
   editDescription?: string | null;
   model?: Model;
   referenceImages?: Array<{ buffer: Buffer; mediaType: string }>;
+  aspectRatio?: AspectRatio | null;
 }): Promise<GeneratedImage> {
   if (process.env.SKIP_AI === "1") {
     const base64 = await fs.readFile(
@@ -112,6 +114,22 @@ export async function generateVisualizationImage(params: {
     filename: params.filename,
   });
 
+  const providerOptions: {
+    google: {
+      responseModalities: ["IMAGE"];
+      imageConfig?: { aspectRatio: string };
+    };
+  } = {
+    google: {
+      responseModalities: ["IMAGE"],
+    },
+  };
+
+  // Only add imageConfig if aspect ratio is specified
+  if (params.aspectRatio) {
+    providerOptions.google.imageConfig = { aspectRatio: params.aspectRatio };
+  }
+
   const result = await imageEditingModel.doGenerate({
     prompt: [
       {
@@ -119,11 +137,7 @@ export async function generateVisualizationImage(params: {
         content,
       },
     ],
-    providerOptions: {
-      google: {
-        responseModalities: ["IMAGE"],
-      },
-    },
+    providerOptions,
   });
 
   const imagePart = result.content.find(
