@@ -69,14 +69,14 @@ export async function generateVisualizationImage(params: {
     ". Use the last image of the first message as the base. Preserve the current perspective unless user asks otherwise. Use the other reference images provided for materials, textures, and items to use";
 
   if (params.editDescription) {
-    prompt += `. Specific user asks: ${params.editDescription}`;
+    prompt += `. Specific requests from the user: ${params.editDescription}`;
   }
 
   // Add reference to provided reference images
   if (params.referenceImages && params.referenceImages.length > 0) {
-    prompt += `. Use the ${params.referenceImages.length} reference image${
+    prompt += `. Use the reference image${
       params.referenceImages.length > 1 ? "s" : ""
-    } provided for materials, textures, and style guidance`;
+    } provided for materials, textures, and style`;
   }
 
   // Select the model, stripping the provider prefix (google/)
