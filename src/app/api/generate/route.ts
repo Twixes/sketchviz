@@ -136,9 +136,11 @@ export async function POST(request: Request) {
       );
     }
 
-    void updateThreadWithTitle(supabase, thread, {
+    void updateThreadWithTitle(supabase, {
       buffer: imageBuffer,
       mediaType: contentType,
+      threadId,
+      userId: user.id,
     }); // Update thread with title in background
 
     // Fetch reference images if provided
@@ -182,6 +184,7 @@ export async function POST(request: Request) {
       model,
       referenceImages: referenceImageBuffers,
       aspectRatio: aspect_ratio,
+      userId: user.id,
     });
 
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
@@ -218,12 +221,13 @@ export async function POST(request: Request) {
 /** Use Gemini Flash with "describe this image" prompt to generate title and update thread with it */
 async function updateThreadWithTitle(
   supabase: SupabaseClient,
-  thread: { id: string },
-  image: {
+  params: {
     buffer: Buffer;
     mediaType: string;
+    threadId: string;
+    userId: string;
   },
 ): Promise<void> {
-  const title = await titleVisualizationImage(image);
-  await supabase.from("threads").update({ title }).eq("id", thread.id);
+  const title = await titleVisualizationImage(params);
+  await supabase.from("threads").update({ title }).eq("id", params.threadId);
 }

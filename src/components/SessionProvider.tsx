@@ -1,6 +1,7 @@
 "use client";
 
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import posthog from "posthog-js";
 import {
   createContext,
   type ReactNode,
@@ -32,6 +33,13 @@ export function SessionProvider({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        posthog.identify(session?.user?.id, {
+          email: session?.user?.email,
+        });
+      } else {
+        posthog.reset();
+      }
     });
 
     return () => {

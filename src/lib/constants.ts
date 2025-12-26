@@ -7,6 +7,8 @@ declare global {
     interface ProcessEnv {
       NEXT_PUBLIC_SUPABASE_URL: string;
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string;
+      NEXT_PUBLIC_POSTHOG_API_KEY: string;
+      NEXT_PUBLIC_POSTHOG_HOST: string;
       BLOB_READ_WRITE_TOKEN: string;
       GOOGLE_GENERATIVE_AI_API_KEY: string;
     }

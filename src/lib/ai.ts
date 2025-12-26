@@ -1,14 +1,17 @@
 import fs from "node:fs/promises";
-import { google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
+import { withTracing } from "@posthog/ai";
 import { generateText, type LanguageModel } from "ai";
 import type { AspectRatio } from "./aspect-ratio";
 import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
 } from "./constants";
+import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 
-const IMAGE_DESCRIPTION_MODEL = google("gemini-flash-lite-latest");
+const googleClient = createGoogleGenerativeAI();
+
 const IMAGE_DESCRIPTION_PROMPT =
   "Describe this SketchUp render in a brief title. Refer to a matching historical or contemporary style of design if relevant (but you must highlight which elements reflect this style). Output plain text";
 
@@ -28,6 +31,7 @@ export async function generateVisualizationImage(params: {
   model?: Model;
   referenceImages?: Array<{ buffer: Buffer; mediaType: string }>;
   aspectRatio?: AspectRatio | null;
+  userId: string;
 }): Promise<GeneratedImage> {
   if (process.env.SKIP_AI === "1") {
     const base64 = await fs.readFile(
@@ -66,7 +70,7 @@ export async function generateVisualizationImage(params: {
     prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
   }
   prompt +=
-    ". Use the last image of the first message as the base. Preserve the current perspective unless user asks otherwise. Use the other reference images provided for materials, textures, and items to use";
+    ". Use the last image of the first message as the base. Preserve the current perspective unless user asks otherwise";
 
   if (params.editDescription) {
     prompt += `. Specific requests from the user: ${params.editDescription}`;
@@ -86,7 +90,13 @@ export async function generateVisualizationImage(params: {
   ];
   let imageEditingModel: LanguageModel;
   if (modelProvider === "google") {
-    imageEditingModel = google(modelName);
+    imageEditingModel = withTracing(
+      googleClient.languageModel(modelName),
+      posthogNode,
+      {
+        posthogDistinctId: params.userId,
+      },
+    );
   } else {
     throw new Error(`Unsupported model provider: ${modelProvider}`);
   }
@@ -165,12 +175,20 @@ export async function generateVisualizationImage(params: {
 export async function titleVisualizationImage(params: {
   buffer: Buffer;
   mediaType: string;
+  userId: string;
 }): Promise<string> {
   if (process.env.SKIP_AI === "1") {
     return "Octocat Test";
   }
+  const model = withTracing(
+    googleClient.languageModel("gemini-flash-lite-latest"),
+    posthogNode,
+    {
+      posthogDistinctId: params.userId,
+    },
+  );
   const result = await generateText({
-    model: IMAGE_DESCRIPTION_MODEL,
+    model,
     prompt: [
       {
         role: "user",
