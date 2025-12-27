@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { upload } from "@vercel/blob/client";
+import posthog from "posthog-js";
 import {
   ACCEPTED_MIME_TYPES,
   getAcceptedFormatsString,
@@ -35,7 +36,6 @@ export function useUploadMutation() {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
-
       return blob.url;
     },
 
@@ -43,6 +43,11 @@ export function useUploadMutation() {
       setError(null);
       setIsUploading(true);
 
+      posthog.capture("base_image_upload_started", {
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+      });
       // Create local object URL for immediate preview
       const objectUrl = URL.createObjectURL(file);
       setInputSrc(objectUrl);

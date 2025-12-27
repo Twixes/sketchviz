@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { upload } from "@vercel/blob/client";
+import posthog from "posthog-js";
 import {
   ACCEPTED_MIME_TYPES,
   getAcceptedFormatsString,
@@ -33,6 +34,13 @@ export function useReferenceUploadMutation() {
       });
 
       return blob.url;
+    },
+    onMutate: ({ file }) => {
+      posthog.capture("reference_image_upload_started", {
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+      });
     },
   });
 }
