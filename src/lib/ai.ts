@@ -28,7 +28,7 @@ export async function generateVisualizationImage(params: {
   outdoorLight?: OutdoorLight;
   indoorLight?: IndoorLight;
   editDescription?: string | null;
-  model?: Model;
+  model: Model;
   referenceImages?: Array<{ buffer: Buffer; mediaType: string }>;
   aspectRatio?: AspectRatio | null;
   userId: string;
@@ -84,10 +84,7 @@ export async function generateVisualizationImage(params: {
   }
 
   // Select the model, stripping the provider prefix (google/)
-  const [modelProvider, modelName] = params.model?.split("/") || [
-    DEFAULT_MODEL_PROVIDER,
-    DEFAULT_IMAGE_EDITING_MODEL,
-  ];
+  const [modelProvider, modelName] = params.model.split("/");
   let imageEditingModel: LanguageModel;
   if (modelProvider === "google") {
     imageEditingModel = withTracing(

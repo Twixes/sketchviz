@@ -4,8 +4,14 @@ import { NextResponse } from "next/server";
 import sharp from "sharp";
 import { generateVisualizationImage, titleVisualizationImage } from "@/lib/ai";
 import { calculateCropDimensions } from "@/lib/aspect-ratio";
-import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "@/lib/constants";
-import { generateRequestSchema } from "@/lib/schemas";
+import {
+  ACCEPTED_MIME_TYPES,
+  DEFAULT_IMAGE_EDITING_MODEL,
+  DEFAULT_MODEL_PROVIDER,
+  MAX_UPLOAD_BYTES,
+} from "@/lib/constants";
+import { polar } from "@/lib/polar";
+import { generateRequestSchema, type Model } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -25,7 +31,7 @@ export async function POST(request: Request) {
     outdoor_light,
     indoor_light,
     edit_description,
-    model,
+    model = `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
     reference_image_urls,
     aspect_ratio,
   } = validation.data;
@@ -186,7 +192,19 @@ export async function POST(request: Request) {
       aspectRatio: aspect_ratio,
       userId: user.id,
     });
-
+    await polar.events.ingest({
+      events: [
+        {
+          name: "image_generation_completed",
+          externalCustomerId: user.id,
+          metadata: {
+            route: "/api/generate",
+            model,
+            credit_count: determineCreditCostOfImageGeneration({ model }),
+          },
+        },
+      ],
+    });
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
     const blob = await put(outputFilename, Buffer.from(result.uint8Array), {
       access: "public",
@@ -230,4 +248,19 @@ async function updateThreadWithTitle(
 ): Promise<void> {
   const title = await titleVisualizationImage(params);
   await supabase.from("threads").update({ title }).eq("id", params.threadId);
+}
+
+function determineCreditCostOfImageGeneration({
+  model,
+}: {
+  model: Model;
+}): number {
+  // Each credit costs the user 0.015 USD, but our calculation is `cost_of_image_output / 0.01` for a general 50% margin
+  if (model === "google/gemini-3-pro-image-preview") {
+    return 14; // Each 2K output image is 0.139 USD
+  }
+  if (model === "google/gemini-2.5-flash-image-preview") {
+    return 4; // Each output image is 0.04 USD
+  }
+  return 0;
 }
