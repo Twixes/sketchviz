@@ -8,6 +8,7 @@ import { type Usable, use, useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
+import { Button } from "@/lib/components/ui/Button";
 import type { UserParams } from "@/lib/schemas";
 
 interface Generation {
@@ -109,13 +110,14 @@ export default function ThreadDetailPage({
 
         <motion.section className="space-y-8">
           <div className="flex items-center gap-4">
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={handleBackToThreads}
-              className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-3 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
+              leftIcon={<ArrowLeftIcon />}
             >
-              <ArrowLeftIcon /> Back to threads
-            </button>
+              Back to threads
+            </Button>
           </div>
 
           {isLoading ? (

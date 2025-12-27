@@ -1,15 +1,13 @@
 "use client";
 
-import { ExitIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
-import clsx from "clsx";
 import { motion } from "motion/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
+import { Button } from "@/lib/components/ui/Button";
 
 interface Thread {
   id: string;
@@ -178,16 +176,14 @@ export default function ThreadsPage() {
               <p className="mt-2 text-sm text-black/40">
                 Start by creating your first visualization
               </p>
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                size="lg"
                 onClick={handleBackHome}
-                className={clsx([
-                  "mt-6 inline-flex items-center gap-2 justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all",
-                  "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
-                ])}
+                className="mt-6"
               >
                 Create visualization
-              </button>
+              </Button>
             </div>
           )}
         </motion.section>

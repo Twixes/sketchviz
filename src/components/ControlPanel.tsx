@@ -15,6 +15,7 @@ import { UploadDropzone } from "@/components/UploadDropzone";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import type { AspectRatio } from "@/lib/aspect-ratio";
+import { Button } from "@/lib/components/ui/Button";
 import type { Model } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -255,29 +256,22 @@ export function ControlPanel({
               <ReferenceImageUpload disabled={isBusyForUser} />
             </div>
 
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              size="lg"
               onClick={!user ? handleSignIn : onGenerate}
               disabled={isBusyForUser}
-              className={clsx([
-                "flex items-center gap-2 justify-center rounded-xl px-6 py-3 text-sm font-semibold transition-all",
-                isBusyForUser
-                  ? "cursor-not-allowed bg-black/20 text-black/40"
-                  : "bg-black text-white hover:scale-[1.02] active:scale-[0.98]",
-              ])}
+              leftIcon={!user && !isBusyForUser ? <EnterIcon /> : undefined}
             >
-              {isBusyForUser ? (
-                "Visualizing…"
-              ) : !user ? (
-                <>
-                  <EnterIcon /> Log in with Google to complete visualization
-                </>
-              ) : outputSrc ? (
-                "Visualize again"
-              ) : (
-                "Visualize"
-              )}
-            </button>
+              {isBusyForUser
+                ? "Visualizing…"
+                : !user
+                  ? "Log in with Google to complete visualization"
+                  : outputSrc
+                    ? "Visualize again"
+                    : "Visualize"}
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>

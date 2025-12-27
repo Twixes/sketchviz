@@ -7,6 +7,7 @@ import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
 import { parseAspectRatio } from "@/lib/aspect-ratio";
+import { Button } from "@/lib/components/ui/Button";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -245,23 +246,21 @@ export function UploadDropzone({
                         : "Rendering..."}
                   </div>
                   {isReady ? (
-                    <button
-                      type="button"
+                    <Button
+                      variant="icon"
+                      size="sm"
+                      colorScheme={isComparing ? "light" : "dark"}
                       onPointerDown={handleCompareStart}
                       onPointerUp={handleCompareEnd}
                       onClick={(e) => {
                         e.stopPropagation();
                       }}
                       title="Compare with original"
-                      className={clsx(
-                        "flex rounded-full p-1 text-xs backdrop-blur-sm shadow-sm hover:rotate-45 cursor-pointer touch-none",
-                        !isComparing
-                          ? "bg-black/80 text-white"
-                          : "bg-white/80 text-black",
-                      )}
+                      aria-label="Compare with original"
+                      className="backdrop-blur-sm shadow-sm hover:rotate-45 touch-none"
                     >
-                      <Half2Icon className="size-4" />
-                    </button>
+                      <Half2Icon />
+                    </Button>
                   ) : null}
                 </div>
               </>

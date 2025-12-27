@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
+import { Button } from "@/lib/components/ui/Button";
 import type { ReferenceImage } from "@/stores/upload-store";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -82,20 +83,15 @@ export function ReferenceImageUpload({ disabled }: ReferenceImageUploadProps) {
 
         {canAddMore && (
           <>
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={handleButtonClick}
               disabled={disabled}
-              className={clsx([
-                "flex items-center gap-1.5 rounded-lg border border-black/20 bg-white px-2 py-1 text-xs font-medium transition-all",
-                disabled
-                  ? "cursor-not-allowed opacity-50"
-                  : "hover:border-black/40 hover:bg-black/5",
-              ])}
+              leftIcon={<ImageIcon />}
             >
-              <ImageIcon className="h-3.5 w-3.5" />
               Add reference image
-            </button>
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -163,17 +159,19 @@ function ReferenceImagePreview({
           />
         </button>
       </div>
-      <button
-        type="button"
+      <Button
+        variant="icon"
+        size="sm"
+        colorScheme="dark"
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute -right-1.5 -top-1.5 rounded-full bg-black text-white p-0.5 opacity-0 group-hover:opacity-100 cursor-pointer"
+        className="absolute -right-1.5 -top-1.5 opacity-0 group-hover:opacity-100"
         aria-label="Remove reference image"
       >
         <Cross2Icon className="h-3 w-3" />
-      </button>
+      </Button>
     </div>
   );
 }
@@ -190,14 +188,15 @@ function ImageModal({ image, onClose }: ImageModalProps) {
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xl p-4">
-      <button
-        type="button"
+      <Button
+        variant="icon"
+        colorScheme="light"
         onClick={onClose}
-        className="absolute right-4 top-4 rounded-full bg-white text-black p-2 hover:bg-white/90 transition-colors"
+        className="absolute right-4 top-4"
         aria-label="Close full view"
       >
         <Cross2Icon className="h-5 w-5" />
-      </button>
+      </Button>
       <div className="max-w-[90vw] max-h-[90vh] relative">
         <img
           src={image.localSrc}
