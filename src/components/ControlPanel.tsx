@@ -155,7 +155,6 @@ export function ControlPanel({
       ref={dropzoneRef}
       layout
       transition={LAYOUT_TRANSITION}
-      animate={focusUpload ? { scale: 1.03 } : { scale: 1 }}
       className={clsx([
         "relative w-full min-w-0",
         focusUpload ? "max-w-5xl" : "",

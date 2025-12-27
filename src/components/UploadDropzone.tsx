@@ -2,6 +2,7 @@
 
 import { Half2Icon, UploadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
+import { motion } from "motion/react";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
@@ -178,7 +179,7 @@ export function UploadDropzone({
     : aspectRatio;
 
   return (
-    <div className="relative w-full">
+    <motion.div className="relative w-full">
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
         className={clsx([
@@ -212,58 +213,60 @@ export function UploadDropzone({
       >
         {isBusyForUser ? <div className="loading-ring" aria-hidden /> : null}
         {inputSrc ? (
-          <div>
+          <>
             <img
               src={inputSrc}
               alt="Original"
               onLoad={handleInputLoad}
               className="absolute inset-0 h-full w-full object-cover rounded-3xl"
             />
-            <img
-              ref={outputRef}
-              src={outputSrc ?? inputSrc}
-              alt="Result"
-              className="absolute inset-0 h-full w-full object-cover rounded-3xl opacity-0 transition-opacity duration-300"
-              style={isComparing ? { visibility: "hidden" } : undefined}
-            />
             {outputSrc && (
-              <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
-                <div
-                  className={clsx(
-                    "whitespace-nowrap rounded-lg px-2 py-1 text-xs font-semibold backdrop-blur-sm shadow-sm",
-                    !isComparing
-                      ? "bg-black/80 text-white"
-                      : "bg-white/80 text-black",
-                  )}
-                >
-                  {isComparing
-                    ? "Original"
-                    : isReady
-                      ? "Result"
-                      : "Rendering..."}
-                </div>
-                {isReady ? (
-                  <button
-                    type="button"
-                    onPointerDown={handleCompareStart}
-                    onPointerUp={handleCompareEnd}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    title="Compare with original"
+              <>
+                <img
+                  ref={outputRef}
+                  src={outputSrc}
+                  alt="Result"
+                  className="absolute inset-0 h-full w-full object-cover rounded-3xl opacity-0 transition-opacity duration-300"
+                  style={isComparing ? { visibility: "hidden" } : undefined}
+                />
+                <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
+                  <div
                     className={clsx(
-                      "flex rounded-full p-1 text-xs backdrop-blur-sm shadow-sm hover:rotate-45 cursor-pointer touch-none",
+                      "whitespace-nowrap rounded-lg px-2 py-1 text-xs font-semibold backdrop-blur-sm shadow-sm",
                       !isComparing
                         ? "bg-black/80 text-white"
                         : "bg-white/80 text-black",
                     )}
                   >
-                    <Half2Icon className="size-4" />
-                  </button>
-                ) : null}
-              </div>
+                    {isComparing
+                      ? "Original"
+                      : isReady
+                        ? "Result"
+                        : "Rendering..."}
+                  </div>
+                  {isReady ? (
+                    <button
+                      type="button"
+                      onPointerDown={handleCompareStart}
+                      onPointerUp={handleCompareEnd}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      title="Compare with original"
+                      className={clsx(
+                        "flex rounded-full p-1 text-xs backdrop-blur-sm shadow-sm hover:rotate-45 cursor-pointer touch-none",
+                        !isComparing
+                          ? "bg-black/80 text-white"
+                          : "bg-white/80 text-black",
+                      )}
+                    >
+                      <Half2Icon className="size-4" />
+                    </button>
+                  ) : null}
+                </div>
+              </>
             )}
-          </div>
+          </>
         ) : (
           <>
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-black text-white shadow-[0_10px_25px_-15px_rgba(0,0,0,0.5)]">
@@ -295,6 +298,6 @@ export function UploadDropzone({
         />
       </div>
       {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-    </div>
+    </motion.div>
   );
 }

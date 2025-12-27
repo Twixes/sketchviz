@@ -29,7 +29,15 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${outfit.variable} antialiased`}>
+      <body
+        className={`${outfit.variable} antialiased`}
+        style={
+          {
+            // dynamic-range-limit disables HDR on images - not yet supported in Firefox, but it's important, as AI models put out SDR content
+            "dynamic-range-limit": "standard",
+          } as React.CSSProperties
+        }
+      >
         <QueryProvider>
           <SessionProvider initialUser={user}>{children}</SessionProvider>
         </QueryProvider>
