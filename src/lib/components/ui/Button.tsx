@@ -96,25 +96,24 @@ export const Button = ({
   // Variant-specific classes
   const variantClasses = {
     primary: clsx([
-      "rounded-xl font-semibold",
+      "font-semibold",
       loading || disabled
         ? "cursor-not-allowed bg-black/20 text-black/40"
         : "bg-black text-white hover:bg-black/90",
     ]),
     secondary: clsx([
-      "rounded-xl border border-black/20 bg-white/75 font-medium text-black",
+      "border border-black/20 bg-white/75 font-medium text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
         : "hover:border-black/30 hover:bg-black/5",
     ]),
     ghost: clsx([
-      "rounded-lg text-black",
+      "text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
         : "hover:bg-black/5",
     ]),
     icon: clsx([
-      "rounded-full",
       colorScheme === "dark"
         ? "bg-black/80 text-white"
         : "bg-white/80 text-black",
@@ -127,24 +126,24 @@ export const Button = ({
   // Size-specific classes
   const sizeClasses = {
     primary: {
-      sm: "px-3 py-1.5 text-xs gap-1.5",
-      md: "px-4 py-2 text-sm gap-2",
-      lg: "px-6 py-3 text-sm gap-2",
+      sm: "px-3 py-1.5 text-xs gap-1.5 rounded-lg",
+      md: "px-4 py-2 text-sm gap-2 rounded-xl",
+      lg: "px-6 py-3 text-sm gap-2 rounded-xl",
     },
     secondary: {
-      sm: "px-2 py-1 text-xs gap-1.5",
-      md: "px-4 py-2 text-sm gap-2",
-      lg: "px-6 py-3 text-sm gap-2",
+      sm: "px-2 py-1 text-xs gap-1.5 rounded-lg",
+      md: "px-4 py-2 text-sm gap-2 rounded-xl",
+      lg: "px-6 py-3 text-sm gap-2 rounded-xl",
     },
     ghost: {
-      sm: "px-2 py-1 text-xs gap-1.5",
-      md: "px-3 py-2 text-sm gap-2",
-      lg: "px-4 py-3 text-sm gap-2",
+      sm: "px-2 py-1 text-xs gap-1.5 rounded-lg",
+      md: "px-3 py-2 text-sm gap-2 rounded-xl",
+      lg: "px-4 py-3 text-sm gap-2 rounded-xl",
     },
     icon: {
-      sm: "p-1",
-      md: "p-2",
-      lg: "p-3",
+      sm: "p-1 rounded-lg",
+      md: "p-2 rounded-xl",
+      lg: "p-3 rounded-xl",
     },
   }[variant][size];
 

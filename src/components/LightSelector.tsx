@@ -46,6 +46,6 @@ export const OUTDOOR_LIGHT_OPTIONS: LightOption[] = [
 
 export const INDOOR_LIGHT_OPTIONS: LightOption[] = [
   { value: null, label: "Auto", icon: MagicWandIcon },
-  { value: "all_on", label: "All on", icon: LightningBoltIcon },
-  { value: "all_off", label: "All off", icon: DotFilledIcon },
+  { value: "all_on", label: "All lights on", icon: LightningBoltIcon },
+  { value: "all_off", label: "All lights off", icon: DotFilledIcon },
 ];

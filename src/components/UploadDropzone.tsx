@@ -257,7 +257,7 @@ export function UploadDropzone({
                       }}
                       title="Compare with original"
                       aria-label="Compare with original"
-                      className="backdrop-blur-sm shadow-sm hover:rotate-45 touch-none"
+                      className="backdrop-blur-sm shadow-sm hover:*:rotate-45 touch-none"
                     >
                       <Half2Icon />
                     </Button>
