@@ -4,19 +4,20 @@ const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 const FEATURES = [
   {
-    label: "Speed",
-    value: "~30 seconds",
-    detail: "From upload to photoreal",
+    label: "Quick",
+    value: "Get it done in 30 s",
+    detail:
+      "Too quick to get a cup of coffee, iterate on your visualizations rapidly",
   },
   {
-    label: "Materials",
-    value: "Real-world finish",
-    detail: "Refined surfaces & textures",
+    label: "Configurable",
+    value: "Control every aspect",
+    detail: "Define items, lighting, materials; reference images supported",
   },
   {
-    label: "Lighting",
-    value: "Natural depth",
-    detail: "Balanced ambient glow",
+    label: "Cutting-edge",
+    value: "Get the best results",
+    detail: "Reliable and beautiful – powered by Google's Nano Banana AI",
   },
 ] as const;
 
@@ -48,10 +49,12 @@ export function Hero() {
             key={item.label}
             className="rounded-2xl border border-black/10 bg-white/75 px-4 py-3 text-left"
           >
-            <p className="text-xs uppercase tracking-widest font-semibold mb-0.5 text-black/40">
+            <p className="text-xs uppercase tracking-widest font-semibold mb-1 text-black/40">
               {item.label}
             </p>
-            <p className="text-sm font-semibold text-black">{item.value}</p>
+            <p className="text-sm font-semibold text-black leading-tight">
+              {item.value}
+            </p>
             <p className="mt-1 text-xs text-black/50">{item.detail}</p>
           </div>
         ))}

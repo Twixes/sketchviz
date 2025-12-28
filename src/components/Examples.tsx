@@ -6,19 +6,19 @@ import { useEffect, useRef, useState } from "react";
 
 const EXAMPLES = [
   {
-    before: "/before-test.png",
-    after: "/after-test.jpg",
-    label: "Living room",
+    before: "/kitchen-before.webp",
+    after: "/kitchen-after.webp",
+    label: "For interior design",
   },
   {
-    before: "/before-test.png",
-    after: "/after-test.jpg",
-    label: "Kitchen",
+    before: "/house-before.webp",
+    after: "/house-after.webp",
+    label: "For architecture",
   },
   {
-    before: "/before-test.png",
-    after: "/after-test.jpg",
-    label: "Exterior",
+    before: "/anything-before.webp",
+    after: "/anything-after.webp",
+    label: "For absolutely anything",
   },
 ];
 
@@ -63,7 +63,7 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
       ref={containerRef}
     >
       <button
-        className="relative aspect-[4/3] cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)] touch-none"
+        className="relative aspect-[3/2] cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)] touch-none"
         onPointerDown={() => setIsDragging(true)}
         type="button"
       >
