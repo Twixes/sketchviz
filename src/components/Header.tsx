@@ -48,7 +48,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
           <p className="text-xs text-black/50">AI visualization studio</p>
         </div>
       </a>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap justify-start items-center gap-3 whitespace-nowrap">
         {user ? (
           <>
             {!isLoadingCredits && credits !== null && (

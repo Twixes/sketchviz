@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
+import { Footer } from "./Footer";
 
 interface FunkyBackgroundProps {
   children: ReactNode;
@@ -9,7 +10,7 @@ interface FunkyBackgroundProps {
 
 export function FunkyBackground({ children }: FunkyBackgroundProps) {
   return (
-    <div className="memphis-shell min-h-screen">
+    <div className="memphis-shell min-h-screen flex flex-col">
       {/* Background Memphis shapes - fixed to viewport, won't affect layout */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <motion.div
@@ -35,6 +36,7 @@ export function FunkyBackground({ children }: FunkyBackgroundProps) {
       </div>
 
       {children}
+      <Footer />
     </div>
   );
 }

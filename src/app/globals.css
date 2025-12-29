@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #fdf7ef;
@@ -31,6 +32,10 @@ body {
     ), linear-gradient(180deg, #fdf7ef 0%, #fff9f2 100%);
   color: var(--foreground);
   font-family: var(--font-outfit), "Outfit", system-ui, sans-serif;
+}
+
+button {
+  text-wrap-style: balance;
 }
 
 .memphis-shell {

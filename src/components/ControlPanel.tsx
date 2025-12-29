@@ -289,7 +289,9 @@ export function ControlPanel({
               }
               disabled={isBusyForUser}
               leftIcon={!user && !isBusyForUser ? <EnterIcon /> : undefined}
-              className="relative"
+              className={
+                "relative px-20" /* The horizontal padding is for the credit cost to fit */
+              }
             >
               {isBusyForUser ? (
                 "Visualizing…"

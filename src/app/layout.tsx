@@ -33,8 +33,8 @@ export default async function RootLayout({
         className={`${outfit.variable} antialiased`}
         style={
           {
-            // dynamic-range-limit disables HDR on images - not yet supported in Firefox, but it's important, as AI models put out SDR content
-            "dynamic-range-limit": "standard",
+            // dynamicRangeLimit disables HDR on images - not yet supported in Firefox, but it's important, as AI models put out SDR content
+            dynamicRangeLimit: "standard",
           } as React.CSSProperties
         }
       >

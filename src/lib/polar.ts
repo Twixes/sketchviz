@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Polar } from "@polar-sh/sdk";
+import type { Subscription } from "@polar-sh/sdk/models/components/subscription";
 
 export const polar = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
@@ -21,4 +22,13 @@ export async function getCreditsForUser(
     console.error("Error fetching credits:", error);
     return null;
   }
+}
+
+export async function getSubscriptionsForUser(
+  userId: string,
+): Promise<Subscription[]> {
+  const subscriptions = await polar.subscriptions.list({
+    externalCustomerId: userId,
+  });
+  return subscriptions.result.items;
 }

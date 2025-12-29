@@ -14,6 +14,10 @@ const nextConfig: NextConfig = {
         ],
         as: "*.js",
       },
+      "*.md": {
+        loaders: ["raw-loader"],
+        as: "*.js",
+      },
     },
   },
   images: {
