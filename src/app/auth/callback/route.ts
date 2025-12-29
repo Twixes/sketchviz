@@ -17,9 +17,7 @@ export async function GET(request: Request) {
       try {
         await polar.customers.getExternal({ externalId: user.id });
       } catch (error) {
-        if ("name" in error && error.name === "ResourceNotFound") {
-          console.log("Customer not found, creating...");
-
+        if (error instanceof Error && error.name === "ResourceNotFound") {
           await polar.customers.create({
             externalId: user.id,
             email: user.email!,
