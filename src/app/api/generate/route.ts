@@ -180,6 +180,19 @@ export async function POST(request: Request) {
     const filenameWithoutExt = filenameParts.slice(0, -1).join(".");
     const ext = filenameParts.at(-1);
 
+    await polar.events.ingest({
+      events: [
+        {
+          name: "image_generation_started",
+          externalCustomerId: user.id,
+          metadata: {
+            route: "/api/generate",
+            model,
+            credit_count: determineCreditCostOfImageGeneration({ model }),
+          },
+        },
+      ],
+    });
     const result = await generateVisualizationImage({
       imageBuffer,
       mediaType: contentType,
@@ -191,19 +204,6 @@ export async function POST(request: Request) {
       referenceImages: referenceImageBuffers,
       aspectRatio: aspect_ratio,
       userId: user.id,
-    });
-    await polar.events.ingest({
-      events: [
-        {
-          name: "image_generation_completed",
-          externalCustomerId: user.id,
-          metadata: {
-            route: "/api/generate",
-            model,
-            credit_count: determineCreditCostOfImageGeneration({ model }),
-          },
-        },
-      ],
     });
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
     const blob = await put(outputFilename, Buffer.from(result.uint8Array), {
