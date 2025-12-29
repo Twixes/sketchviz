@@ -10,7 +10,8 @@ import {
   DEFAULT_MODEL_PROVIDER,
   MAX_UPLOAD_BYTES,
 } from "@/lib/constants";
-import { polar } from "@/lib/polar";
+import { determineCreditCostOfImageGeneration } from "@/lib/credits";
+import { getCreditsForUser, polar } from "@/lib/polar";
 import { generateRequestSchema, type Model } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
@@ -180,6 +181,22 @@ export async function POST(request: Request) {
     const filenameWithoutExt = filenameParts.slice(0, -1).join(".");
     const ext = filenameParts.at(-1);
 
+    const creditCost = determineCreditCostOfImageGeneration({ model });
+
+    const creditsAvailable = await getCreditsForUser(user.id);
+    if (creditsAvailable === null) {
+      return NextResponse.json(
+        { error: "Failed to fetch available credits" },
+        { status: 500 },
+      );
+    }
+    if (creditsAvailable < creditCost) {
+      return NextResponse.json(
+        { error: "Insufficient credits" },
+        { status: 402 },
+      );
+    }
+
     await polar.events.ingest({
       events: [
         {
@@ -188,7 +205,7 @@ export async function POST(request: Request) {
           metadata: {
             route: "/api/generate",
             model,
-            credit_count: determineCreditCostOfImageGeneration({ model }),
+            credit_count: creditCost,
           },
         },
       ],
@@ -248,19 +265,4 @@ async function updateThreadWithTitle(
 ): Promise<void> {
   const title = await titleVisualizationImage(params);
   await supabase.from("threads").update({ title }).eq("id", params.threadId);
-}
-
-function determineCreditCostOfImageGeneration({
-  model,
-}: {
-  model: Model;
-}): number {
-  // Each credit costs the user 0.015 USD, but our calculation is `cost_of_image_output / 0.01` for a general 50% margin
-  if (model === "google/gemini-3-pro-image-preview") {
-    return 14; // Each 2K output image is 0.139 USD
-  }
-  if (model === "google/gemini-2.5-flash-image-preview") {
-    return 4; // Each output image is 0.04 USD
-  }
-  return 0;
 }

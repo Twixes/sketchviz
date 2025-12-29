@@ -1,4 +1,8 @@
-import { EnterIcon } from "@radix-ui/react-icons";
+import {
+  DoubleArrowUpIcon,
+  EnterIcon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 import type { User } from "@supabase/supabase-js";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
@@ -12,10 +16,12 @@ import {
 import { ModelSelector } from "@/components/ModelSelector";
 import { ReferenceImageUpload } from "@/components/ReferenceImageUpload";
 import { UploadDropzone } from "@/components/UploadDropzone";
+import { useCreditsQuery } from "@/hooks/use-credits-query";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import { Button } from "@/lib/components/ui/Button";
+import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -75,6 +81,20 @@ export function ControlPanel({
     removeReferenceImage,
   } = useUploadStore();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+  // Fetch user's credits when logged in
+  const { data: credits } = useCreditsQuery(!!user);
+
+  // Calculate credit cost for current generation
+  const creditCost = determineCreditCostOfImageGeneration({ model });
+
+  // Check if user has insufficient credits
+  const hasInsufficientCredits = !!(
+    user &&
+    credits !== null &&
+    credits !== undefined &&
+    credits < creditCost
+  );
 
   const handleReferenceImageDrop = async (file: File) => {
     if (referenceImages.length >= 3) {
@@ -260,21 +280,47 @@ export function ControlPanel({
               type="submit"
               variant="primary"
               size="lg"
-              onClick={!user ? handleSignIn : onGenerate}
+              onClick={
+                !user
+                  ? handleSignIn
+                  : hasInsufficientCredits
+                    ? () => handleUpgradeToPro(user.id)
+                    : onGenerate
+              }
               disabled={isBusyForUser}
               leftIcon={!user && !isBusyForUser ? <EnterIcon /> : undefined}
+              className="relative"
             >
-              {isBusyForUser
-                ? "Visualizing…"
-                : !user
-                  ? "Log in with Google to complete visualization"
-                  : outputSrc
-                    ? "Visualize again"
-                    : "Visualize"}
+              {isBusyForUser ? (
+                "Visualizing…"
+              ) : !user ? (
+                "Log in with Google to complete visualization"
+              ) : hasInsufficientCredits ? (
+                <>
+                  You're out of free credits – upgrade to SketchViz Pro to
+                  visualize
+                  <DoubleArrowUpIcon />
+                </>
+              ) : outputSrc ? (
+                "Visualize again"
+              ) : (
+                "Visualize"
+              )}
+              <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border text-xs">
+                {hasInsufficientCredits && (
+                  <ExclamationTriangleIcon className="mr-0.5" />
+                )}
+                {creditCost} credits
+              </div>
             </Button>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.div>
   );
+}
+
+function handleUpgradeToPro(userId: string) {
+  const PRO_PRODUCT_ID = "a127ef8f-a886-49c3-9e8b-3435fd8d1694";
+  window.location.href = `/billing/checkout?products=${PRO_PRODUCT_ID}&customerExternalId=${userId}`;
 }

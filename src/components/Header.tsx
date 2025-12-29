@@ -3,6 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useCreditsQuery } from "@/hooks/use-credits-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import GoogleIcon from "@/icons/google.svg";
@@ -18,6 +19,9 @@ interface HeaderProps {
 export function Header({ user, onLogoClick }: HeaderProps) {
   const handleSignIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
+  const { data: credits, isLoading: isLoadingCredits } = useCreditsQuery(
+    !!user,
+  );
 
   return (
     <motion.header
@@ -46,6 +50,12 @@ export function Header({ user, onLogoClick }: HeaderProps) {
       </a>
       {user ? (
         <div className="flex items-center gap-3">
+          {!isLoadingCredits && credits !== null && (
+            <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black">
+              <span className="text-black/50">Credits:</span>
+              <span>{credits}</span>
+            </div>
+          )}
           <Link
             href="/threads"
             className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"

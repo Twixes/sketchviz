@@ -38,8 +38,8 @@ export function Hero() {
           into <span className="gradient-title">photorealistic visuals</span>.
         </h1>
         <p className="max-w-xl text-lg text-black/70">
-          Upload a render and get polished, photorealistic output with refined
-          lighting, realistic materials, and professional depth.
+          Upload a raw render and get polished, photorealistic output with
+          refined lighting, realistic materials, and professional depth.
         </p>
       </div>
 

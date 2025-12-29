@@ -30,7 +30,7 @@ interface ExampleItemProps {
 }
 
 function ExampleItem({ before, after, label, index }: ExampleItemProps) {
-  const [revealPercent, setRevealPercent] = useState(40);
+  const [revealPercent, setRevealPercent] = useState(50 - (1 - index) * 10);
   const [isDragging, setIsDragging] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
