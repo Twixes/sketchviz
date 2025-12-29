@@ -1,19 +1,39 @@
 "use client";
 
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  Pencil1Icon,
+} from "@radix-ui/react-icons";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import type { GenerateRequest } from "@/lib/schemas";
+import { useUploadStore } from "@/stores/upload-store";
 
-const EXAMPLES = [
+const EXAMPLES: {
+  before: string;
+  after: string;
+  label: string;
+  generateParams?: Partial<GenerateRequest>;
+}[] = [
   {
     before: "/kitchen-before.webp",
     after: "/kitchen-after.webp",
     label: "For interior design",
+    generateParams: {
+      indoor_light: "all_on",
+      outdoor_light: "night",
+    },
   },
   {
     before: "/house-before.webp",
     after: "/house-after.webp",
     label: "For architecture",
+    generateParams: {
+      edit_description:
+        "Place the house alongside an Albuquerque suburban street, with deserty hills in the background",
+    },
   },
   {
     before: "/anything-before.webp",
@@ -27,13 +47,57 @@ interface ExampleItemProps {
   after: string;
   label: string;
   index: number;
+  generateParams?: Pick<
+    GenerateRequest,
+    "indoor_light" | "outdoor_light" | "edit_description"
+  >;
 }
 
-function ExampleItem({ before, after, label, index }: ExampleItemProps) {
+function ExampleItem({
+  before,
+  after,
+  label,
+  index,
+  generateParams,
+}: ExampleItemProps) {
   const [revealPercent, setRevealPercent] = useState(50 - (1 - index) * 10);
   const [isDragging, setIsDragging] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const {
+    setInputSrc,
+    setBlobUrl,
+    setEditDescription,
+    setIndoorLight,
+    setOutdoorLight,
+  } = useUploadStore();
+
+  const handleTryExample = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    try {
+      // Fetch the static image
+      const response = await fetch(before);
+      if (!response.ok) throw new Error("Failed to fetch image");
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+
+      // Set the local blob URL for preview
+      setInputSrc(objectUrl);
+
+      // Set the full URL for the generate API to fetch from
+      const fullUrl = new URL(before, window.location.origin).href;
+      setBlobUrl(fullUrl);
+
+      // Set edit description if available
+      setEditDescription(generateParams?.edit_description ?? null);
+      setIndoorLight(generateParams?.indoor_light ?? null);
+      setOutdoorLight(generateParams?.outdoor_light ?? null);
+    } catch (error) {
+      console.error("Failed to load example:", error);
+    }
+  };
 
   useEffect(() => {
     if (!isDragging) return;
@@ -62,10 +126,9 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
       className="flex select-none flex-col gap-3"
       ref={containerRef}
     >
-      <button
+      <div
         className="relative aspect-3/2 cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)] touch-none"
         onPointerDown={() => setIsDragging(true)}
-        type="button"
       >
         {/* Before image (base layer - left side) */}
         <Image
@@ -110,12 +173,21 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
 
         {/* Drag button - always visible on the divider */}
         <div
-          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-xs font-medium text-black shadow-lg"
+          className="flex items-center gap-0.5 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white px-2 py-1.5 text-xs font-medium text-black shadow-lg"
           style={{ left: `${revealPercent}%` }}
         >
-          ← Drag →
+          <ArrowLeftIcon /> Drag <ArrowRightIcon />
         </div>
-      </button>
+
+        {/* Try this out button */}
+        <button
+          onClick={handleTryExample}
+          className="flex items-center gap-0.5 absolute left-3 bottom-3 whitespace-nowrap rounded-lg bg-white/80 hover:bg-white transition-colors px-2.5 py-1 text-xs font-medium text-black/70 hover:text-black shadow-sm backdrop-blur-sm z-10"
+          type="button"
+        >
+          Try this out <Pencil1Icon className="size-3.5" />
+        </button>
+      </div>
 
       <p className="whitespace-nowrap text-center text-sm font-medium text-black/70">
         {label}
@@ -134,6 +206,7 @@ export function Examples() {
           after={example.after}
           label={example.label}
           index={index}
+          generateParams={example.generateParams}
         />
       ))}
     </motion.section>
