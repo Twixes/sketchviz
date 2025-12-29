@@ -64,7 +64,7 @@ export async function generateVisualizationImage(params: {
   if (params.indoorLight === "all_off") {
     prompt += ", all indoor lights are off";
   } else if (params.indoorLight === "all_on") {
-    prompt += ", all indoor lights are on";
+    prompt += ", all visible indoor lights are on";
   } else if (params.indoorLight) {
     // Custom indoor lighting description
     prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
