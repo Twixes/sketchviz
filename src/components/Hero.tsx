@@ -4,20 +4,20 @@ const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 const FEATURES = [
   {
-    label: "Quick",
-    value: "Get it done in 30 s",
+    label: "Quality",
+    value: "Reliable & beautiful",
+    detail: "World-class rendering powered by Google's Nano Banana models",
+  },
+  {
+    label: "Speed",
+    value: "Done in 30 s",
     detail:
-      "Too quick to get a cup of coffee, iterate on your visualizations rapidly",
+      "Too quick to get a cup of coffee – iterate on your visualizations rapidly",
   },
   {
-    label: "Configurable",
-    value: "Control every aspect",
+    label: "Control",
+    value: "It's all up to you",
     detail: "Define items, lighting, materials; reference images supported",
-  },
-  {
-    label: "Cutting-edge",
-    value: "Get the best results",
-    detail: "Reliable and beautiful – powered by Google's Nano Banana AI",
   },
 ] as const;
 
