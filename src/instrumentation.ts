@@ -1,6 +1,11 @@
+import type { Instrumentation } from "next";
 import { posthogNode } from "./lib/posthog/server";
 
-export const onRequestError = async (err, request, _context) => {
+export const onRequestError: Instrumentation.onRequestError = async (
+  err,
+  request,
+  _context,
+) => {
   let distinctId = null;
   if (request.headers.cookie) {
     // Normalize multiple cookie arrays to string
