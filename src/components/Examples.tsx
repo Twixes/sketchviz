@@ -30,7 +30,7 @@ interface ExampleItemProps {
 }
 
 function ExampleItem({ before, after, label, index }: ExampleItemProps) {
-  const [revealPercent, setRevealPercent] = useState(50);
+  const [revealPercent, setRevealPercent] = useState(40);
   const [isDragging, setIsDragging] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -63,7 +63,7 @@ function ExampleItem({ before, after, label, index }: ExampleItemProps) {
       ref={containerRef}
     >
       <button
-        className="relative aspect-[3/2] cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)] touch-none"
+        className="relative aspect-3/2 cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)] touch-none"
         onPointerDown={() => setIsDragging(true)}
         type="button"
       >
