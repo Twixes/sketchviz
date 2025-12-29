@@ -2,7 +2,7 @@ import { ClockIcon, ExitIcon, RocketIcon } from "@radix-ui/react-icons";
 import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link, useTranslations } from "next-globe-gen";
 import { useCreditsQuery } from "@/hooks/use-credits-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
@@ -17,6 +17,7 @@ interface HeaderProps {
 }
 
 export function Header({ user, onLogoClick }: HeaderProps) {
+  const t = useTranslations();
   const handleSignIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
   const { data: credits, isLoading: isLoadingCredits } = useCreditsQuery(
@@ -29,31 +30,31 @@ export function Header({ user, onLogoClick }: HeaderProps) {
       transition={FADE_TRANSITION}
       className="flex flex-wrap items-center justify-between z-10 gap-4"
     >
-      <a
+      <Link
         href="/"
         onClick={onLogoClick}
         className="flex items-center gap-4 cursor-pointer whitespace-nowrap"
       >
         <Image
           src="/icon.png"
-          alt="SketchViz"
+          alt={t("header.brand")}
           className="size-16 -m-1"
           width={64}
           height={64}
         />
         <div className="text-left">
           <p className="text-base font-semibold tracking-tight text-black">
-            SketchViz
+            {t("header.brand")}
           </p>
-          <p className="text-xs text-black/50">AI visualization studio</p>
+          <p className="text-xs text-black/50">{t("header.tagline")}</p>
         </div>
-      </a>
+      </Link>
       <div className="flex flex-wrap justify-start items-center gap-3 whitespace-nowrap">
         {user ? (
           <>
             {!isLoadingCredits && credits !== null && (
               <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black">
-                <span className="text-black/50">Credits:</span>
+                <span className="text-black/50">{t("header.credits")}</span>
                 <span>{credits}</span>
               </div>
             )}
@@ -63,7 +64,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
                 leftIcon={<RocketIcon />}
                 className="cursor-pointer"
               >
-                Pricing
+                {t("header.pricing")}
               </Button>
             </Link>
             <Link href="/threads">
@@ -72,7 +73,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
                 leftIcon={<ClockIcon />}
                 className="cursor-pointer"
               >
-                Past threads
+                {t("header.threads")}
               </Button>
             </Link>
             <Button
@@ -81,7 +82,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
               leftIcon={<ExitIcon />}
               className="cursor-pointer"
             >
-              Log out
+              {t("header.logout")}
             </Button>
           </>
         ) : (
@@ -92,7 +93,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
                 leftIcon={<RocketIcon />}
                 className="cursor-pointer"
               >
-                Pricing
+                {t("header.pricing")}
               </Button>
             </Link>
             <Button
@@ -101,7 +102,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
               leftIcon={<GoogleIcon />}
               className="cursor-pointer"
             >
-              Log in with Google
+              {t("header.login")}
             </Button>
           </>
         )}

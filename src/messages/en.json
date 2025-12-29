@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "title": "SketchViz",
+    "description": "Turn SketchUp renders into photorealistic visualizations with AI."
+  },
+  "header": {
+    "brand": "SketchViz",
+    "tagline": "AI visualization studio",
+    "credits": "Credits:",
+    "pricing": "Pricing",
+    "threads": "Past threads",
+    "login": "Log in with Google",
+    "logout": "Log out"
+  },
+  "hero": {
+    "headline": "Transform your SketchUp renders into photorealistic visuals.",
+    "description": "Upload a raw render and get polished, photorealistic output with refined lighting, realistic materials, and professional depth.",
+    "features": {
+      "quality": {
+        "label": "Quality",
+        "value": "Reliable & beautiful",
+        "detail": "World-class rendering powered by Google's Nano Banana models"
+      },
+      "speed": {
+        "label": "Speed",
+        "value": "Done in 30 s",
+        "detail": "Too quick to get a cup of coffee – iterate on your visualizations rapidly"
+      },
+      "control": {
+        "label": "Control",
+        "value": "It's all up to you",
+        "detail": "Define items, lighting, materials; reference images supported"
+      }
+    }
+  },
+  "upload": {
+    "dropzone": "Drop or paste your SketchUp render",
+    "subtitle": "PNG, JPG, WEBP, HEIC, or HEIF – up to 20 MB",
+    "choose": "Choose file",
+    "generating": "Generating...",
+    "tryFree": "Try for free",
+    "original": "Original",
+    "result": "Result",
+    "rendering": "Rendering...",
+    "compareAlt": "Compare with original"
+  },
+  "controls": {
+    "outdoorLight": "Outdoor light",
+    "indoorLighting": "Indoor lighting",
+    "editPlaceholder": "Request edits or specify materials (optional)",
+    "visualizing": "Visualizing…",
+    "loginPrompt": "Log in with Google to complete visualization",
+    "insufficientCredits": "You're out of free credits – upgrade to SketchViz Pro to visualize",
+    "visualize": "Visualize",
+    "visualizeAgain": "Visualize again",
+    "creditCost": "{creditCost} credits"
+  },
+  "lights": {
+    "auto": "Auto",
+    "sunny": "Sunny",
+    "overcast": "Overcast",
+    "night": "Night",
+    "allOn": "All lights on",
+    "allOff": "All lights off",
+    "customPlaceholder": "…or specify it in text"
+  },
+  "aspectRatio": {
+    "label": "Aspect ratio",
+    "preserve": "Preserve",
+    "preserveDescription": "Keep original aspect ratio",
+    "requiredReason": "The AI models require a concrete aspect ratio when reference images are included",
+    "labels": {
+      "square": "Square",
+      "portrait": "Portrait",
+      "landscape": "Landscape",
+      "standard": "Standard",
+      "portraitStandard": "Portrait Standard"
+    }
+  },
+  "model": {
+    "label": "AI model",
+    "nanoBananaPro": "Nano Banana Pro",
+    "nanoProDescription": "Highest quality (recommended). By Google.",
+    "nanoBanana": "Nano Banana",
+    "nanoDescription": "Faster, but less reliable. By Google."
+  },
+  "reference": {
+    "add": "Add reference image",
+    "view": "View reference image full size",
+    "remove": "Remove reference image",
+    "close": "Close full view"
+  },
+  "examples": {
+    "interior": "For interior design",
+    "architecture": "For architecture",
+    "anything": "For absolutely anything",
+    "before": "Before",
+    "after": "After",
+    "drag": "Drag",
+    "try": "Try this out"
+  },
+  "pricing": {
+    "headline": "Simple, transparent pricing",
+    "subtitle": "Start free, upgrade when you need more power",
+    "free": {
+      "name": "Free",
+      "price": "$0",
+      "unit": "/ month",
+      "description": "Perfect for exploring and getting started"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "$15",
+      "unit": "/ month",
+      "description": "For professionals and power users"
+    },
+    "currentPlan": "Current plan",
+    "upgrade": "Upgrade to Pro",
+    "signInToUpgrade": "Sign in to upgrade",
+    "custom": {
+      "headline": "Need a custom plan?",
+      "description": "Contact us for enterprise pricing, volume discounts, or special requirements",
+      "cta": "Get in touch"
+    },
+    "features": {
+      "free": [
+        "Limited to 100 credits monthly",
+        "Basic image generation",
+        "Standard support"
+      ],
+      "pro": [
+        "1,000 credits monthly included",
+        "Then, unlimited usage at $0.015/credit",
+        "Upload reference images",
+        "Iterate on visualizations in threads",
+        "Priority support"
+      ]
+    }
+  },
+  "threads": {
+    "title": "Past threads",
+    "subtitle": "Your visualization history",
+    "loading": "Loading threads...",
+    "empty": {
+      "title": "No threads yet",
+      "description": "Start by creating your first visualization"
+    },
+    "create": "Create visualization",
+    "generation": "generation",
+    "generations": "generations",
+    "noPreview": "No preview"
+  },
+  "thread": {
+    "back": "Back to threads",
+    "loading": "Loading thread...",
+    "notFound": "Thread not found",
+    "generationLabel": "Generation {index}",
+    "input": "Input",
+    "output": "Output",
+    "noOutput": "No output generated",
+    "parameters": "Parameters",
+    "outdoor": "Outdoor:",
+    "indoor": "Indoor:",
+    "aiModel": "AI model:",
+    "aspectRatio": "Aspect ratio:",
+    "preserve": "Preserve",
+    "noGenerations": "No generations in this thread"
+  },
+  "auth": {
+    "redirecting": "Redirecting to Google...",
+    "success": "Sign in successful!"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "cta": "Go back home"
+  },
+  "footer": {
+    "copyright": "© {year} SketchViz. Architected in Warsaw.",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy"
+  },
+  "api": {
+    "errors": {
+      "unsupportedFormat": "Unsupported image format.",
+      "fileTooLarge": "File too large. Max 20MB.",
+      "cannotReadDimensions": "Unable to read image dimensions.",
+      "fetchBlobFailed": "Failed to fetch blob.",
+      "fetchCreditsFailed": "Failed to fetch available credits",
+      "insufficientCredits": "Insufficient credits",
+      "generationFailed": "Failed to generate image.",
+      "unauthorized": "Unauthorized"
+    }
+  }
+}

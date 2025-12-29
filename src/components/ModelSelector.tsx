@@ -1,4 +1,5 @@
 import { LightningBoltIcon, RocketIcon } from "@radix-ui/react-icons";
+import { useTranslations } from "next-globe-gen";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
 import type { Model } from "@/lib/schemas";
 
@@ -27,11 +28,28 @@ export const MODEL_OPTIONS: ModelOption[] = [
 ];
 
 export function ModelSelector({ value, onChange }: ModelSelectorProps) {
+  const t = useTranslations();
+
+  const modelOptions: ModelOption[] = [
+    {
+      value: "google/gemini-3-pro-image-preview",
+      label: t("model.nanoBananaPro"),
+      description: t("model.nanoProDescription"),
+      icon: RocketIcon,
+    },
+    {
+      value: "google/gemini-2.5-flash-image-preview",
+      label: t("model.nanoBanana"),
+      description: t("model.nanoDescription"),
+      icon: LightningBoltIcon,
+    },
+  ];
+
   return (
     <Select
-      label="AI model"
+      label={t("model.label")}
       value={value}
-      options={MODEL_OPTIONS}
+      options={modelOptions}
       onChange={onChange}
     />
   );

@@ -1,8 +1,13 @@
-import type { NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { middleware as nextGlobeGenMiddleware } from "next-globe-gen/middleware";
 import { updateSession } from "@/lib/supabase/proxy";
 
 export async function proxy(request: NextRequest) {
-  return await updateSession(request);
+  const localizedRequest = await nextGlobeGenMiddleware(request);
+  if (localizedRequest instanceof NextResponse) {
+    return localizedRequest;
+  }
+  return await updateSession(localizedRequest);
 }
 
 export const config = {

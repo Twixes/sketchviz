@@ -1,27 +1,32 @@
 import { motion } from "motion/react";
+import { useTranslations } from "next-globe-gen";
 
 const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
-const FEATURES = [
-  {
-    label: "Quality",
-    value: "Reliable & beautiful",
-    detail: "World-class rendering powered by Google's Nano Banana models",
-  },
-  {
-    label: "Speed",
-    value: "Done in 30 s",
-    detail:
-      "Too quick to get a cup of coffee – iterate on your visualizations rapidly",
-  },
-  {
-    label: "Control",
-    value: "It's all up to you",
-    detail: "Define items, lighting, materials; reference images supported",
-  },
-] as const;
-
 export function Hero() {
+  const t = useTranslations();
+
+  const features = [
+    {
+      key: "quality",
+      label: t("hero.features.quality.label"),
+      value: t("hero.features.quality.value"),
+      detail: t("hero.features.quality.detail"),
+    },
+    {
+      key: "speed",
+      label: t("hero.features.speed.label"),
+      value: t("hero.features.speed.value"),
+      detail: t("hero.features.speed.detail"),
+    },
+    {
+      key: "control",
+      label: t("hero.features.control.label"),
+      value: t("hero.features.control.value"),
+      detail: t("hero.features.control.detail"),
+    },
+  ];
+
   return (
     <motion.div
       key="hero"
@@ -34,19 +39,17 @@ export function Hero() {
     >
       <div className="space-y-6">
         <h1 className="text-4xl font-semibold leading-tight text-black sm:text-5xl">
-          Transform your <span className="outline-title">SketchUp renders</span>{" "}
-          into <span className="gradient-title">photorealistic visuals</span>.
+          {t("hero.headline")}
         </h1>
         <p className="max-w-xl text-lg text-black/70">
-          Upload a raw render and get polished, photorealistic output with
-          refined lighting, realistic materials, and professional depth.
+          {t("hero.description")}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {FEATURES.map((item) => (
+        {features.map((item) => (
           <div
-            key={item.label}
+            key={item.key}
             className="rounded-2xl border border-black/10 bg-white/75 px-4 py-3 text-left"
           >
             <p className="text-xs uppercase tracking-widest font-semibold mb-1 text-black/40">

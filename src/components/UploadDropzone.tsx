@@ -3,6 +3,7 @@
 import { Half2Icon, UploadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { motion } from "motion/react";
+import { useTranslations } from "next-globe-gen";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
@@ -22,6 +23,7 @@ export function UploadDropzone({
   frame = true,
   className,
 }: UploadDropzoneProps) {
+  const t = useTranslations();
   // Get state from Zustand store
   const {
     isBusyForUser,
@@ -217,7 +219,7 @@ export function UploadDropzone({
           <>
             <img
               src={inputSrc}
-              alt="Original"
+              alt={t("upload.original")}
               onLoad={handleInputLoad}
               className="absolute inset-0 h-full w-full object-cover rounded-3xl"
             />
@@ -226,7 +228,7 @@ export function UploadDropzone({
                 <img
                   ref={outputRef}
                   src={outputSrc}
-                  alt="Result"
+                  alt={t("upload.result")}
                   className="absolute inset-0 h-full w-full object-cover rounded-3xl opacity-0 transition-opacity duration-300"
                   style={isComparing ? { visibility: "hidden" } : undefined}
                 />
@@ -240,10 +242,10 @@ export function UploadDropzone({
                     )}
                   >
                     {isComparing
-                      ? "Original"
+                      ? t("upload.original")
                       : isReady
-                        ? "Result"
-                        : "Rendering..."}
+                        ? t("upload.result")
+                        : t("upload.rendering")}
                   </div>
                   {isReady ? (
                     <Button
@@ -255,8 +257,8 @@ export function UploadDropzone({
                       onClick={(e) => {
                         e.stopPropagation();
                       }}
-                      title="Compare with original"
-                      aria-label="Compare with original"
+                      title={t("upload.compareAlt")}
+                      aria-label={t("upload.compareAlt")}
                       className="backdrop-blur-sm shadow-sm hover:*:rotate-45 touch-none"
                     >
                       <Half2Icon />
@@ -273,17 +275,17 @@ export function UploadDropzone({
             </div>
             <div className="space-y-2">
               <p className="text-xl font-semibold text-black">
-                Drop or paste your SketchUp render
+                {t("upload.dropzone")}
               </p>
-              <p className="text-sm text-black/60">
-                PNG, JPG, WEBP, HEIC, or HEIF – up to 20 MB
-              </p>
+              <p className="text-sm text-black/60">{t("upload.subtitle")}</p>
             </div>
             <div className="flex items-center gap-3">
               <span className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white">
-                {isBusyForUser ? "Generating..." : "Choose file"}
+                {isBusyForUser ? t("upload.generating") : t("upload.choose")}
               </span>
-              <span className="text-xs text-black/40">Try for free</span>
+              <span className="text-xs text-black/40">
+                {t("upload.tryFree")}
+              </span>
             </div>
           </>
         )}

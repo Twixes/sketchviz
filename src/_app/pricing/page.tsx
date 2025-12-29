@@ -7,6 +7,7 @@ import {
 } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-globe-gen";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
@@ -22,23 +23,24 @@ const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 const PRO_PRODUCT_ID = "a127ef8f-a886-49c3-9e8b-3435fd8d1694";
 
-const FREE_FEATURES = [
-  "Limited to 100 credits monthly",
-  "Basic image generation",
-  "Standard support",
-];
-
-const PRO_FEATURES = [
-  "1,000 credits monthly included",
-  "Then, unlimited usage at $0.015/credit",
-  "Upload reference images",
-  "Iterate on visualizations in threads",
-  "Priority support",
-];
-
 export default function PricingPage() {
+  const t = useTranslations();
   const router = useRouter();
   const { user } = useSession();
+
+  const FREE_FEATURES = [
+    t("pricing.free.features.credits"),
+    t("pricing.free.features.generation"),
+    t("pricing.free.features.support"),
+  ];
+
+  const PRO_FEATURES = [
+    t("pricing.pro.features.creditsIncluded"),
+    t("pricing.pro.features.unlimitedUsage"),
+    t("pricing.pro.features.referenceImages"),
+    t("pricing.pro.features.threads"),
+    t("pricing.pro.features.support"),
+  ];
 
   const handleUpgradeToPro = () => {
     if (!user) {
@@ -110,7 +112,7 @@ export default function PricingPage() {
               transition={{ delay: 0.1, ...FADE_TRANSITION }}
               className="text-4xl font-semibold tracking-tight lg:text-5xl"
             >
-              Simple, transparent pricing
+              {t("pricing.title")}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -118,7 +120,7 @@ export default function PricingPage() {
               transition={{ delay: 0.2, ...FADE_TRANSITION }}
               className="mx-auto mt-4 max-w-2xl text-lg text-black/60 lg:text-xl"
             >
-              Start free, upgrade when you need more power
+              {t("pricing.subtitle")}
             </motion.p>
           </div>
 
@@ -158,15 +160,19 @@ export default function PricingPage() {
               className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-sm"
             >
               <div className="relative flex-1">
-                <h2 className="text-3xl font-bold text-black">Free</h2>
+                <h2 className="text-3xl font-bold text-black">
+                  {t("pricing.free.title")}
+                </h2>
                 <div className="mt-4 flex items-baseline gap-2">
                   <span className="text-6xl font-bold tracking-tight text-black">
-                    $0
+                    {t("pricing.free.price")}
                   </span>
-                  <span className="text-lg text-black/50">/ month</span>
+                  <span className="text-lg text-black/50">
+                    {t("pricing.perMonth")}
+                  </span>
                 </div>
                 <p className="mt-3 text-base text-black/60">
-                  Perfect for exploring and getting started
+                  {t("pricing.free.description")}
                 </p>
 
                 <ul className="mt-8 space-y-4">
@@ -193,7 +199,7 @@ export default function PricingPage() {
                 className="relative mt-10 w-full"
                 disabled
               >
-                Current plan
+                {t("pricing.currentPlan")}
               </Button>
             </motion.div>
 
@@ -205,15 +211,19 @@ export default function PricingPage() {
               className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-sm"
             >
               <div className="relative flex-1">
-                <h2 className="text-3xl font-bold text-black">Pro</h2>
+                <h2 className="text-3xl font-bold text-black">
+                  {t("pricing.pro.title")}
+                </h2>
                 <div className="mt-4 flex items-baseline gap-2">
                   <span className="gradient-title text-6xl font-bold tracking-tight">
-                    $15
+                    {t("pricing.pro.price")}
                   </span>
-                  <span className="text-lg text-black/50">/ month</span>
+                  <span className="text-lg text-black/50">
+                    {t("pricing.perMonth")}
+                  </span>
                 </div>
                 <p className="mt-3 text-base text-black/60">
-                  For professionals and power users
+                  {t("pricing.pro.description")}
                 </p>
 
                 <ul className="mt-8 space-y-4">
@@ -242,7 +252,9 @@ export default function PricingPage() {
                 className="relative mt-10 w-full shadow-lg transition-shadow hover:shadow-xl"
                 onClick={handleUpgradeToPro}
               >
-                {user ? "Upgrade to Pro" : "Sign in to upgrade"}
+                {user
+                  ? t("pricing.upgradeToPro")
+                  : t("pricing.signInToUpgrade")}
               </Button>
             </motion.div>
           </div>
@@ -267,11 +279,10 @@ export default function PricingPage() {
             />
 
             <h3 className="relative text-2xl font-bold text-black lg:text-3xl">
-              Need a custom plan?
+              {t("pricing.custom.title")}
             </h3>
             <p className="relative mx-auto mt-3 max-w-2xl text-base text-black/70 lg:text-lg">
-              Contact us for enterprise pricing, volume discounts, or special
-              requirements
+              {t("pricing.custom.description")}
             </p>
             <Button
               variant="secondary"
@@ -281,7 +292,7 @@ export default function PricingPage() {
                 window.location.href = "mailto:support@sketchviz.com";
               }}
             >
-              Get in touch
+              {t("pricing.custom.cta")}
             </Button>
           </motion.div>
         </motion.section>

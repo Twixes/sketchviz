@@ -4,6 +4,7 @@ import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-globe-gen";
 import { type Usable, use, useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
@@ -39,6 +40,7 @@ export default function ThreadDetailPage({
 }) {
   const { thread_id: threadId } = use(params);
 
+  const t = useTranslations();
   const router = useRouter();
   const { user, supabase } = useSession();
 
@@ -116,13 +118,13 @@ export default function ThreadDetailPage({
               onClick={handleBackToThreads}
               leftIcon={<ArrowLeftIcon />}
             >
-              Back to threads
+              {t("thread.backToThreads")}
             </Button>
           </div>
 
           {isLoading ? (
             <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-              <p className="text-black/50">Loading thread...</p>
+              <p className="text-black/50">{t("thread.loading")}</p>
             </div>
           ) : thread ? (
             <div className="space-y-8">
@@ -147,7 +149,7 @@ export default function ThreadDetailPage({
                     >
                       <div className="mb-4">
                         <p className="text-sm font-semibold text-black/60">
-                          Generation {index + 1}
+                          {t("thread.generationNumber", { number: index + 1 })}
                         </p>
                         <p className="text-xs text-black/40">
                           {new Date(generation.created_at).toLocaleString()}
@@ -158,12 +160,12 @@ export default function ThreadDetailPage({
                         {/* Input Image */}
                         <div>
                           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-black/40">
-                            Input
+                            {t("thread.input")}
                           </p>
                           <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
                             <img
                               src={generation.input_url}
-                              alt="Input"
+                              alt={t("thread.input")}
                               width={600}
                               height={400}
                               className="h-auto w-full object-contain"
@@ -174,13 +176,13 @@ export default function ThreadDetailPage({
                         {/* Output Image */}
                         <div>
                           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-black/40">
-                            Output
+                            {t("thread.output")}
                           </p>
                           {generation.output_url ? (
                             <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
                               <img
                                 src={generation.output_url}
-                                alt="Output"
+                                alt={t("thread.output")}
                                 width={600}
                                 height={400}
                                 className="h-auto w-full object-contain"
@@ -189,7 +191,7 @@ export default function ThreadDetailPage({
                           ) : (
                             <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-black/20 bg-black/5">
                               <p className="text-sm text-black/40">
-                                No output generated
+                                {t("thread.noOutput")}
                               </p>
                             </div>
                           )}
@@ -203,29 +205,37 @@ export default function ThreadDetailPage({
                         generation.user_params.model) && (
                         <div className="mt-4 space-y-2 rounded-lg bg-black/5 p-3">
                           <p className="text-xs font-semibold uppercase tracking-widest text-black/40">
-                            Parameters
+                            {t("thread.parameters")}
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {generation.user_params.outdoor_light && (
                               <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                Outdoor: {generation.user_params.outdoor_light}
+                                {t("thread.paramOutdoor", {
+                                  value: generation.user_params.outdoor_light,
+                                })}
                               </span>
                             )}
                             {generation.user_params.indoor_light && (
                               <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                Indoor: {generation.user_params.indoor_light}
+                                {t("thread.paramIndoor", {
+                                  value: generation.user_params.indoor_light,
+                                })}
                               </span>
                             )}
                             {generation.user_params.model && (
                               <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                AI model: {generation.user_params.model}
+                                {t("thread.paramModel", {
+                                  value: generation.user_params.model,
+                                })}
                               </span>
                             )}
                             {generation.user_params.aspect_ratio && (
                               <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                Aspect ratio:{" "}
-                                {generation.user_params.aspect_ratio ||
-                                  "Preserve"}
+                                {t("thread.paramAspectRatio", {
+                                  value:
+                                    generation.user_params.aspect_ratio ||
+                                    t("aspectRatio.preserve"),
+                                })}
                               </span>
                             )}
                           </div>
@@ -242,14 +252,14 @@ export default function ThreadDetailPage({
               ) : (
                 <div className="rounded-2xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
                   <p className="text-lg text-black/50">
-                    No generations in this thread
+                    {t("thread.noGenerations")}
                   </p>
                 </div>
               )}
             </div>
           ) : (
             <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-              <p className="text-black/50">Thread not found</p>
+              <p className="text-black/50">{t("thread.notFound")}</p>
             </div>
           )}
         </motion.section>

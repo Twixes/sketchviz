@@ -5,6 +5,7 @@ import {
   SectionIcon,
   SquareIcon,
 } from "@radix-ui/react-icons";
+import { useTranslations } from "next-globe-gen";
 import {
   ASPECT_RATIO_LABELS,
   ASPECT_RATIOS,
@@ -38,13 +39,15 @@ export function AspectRatioSelector({
   onChange,
   hasReferenceImages,
 }: AspectRatioSelectorProps) {
+  const t = useTranslations();
+
   const preserveOption: AspectRatioOption = {
     value: null,
-    label: "Preserve",
-    description: "Keep original aspect ratio",
+    label: t("aspectRatio.preserve"),
+    description: t("aspectRatio.preserveDescription"),
     icon: AspectRatioIcon,
     disabledReason: hasReferenceImages
-      ? "The AI models require a concrete aspect ratio when reference images are included"
+      ? t("aspectRatio.requiredReason")
       : undefined,
   };
 
@@ -61,7 +64,7 @@ export function AspectRatioSelector({
 
   return (
     <Select
-      label="Aspect ratio"
+      label={t("aspectRatio.label")}
       value={value}
       options={allOptions}
       onChange={onChange}

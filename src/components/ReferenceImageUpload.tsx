@@ -1,5 +1,6 @@
 import { Cross2Icon, ImageIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
+import { useTranslations } from "next-globe-gen";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
@@ -12,6 +13,7 @@ interface ReferenceImageUploadProps {
 }
 
 export function ReferenceImageUpload({ disabled }: ReferenceImageUploadProps) {
+  const t = useTranslations();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     referenceImages,
@@ -90,7 +92,7 @@ export function ReferenceImageUpload({ disabled }: ReferenceImageUploadProps) {
               disabled={disabled}
               leftIcon={<ImageIcon />}
             >
-              Add reference image
+              {t("reference.addImage")}
             </Button>
             <input
               ref={fileInputRef}
@@ -124,6 +126,7 @@ function ReferenceImagePreview({
   onRemove,
   onClick,
 }: ReferenceImagePreviewProps) {
+  const t = useTranslations();
   const isUploading = image.blobUrl === null;
 
   return (
@@ -150,11 +153,11 @@ function ReferenceImagePreview({
           type="button"
           onClick={onClick}
           className="size-16 rounded-lg border border-black/20 overflow-hidden relative cursor-zoom-in transition-all hover:ring-2 hover:ring-black/30 hover:ring-offset-1 cursor-zoom-in"
-          aria-label="View reference image full size"
+          aria-label={t("reference.viewFull")}
         >
           <img
             src={image.localSrc}
-            alt="Reference"
+            alt={t("reference.imageAlt")}
             className="size-full object-cover"
           />
         </button>
@@ -168,7 +171,7 @@ function ReferenceImagePreview({
           onRemove();
         }}
         className="absolute -right-1.5 -top-1.5 opacity-0 group-hover:opacity-100"
-        aria-label="Remove reference image"
+        aria-label={t("reference.remove")}
       >
         <Cross2Icon className="h-3 w-3" />
       </Button>
@@ -182,6 +185,8 @@ interface ImageModalProps {
 }
 
 function ImageModal({ image, onClose }: ImageModalProps) {
+  const t = useTranslations();
+
   if (typeof document === "undefined") {
     return null;
   }
@@ -193,14 +198,14 @@ function ImageModal({ image, onClose }: ImageModalProps) {
         colorScheme="light"
         onClick={onClose}
         className="absolute right-4 top-4"
-        aria-label="Close full view"
+        aria-label={t("reference.closeFull")}
       >
         <Cross2Icon className="h-5 w-5" />
       </Button>
       <div className="max-w-[90vw] max-h-[90vh] relative">
         <img
           src={image.localSrc}
-          alt="Reference full view"
+          alt={t("reference.fullViewAlt")}
           className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-xl"
         />
       </div>

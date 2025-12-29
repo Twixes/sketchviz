@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "title": "SketchViz",
+    "description": "Przekształć renderingi SketchUp w fotorealistyczne wizualizacje za pomocą AI."
+  },
+  "header": {
+    "brand": "SketchViz",
+    "tagline": "Studio wizualizacji AI",
+    "credits": "Kredyty:",
+    "pricing": "Cennik",
+    "threads": "Historia wizualizacji",
+    "login": "Zaloguj się przez Google",
+    "logout": "Wyloguj się"
+  },
+  "hero": {
+    "headline": "Przekształć swoje renderingi SketchUp w fotorealistyczne wizualizacje.",
+    "description": "Prześlij surowy rendering i otrzymaj dopracowany, fotorealistyczny efekt z wyrafinowanym oświetleniem, realistycznymi materiałami i profesjonalną głębią.",
+    "features": {
+      "quality": {
+        "label": "Jakość",
+        "value": "Niezawodna i piękna",
+        "detail": "Rendering światowej klasy oparty na modelach Google Nano Banana"
+      },
+      "speed": {
+        "label": "Szybkość",
+        "value": "Gotowe w 30 s",
+        "detail": "Za szybko, by zdążyć po kawę – iteruj swoje wizualizacje błyskawicznie"
+      },
+      "control": {
+        "label": "Kontrola",
+        "value": "Wszystko zależy od Ciebie",
+        "detail": "Zdefiniuj elementy, oświetlenie, materiały; obsługiwane są zdjęcia referencyjne"
+      }
+    }
+  },
+  "upload": {
+    "dropzone": "Upuść lub wklej swój rendering SketchUp",
+    "subtitle": "PNG, JPG, WEBP, HEIC lub HEIF – do 20 MB",
+    "choose": "Wybierz plik",
+    "generating": "Generowanie...",
+    "tryFree": "Wypróbuj za darmo",
+    "original": "Oryginał",
+    "result": "Wynik",
+    "rendering": "Renderowanie...",
+    "compareAlt": "Porównaj z oryginałem"
+  },
+  "controls": {
+    "outdoorLight": "Oświetlenie zewnętrzne",
+    "indoorLighting": "Oświetlenie wewnętrzne",
+    "editPlaceholder": "Poproś o zmiany lub określ materiały (opcjonalnie)",
+    "visualizing": "Wizualizowanie…",
+    "loginPrompt": "Zaloguj się przez Google, aby dokończyć wizualizację",
+    "insufficientCredits": "Skończyły Ci się darmowe kredyty – przejdź na SketchViz Pro, aby wizualizować",
+    "visualize": "Wizualizuj",
+    "visualizeAgain": "Wizualizuj ponownie",
+    "creditCost": "{creditCost} kredytów"
+  },
+  "lights": {
+    "auto": "Auto",
+    "sunny": "Słonecznie",
+    "overcast": "Pochmurno",
+    "night": "Noc",
+    "allOn": "Wszystkie światła włączone",
+    "allOff": "Wszystkie światła wyłączone",
+    "customPlaceholder": "…lub określ w tekście"
+  },
+  "aspectRatio": {
+    "label": "Proporcje obrazu",
+    "preserve": "Zachowaj",
+    "preserveDescription": "Zachowaj oryginalne proporcje obrazu",
+    "requiredReason": "Modele AI wymagają konkretnych proporcji obrazu, gdy dołączone są zdjęcia referencyjne",
+    "labels": {
+      "square": "Kwadrat",
+      "portrait": "Pionowy",
+      "landscape": "Poziomy",
+      "standard": "Standardowy",
+      "portraitStandard": "Standardowy pionowy"
+    }
+  },
+  "model": {
+    "label": "Model AI",
+    "nanoBananaPro": "Nano Banana Pro",
+    "nanoProDescription": "Najwyższa jakość (zalecane). Od Google.",
+    "nanoBanana": "Nano Banana",
+    "nanoDescription": "Szybszy, ale mniej niezawodny. Od Google."
+  },
+  "reference": {
+    "add": "Dodaj zdjęcie referencyjne",
+    "view": "Zobacz zdjęcie referencyjne w pełnym rozmiarze",
+    "remove": "Usuń zdjęcie referencyjne",
+    "close": "Zamknij pełny widok"
+  },
+  "examples": {
+    "interior": "Do projektowania wnętrz",
+    "architecture": "Do architektury",
+    "anything": "Do absolutnie wszystkiego",
+    "before": "Przed",
+    "after": "Po",
+    "drag": "Przeciągnij",
+    "try": "Wypróbuj to"
+  },
+  "pricing": {
+    "headline": "Prosty, przejrzysty cennik",
+    "subtitle": "Zacznij za darmo, uaktualnij gdy potrzebujesz więcej mocy",
+    "free": {
+      "name": "Darmowy",
+      "price": "0 zł",
+      "unit": "/ miesiąc",
+      "description": "Idealny do eksploracji i rozpoczęcia"
+    },
+    "pro": {
+      "name": "Pro",
+      "price": "60 zł",
+      "unit": "/ miesiąc",
+      "description": "Dla profesjonalistów i zaawansowanych użytkowników"
+    },
+    "currentPlan": "Obecny plan",
+    "upgrade": "Przejdź na Pro",
+    "signInToUpgrade": "Zaloguj się, aby uaktualnić",
+    "custom": {
+      "headline": "Potrzebujesz planu na miarę?",
+      "description": "Skontaktuj się z nami w sprawie cen dla przedsiębiorstw, zniżek dla dużych wolumenów lub specjalnych wymagań",
+      "cta": "Skontaktuj się"
+    },
+    "features": {
+      "free": [
+        "Limit 100 kredytów miesięcznie",
+        "Podstawowa generacja obrazów",
+        "Standardowe wsparcie"
+      ],
+      "pro": [
+        "1000 kredytów miesięcznie w cenie",
+        "Następnie nieograniczone użycie po 0,06 zł/kredyt",
+        "Przesyłanie zdjęć referencyjnych",
+        "Iterowanie wizualizacji w wątkach",
+        "Priorytetowe wsparcie"
+      ]
+    }
+  },
+  "threads": {
+    "title": "Historia wizualizacji",
+    "subtitle": "Twoja historia wizualizacji",
+    "loading": "Ładowanie wątków...",
+    "empty": {
+      "title": "Nie masz jeszcze wątków",
+      "description": "Zacznij od stworzenia swojej pierwszej wizualizacji"
+    },
+    "create": "Utwórz wizualizację",
+    "generation": "generacja",
+    "generations": "generacje",
+    "noPreview": "Brak podglądu"
+  },
+  "thread": {
+    "back": "Powrót do wątków",
+    "loading": "Ładowanie wątku...",
+    "notFound": "Nie znaleziono wątku",
+    "generationLabel": "Generacja {index}",
+    "input": "Wejście",
+    "output": "Wyjście",
+    "noOutput": "Nie wygenerowano wyniku",
+    "parameters": "Parametry",
+    "outdoor": "Zewnętrzne:",
+    "indoor": "Wewnętrzne:",
+    "aiModel": "Model AI:",
+    "aspectRatio": "Proporcje obrazu:",
+    "preserve": "Zachowaj",
+    "noGenerations": "Brak generacji w tym wątku"
+  },
+  "auth": {
+    "redirecting": "Przekierowywanie do Google...",
+    "success": "Logowanie pomyślne!"
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Nie znaleziono strony",
+    "cta": "Wróć do strony głównej"
+  },
+  "footer": {
+    "copyright": "© {year} SketchViz. Zaprojektowane w Warszawie.",
+    "terms": "Regulamin",
+    "privacy": "Polityka prywatności"
+  },
+  "api": {
+    "errors": {
+      "unsupportedFormat": "Nieobsługiwany format obrazu.",
+      "fileTooLarge": "Plik zbyt duży. Maksymalnie 20 MB.",
+      "cannotReadDimensions": "Nie można odczytać wymiarów obrazu.",
+      "fetchBlobFailed": "Nie udało się pobrać pliku.",
+      "fetchCreditsFailed": "Nie udało się pobrać dostępnych kredytów",
+      "insufficientCredits": "Niewystarczająca liczba kredytów",
+      "generationFailed": "Nie udało się wygenerować obrazu.",
+      "unauthorized": "Brak autoryzacji"
+    }
+  }
+}

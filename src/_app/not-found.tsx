@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import Link from "next/link";
+import { Link, useTranslations } from "next-globe-gen";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
@@ -14,6 +14,7 @@ const LAYOUT_TRANSITION = {
 } as const;
 
 export default function NotFound() {
+  const t = useTranslations();
   const { user } = useSession();
 
   return (
@@ -41,7 +42,7 @@ export default function NotFound() {
                 404
               </h1>
               <h2 className="text-4xl font-bold tracking-tight text-black">
-                Page not found
+                {t("notFound.title")}
               </h2>
             </motion.div>
 
@@ -52,7 +53,7 @@ export default function NotFound() {
             >
               <Link href="/">
                 <Button variant="primary" size="lg" className="cursor-pointer">
-                  Go back home
+                  {t("notFound.cta")}
                 </Button>
               </Link>
             </motion.div>

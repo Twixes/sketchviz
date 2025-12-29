@@ -6,12 +6,13 @@ import {
 import type { User } from "@supabase/supabase-js";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
+import { useTranslations } from "next-globe-gen";
 import { useRef, useState } from "react";
 import { AspectRatioSelector } from "@/components/AspectRatioSelector";
 import {
-  INDOOR_LIGHT_OPTIONS,
   LightSelector,
-  OUTDOOR_LIGHT_OPTIONS,
+  useIndoorLightOptions,
+  useOutdoorLightOptions,
 } from "@/components/LightSelector";
 import { ModelSelector } from "@/components/ModelSelector";
 import { ReferenceImageUpload } from "@/components/ReferenceImageUpload";
@@ -71,6 +72,9 @@ export function ControlPanel({
   onAspectRatioChange,
   onGenerate,
 }: ControlPanelProps) {
+  const t = useTranslations();
+  const outdoorLightOptions = useOutdoorLightOptions();
+  const indoorLightOptions = useIndoorLightOptions();
   const dropzoneRef = useRef<HTMLDivElement | null>(null);
   const handleSignIn = useSignInCallback();
   const referenceUploadMutation = useReferenceUploadMutation();
@@ -226,15 +230,15 @@ export function ControlPanel({
           >
             <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap *:shrink">
               <LightSelector
-                label="Outdoor light"
+                label={t("controls.outdoorLight")}
                 value={outdoorLight}
-                options={OUTDOOR_LIGHT_OPTIONS}
+                options={outdoorLightOptions}
                 onChange={onOutdoorLightChange}
               />
               <LightSelector
-                label="Indoor lighting"
+                label={t("controls.indoorLighting")}
                 value={indoorLight}
-                options={INDOOR_LIGHT_OPTIONS}
+                options={indoorLightOptions}
                 onChange={onIndoorLightChange}
               />
               <AspectRatioSelector
@@ -263,7 +267,7 @@ export function ControlPanel({
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onPaste={handlePaste}
-                placeholder="Request edits or specify materials (optional)"
+                placeholder={t("controls.editPlaceholder")}
                 rows={2}
                 className={clsx([
                   "w-full rounded-xl border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-none transition-colors",
@@ -294,26 +298,25 @@ export function ControlPanel({
               }
             >
               {isBusyForUser ? (
-                "Visualizing…"
+                t("controls.visualizing")
               ) : !user ? (
-                "Log in with Google to complete visualization"
+                t("controls.loginPrompt")
               ) : hasInsufficientCredits ? (
                 <>
-                  You're out of free credits – upgrade to SketchViz Pro to
-                  visualize
+                  {t("controls.insufficientCredits")}
                   <DoubleArrowUpIcon />
                 </>
               ) : outputSrc ? (
-                "Visualize again"
+                t("controls.visualizeAgain")
               ) : (
-                "Visualize"
+                t("controls.visualize")
               )}
               {user && (
                 <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border text-xs">
                   {hasInsufficientCredits && (
                     <ExclamationTriangleIcon className="mr-0.5" />
                   )}
-                  {creditCost} credits
+                  {t("controls.creditCost", { creditCost })}
                 </div>
               )}
             </Button>

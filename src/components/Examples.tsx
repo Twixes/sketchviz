@@ -7,20 +7,23 @@ import {
 } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
 import Image from "next/image";
+import { useTranslations } from "next-globe-gen";
 import { useEffect, useRef, useState } from "react";
 import type { GenerateRequest } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
-const EXAMPLES: {
+interface ExampleConfig {
   before: string;
   after: string;
-  label: string;
+  labelKey: string;
   generateParams?: Partial<GenerateRequest>;
-}[] = [
+}
+
+const EXAMPLE_CONFIGS: ExampleConfig[] = [
   {
     before: "/kitchen-before.webp",
     after: "/kitchen-after.webp",
-    label: "For interior design",
+    labelKey: "examples.interiorDesign",
     generateParams: {
       indoor_light: "all_on",
       outdoor_light: "night",
@@ -29,7 +32,7 @@ const EXAMPLES: {
   {
     before: "/house-before.webp",
     after: "/house-after.webp",
-    label: "For architecture",
+    labelKey: "examples.architecture",
     generateParams: {
       edit_description:
         "Place the house alongside an Albuquerque suburban street, with deserty hills in the background",
@@ -38,7 +41,7 @@ const EXAMPLES: {
   {
     before: "/anything-before.webp",
     after: "/anything-after.webp",
-    label: "For absolutely anything",
+    labelKey: "examples.anything",
   },
 ];
 
@@ -60,6 +63,7 @@ function ExampleItem({
   index,
   generateParams,
 }: ExampleItemProps) {
+  const t = useTranslations();
   const [revealPercent, setRevealPercent] = useState(50 - (1 - index) * 10);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -133,7 +137,7 @@ function ExampleItem({
         {/* Before image (base layer - left side) */}
         <Image
           src={before}
-          alt="Before"
+          alt={t("examples.before")}
           className="absolute inset-0 h-full w-full object-cover"
           draggable={false}
           width={300}
@@ -149,7 +153,7 @@ function ExampleItem({
         >
           <Image
             src={after}
-            alt="After"
+            alt={t("examples.after")}
             className="h-full w-full object-cover"
             draggable={false}
             width={300}
@@ -165,10 +169,10 @@ function ExampleItem({
 
         {/* Labels */}
         <div className="pointer-events-none absolute left-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm shadow-sm">
-          Before
+          {t("examples.before")}
         </div>
         <div className="pointer-events-none absolute right-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm shadow-sm">
-          After
+          {t("examples.after")}
         </div>
 
         {/* Drag button - always visible on the divider */}
@@ -176,7 +180,7 @@ function ExampleItem({
           className="flex items-center gap-0.5 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white px-2 py-1.5 text-xs font-medium text-black shadow-lg"
           style={{ left: `${revealPercent}%` }}
         >
-          <ArrowLeftIcon /> Drag <ArrowRightIcon />
+          <ArrowLeftIcon /> {t("examples.drag")} <ArrowRightIcon />
         </div>
 
         {/* Try this out button */}
@@ -185,7 +189,7 @@ function ExampleItem({
           className="flex items-center gap-0.5 absolute left-3 bottom-3 whitespace-nowrap rounded-lg bg-white/80 hover:bg-white transition-colors px-2.5 py-1 text-xs font-medium text-black/70 hover:text-black shadow-sm backdrop-blur-sm z-10"
           type="button"
         >
-          Try this out <Pencil1Icon className="size-3.5" />
+          {t("examples.tryOut")} <Pencil1Icon className="size-3.5" />
         </button>
       </div>
 
@@ -197,16 +201,18 @@ function ExampleItem({
 }
 
 export function Examples() {
+  const t = useTranslations();
+
   return (
     <motion.section className="grid gap-6 sm:grid-cols-3">
-      {EXAMPLES.map((example, index) => (
+      {EXAMPLE_CONFIGS.map((config, index) => (
         <ExampleItem
-          key={example.label}
-          before={example.before}
-          after={example.after}
-          label={example.label}
+          key={config.labelKey}
+          before={config.before}
+          after={config.after}
+          label={t(config.labelKey)}
           index={index}
-          generateParams={example.generateParams}
+          generateParams={config.generateParams}
         />
       ))}
     </motion.section>

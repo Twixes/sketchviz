@@ -1,7 +1,9 @@
+import { useLocale } from "next-globe-gen";
 import { useCallback } from "react";
 import { useSession } from "@/components/SessionProvider";
 
 export function useSignInCallback() {
+  const locale = useLocale();
   const { supabase } = useSession();
 
   return useCallback(async () => {
@@ -11,7 +13,7 @@ export function useSignInCallback() {
     const top = window.screenY + (window.outerHeight - height) / 2;
 
     const popup = window.open(
-      "/auth/signin",
+      `/${locale}/auth/signin`,
       "Google Sign In",
       `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`,
     );
@@ -44,5 +46,5 @@ export function useSignInCallback() {
       },
       5 * 60 * 1000,
     );
-  }, [supabase]);
+  }, [locale, supabase]);
 }

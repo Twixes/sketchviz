@@ -1,21 +1,23 @@
-import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import { getTranslations, useLocale } from "next-globe-gen";
 import { QueryProvider } from "@/components/QueryProvider";
 import { SessionProvider } from "@/components/SessionProvider";
 import { createClient } from "@/lib/supabase/server";
 
 const outfit = Outfit({
   variable: "--font-outfit",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"], // Added latin-ext for Polish characters
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "SketchViz",
-  description:
-    "Turn SketchUp renders into photorealistic visualizations with AI.",
-};
+export async function generateMetadata() {
+  const t = getTranslations();
+  return {
+    title: t("meta.title"),
+    description: t("meta.description"),
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -26,9 +28,10 @@ export default async function RootLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const locale = useLocale();
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${outfit.variable} antialiased`}
         style={

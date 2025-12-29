@@ -3,11 +3,13 @@
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-globe-gen";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import { useSession } from "@/components/SessionProvider";
-import privacyContent from "@/content/privacy.md";
+import privacyContentEn from "@/content/privacy.md";
+import privacyContentPl from "@/content/privacy.pl.md";
 import { Button } from "@/lib/components/ui/Button";
 
 const LAYOUT_TRANSITION = {
@@ -21,6 +23,9 @@ const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 export default function PrivacyPage() {
   const { user } = useSession();
   const router = useRouter();
+  const locale = useLocale();
+
+  const privacyContent = locale === "pl" ? privacyContentPl : privacyContentEn;
 
   return (
     <FunkyBackground>

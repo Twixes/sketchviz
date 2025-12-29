@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-globe-gen";
 import { useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
@@ -27,6 +28,7 @@ const LAYOUT_TRANSITION = {
 } as const;
 
 export default function ThreadsPage() {
+  const t = useTranslations();
   const router = useRouter();
   const { user, supabase } = useSession();
 
@@ -108,15 +110,17 @@ export default function ThreadsPage() {
 
         <motion.section className="space-y-8">
           <div>
-            <h1 className="text-4xl font-semibold text-black">Past threads</h1>
+            <h1 className="text-4xl font-semibold text-black">
+              {t("threads.title")}
+            </h1>
             <p className="mt-2 text-lg text-black/70">
-              Your visualization history
+              {t("threads.subtitle")}
             </p>
           </div>
 
           {isLoading ? (
             <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-              <p className="text-black/50">Loading threads...</p>
+              <p className="text-black/50">{t("threads.loading")}</p>
             </div>
           ) : threads && threads.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -145,7 +149,9 @@ export default function ThreadsPage() {
                     </div>
                   ) : (
                     <div className="flex aspect-video w-full items-center justify-center bg-black/5">
-                      <p className="text-sm text-black/40">No preview</p>
+                      <p className="text-sm text-black/40">
+                        {t("threads.noPreview")}
+                      </p>
                     </div>
                   )}
 
@@ -156,10 +162,9 @@ export default function ThreadsPage() {
                     </h2>
                     <div className="mt-2 flex items-center gap-3 text-xs text-black/50">
                       <span>
-                        {thread.generation_count}{" "}
-                        {thread.generation_count === 1
-                          ? "generation"
-                          : "generations"}
+                        {t("threads.generationCount", {
+                          count: thread.generation_count,
+                        })}
                       </span>
                       <span>•</span>
                       <span>
@@ -172,9 +177,9 @@ export default function ThreadsPage() {
             </div>
           ) : (
             <div className="rounded-2xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
-              <p className="text-lg text-black/50">No threads yet</p>
+              <p className="text-lg text-black/50">{t("threads.empty")}</p>
               <p className="mt-2 text-sm text-black/40">
-                Start by creating your first visualization
+                {t("threads.emptyHint")}
               </p>
               <Button
                 variant="primary"
@@ -182,7 +187,7 @@ export default function ThreadsPage() {
                 onClick={handleBackHome}
                 className="mt-6"
               >
-                Create visualization
+                {t("threads.createCta")}
               </Button>
             </div>
           )}
