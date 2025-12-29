@@ -1,4 +1,4 @@
-import { ClockIcon, ExitIcon } from "@radix-ui/react-icons";
+import { ClockIcon, ExitIcon, RocketIcon } from "@radix-ui/react-icons";
 import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import Image from "next/image";
@@ -48,37 +48,64 @@ export function Header({ user, onLogoClick }: HeaderProps) {
           <p className="text-xs text-black/50">AI visualization studio</p>
         </div>
       </a>
-      {user ? (
-        <div className="flex items-center gap-3">
-          {!isLoadingCredits && credits !== null && (
-            <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black">
-              <span className="text-black/50">Credits:</span>
-              <span>{credits}</span>
-            </div>
-          )}
-          <Link
-            href="/threads"
-            className="flex items-center gap-2 rounded-xl border border-black/20 bg-white/75 px-4 py-2 text-sm font-medium text-black transition-all hover:bg-black/5 hover:border-black/30"
-          >
-            <ClockIcon /> Past threads
-          </Link>
-          <Button
-            variant="secondary"
-            onClick={handleSignOut}
-            leftIcon={<ExitIcon />}
-          >
-            Log out
-          </Button>
-        </div>
-      ) : (
-        <Button
-          variant="secondary"
-          onClick={handleSignIn}
-          leftIcon={<GoogleIcon />}
-        >
-          Log in with Google
-        </Button>
-      )}
+      <div className="flex items-center gap-3">
+        {user ? (
+          <>
+            {!isLoadingCredits && credits !== null && (
+              <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black">
+                <span className="text-black/50">Credits:</span>
+                <span>{credits}</span>
+              </div>
+            )}
+            <Link href="/pricing">
+              <Button
+                variant="secondary"
+                leftIcon={<RocketIcon />}
+                className="cursor-pointer"
+              >
+                Pricing
+              </Button>
+            </Link>
+            <Link href="/threads">
+              <Button
+                variant="secondary"
+                leftIcon={<ClockIcon />}
+                className="cursor-pointer"
+              >
+                Past threads
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              onClick={handleSignOut}
+              leftIcon={<ExitIcon />}
+              className="cursor-pointer"
+            >
+              Log out
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link href="/pricing">
+              <Button
+                variant="secondary"
+                leftIcon={<RocketIcon />}
+                className="cursor-pointer"
+              >
+                Pricing
+              </Button>
+            </Link>
+            <Button
+              variant="secondary"
+              onClick={handleSignIn}
+              leftIcon={<GoogleIcon />}
+              className="cursor-pointer"
+            >
+              Log in with Google
+            </Button>
+          </>
+        )}
+      </div>
     </motion.header>
   );
 }
