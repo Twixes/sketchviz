@@ -308,12 +308,14 @@ export function ControlPanel({
               ) : (
                 "Visualize"
               )}
-              <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border text-xs">
-                {hasInsufficientCredits && (
-                  <ExclamationTriangleIcon className="mr-0.5" />
-                )}
-                {creditCost} credits
-              </div>
+              {user && (
+                <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border text-xs">
+                  {hasInsufficientCredits && (
+                    <ExclamationTriangleIcon className="mr-0.5" />
+                  )}
+                  {creditCost} credits
+                </div>
+              )}
             </Button>
           </motion.div>
         )}
