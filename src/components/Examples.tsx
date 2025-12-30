@@ -74,7 +74,7 @@ export function Examples() {
   };
 
   return (
-    <motion.section className="grid gap-6 sm:grid-cols-3">
+    <motion.section className="grid gap-6 sm:grid-cols-3 text-balance">
       {EXAMPLES.map((example, index) => (
         <BeforeAfterComparison
           key={example.label}

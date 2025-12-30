@@ -65,7 +65,7 @@ export function PricingCard({
             >
               <div
                 className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full ${
-                  isPro
+                  isPro || index === 0
                     ? "bg-linear-to-br/oklch from-[color:var(--accent-cobalt)] to-[color:var(--accent-coral)]"
                     : "bg-black/10"
                 }`}

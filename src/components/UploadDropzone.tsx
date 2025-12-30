@@ -181,7 +181,7 @@ export function UploadDropzone({
     : aspectRatio;
 
   return (
-    <motion.div className="relative w-full">
+    <motion.div className="relative w-full text-balance">
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
         className={clsx([
