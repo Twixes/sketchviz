@@ -10,6 +10,7 @@ import { parseAspectRatio } from "@/lib/aspect-ratio";
 import { Button } from "@/lib/components/ui/Button";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { useUploadStore } from "@/stores/upload-store";
+import { Hint } from "./Hint";
 
 type UploadDropzoneProps = {
   onFileSelected: (file: File) => void;
@@ -221,6 +222,7 @@ export function UploadDropzone({
               onLoad={handleInputLoad}
               className="absolute inset-0 h-full w-full object-cover rounded-3xl"
             />
+            <Hint position="top-right">Click to replace image</Hint>
             {outputSrc && (
               <>
                 <img

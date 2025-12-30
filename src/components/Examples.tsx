@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/lib/components/ui/Button";
 import type { GenerateRequest } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
+import { Hint } from "./Hint";
 
 const EXAMPLES: {
   before: string;
@@ -165,12 +166,8 @@ function ExampleItem({
         />
 
         {/* Labels */}
-        <div className="pointer-events-none absolute left-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm shadow-sm">
-          Before
-        </div>
-        <div className="pointer-events-none absolute right-3 top-3 whitespace-nowrap rounded-lg bg-black/60 px-2 py-1 text-xs font-semibold text-white backdrop-blur-sm shadow-sm">
-          After
-        </div>
+        <Hint position="top-left">Before</Hint>
+        <Hint position="top-right">After</Hint>
 
         {/* Drag button - always visible on the divider */}
         <div
