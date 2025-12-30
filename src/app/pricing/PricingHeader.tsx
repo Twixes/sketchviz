@@ -46,7 +46,7 @@ export function PricingHeader() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, ...FADE_TRANSITION }}
-        className="text-4xl font-semibold tracking-tight text-balance lg:text-5xl"
+        className="text-4xl font-semibold tracking-tight lg:text-5xl"
       >
         Simple, transparent pricing
       </motion.h1>

@@ -38,6 +38,15 @@ button {
   text-wrap-style: balance;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap-style: balance;
+}
+
 .memphis-shell {
   position: relative;
   overflow: hidden;
