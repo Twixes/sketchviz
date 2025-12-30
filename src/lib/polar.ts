@@ -2,6 +2,7 @@ import "server-only";
 
 import { Polar } from "@polar-sh/sdk";
 import type { Subscription } from "@polar-sh/sdk/models/components/subscription";
+import { posthogNode } from "./posthog/server";
 
 export const polar = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
@@ -19,6 +20,7 @@ export async function getCreditsForUser(
     const creditMeter = customerMetersPage.result.items[0];
     return creditMeter?.balance ?? null;
   } catch (error) {
+    posthogNode.captureException(error, userId);
     console.error("Error fetching credits:", error);
     return null;
   }

@@ -309,7 +309,7 @@ export function ControlPanel({
                 "Visualize"
               )}
               {user && (
-                <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border text-xs">
+                <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border border-white/60 text-xs">
                   {hasInsufficientCredits && (
                     <ExclamationTriangleIcon className="mr-0.5" />
                   )}
