@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
+import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { FADE_TRANSITION, LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import { PricingCard } from "./PricingCard";
 import { PricingContactCTA } from "./PricingContactCTA";
@@ -28,16 +29,16 @@ const PRO_FEATURES = [
 ];
 
 export default function PricingPage() {
-  const router = useRouter();
-  const { user } = useSession();
+  let { user } = useSession();
+  const handleSignIn = useSignInCallback();
 
-  const handleUpgradeToPro = () => {
+  const handleUpgradeToPro = async () => {
     if (!user) {
-      // If not logged in, redirect to sign in
-      router.push("/auth/signin");
-      return;
+      user = await handleSignIn();
     }
-    window.location.href = `/billing/checkout?products=${PRO_PRODUCT_ID}&customerExternalId=${user.id}`;
+    if (user) {
+      window.location.href = `/billing/checkout?products=${PRO_PRODUCT_ID}&customerExternalId=${user.id}`;
+    }
   };
 
   return (
@@ -90,9 +91,10 @@ export default function PricingPage() {
               priceDescription="/ month"
               description="Perfect for exploring and getting started"
               features={FREE_FEATURES}
-              buttonText="Current plan"
-              buttonVariant="secondary"
-              buttonDisabled={true}
+              buttonText={user ? "Current plan" : "Sign up for free"}
+              buttonVariant={user ? "secondary" : "primary"}
+              buttonDisabled={!!user}
+              onButtonClick={!user ? handleSignIn : undefined}
               animationDelay={0.3}
             />
 
@@ -103,8 +105,8 @@ export default function PricingPage() {
               priceDescription="/ month"
               description="For professionals and power users"
               features={PRO_FEATURES}
-              buttonText={user ? "Upgrade to Pro" : "Sign in to upgrade"}
-              buttonVariant="primary"
+              buttonText={user ? "Upgrade to Pro" : "Get Pro"}
+              buttonVariant={user ? "primary" : "secondary"}
               onButtonClick={handleUpgradeToPro}
               animationDelay={0.4}
             />

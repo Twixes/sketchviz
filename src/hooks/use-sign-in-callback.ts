@@ -1,7 +1,8 @@
+import type { User } from "@supabase/supabase-js";
 import { useCallback } from "react";
 import { useSession } from "@/components/SessionProvider";
 
-export function useSignInCallback() {
+export function useSignInCallback(): () => Promise<User | null> {
   const { supabase } = useSession();
 
   return useCallback(async () => {
@@ -24,25 +25,29 @@ export function useSignInCallback() {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      return;
+    } else {
+      // Poll for popup closure - session will be updated automatically via auth state change listener
+      const checkInterval = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkInterval);
+        }
+      }, 500);
+
+      // Cleanup interval after 5 minutes (timeout)
+      setTimeout(
+        () => {
+          clearInterval(checkInterval);
+          if (!popup.closed) {
+            popup.close();
+          }
+        },
+        5 * 60 * 1000,
+      );
     }
 
-    // Poll for popup closure - session will be updated automatically via auth state change listener
-    const checkInterval = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkInterval);
-      }
-    }, 500);
-
-    // Cleanup interval after 5 minutes (timeout)
-    setTimeout(
-      () => {
-        clearInterval(checkInterval);
-        if (!popup.closed) {
-          popup.close();
-        }
-      },
-      5 * 60 * 1000,
-    );
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user || null;
   }, [supabase]);
 }
