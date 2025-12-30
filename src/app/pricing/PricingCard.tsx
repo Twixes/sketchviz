@@ -71,11 +71,11 @@ export function PricingCard({
                 }`}
               >
                 <CheckIcon
-                  className={`size-4 ${isPro ? "text-white" : "text-black/70"}`}
+                  className={`size-4 ${isPro || index === 0 ? "text-white" : "text-black/70"}`}
                 />
               </div>
               <span
-                className={`text-base ${isPro ? "font-medium text-black" : "text-black/80"}`}
+                className={`text-base ${isPro || index === 0 ? "font-medium text-black" : "text-black/80"}`}
               >
                 {feature}
               </span>
