@@ -10,8 +10,8 @@ interface PricingCardProps {
   priceDescription: string;
   description: string;
   features: string[];
-  buttonText?: string;
-  buttonVariant?: "primary" | "secondary";
+  buttonText: string;
+  buttonVariant: "primary" | "secondary";
   buttonDisabled?: boolean;
   onButtonClick?: () => void;
   animationDelay: number;
@@ -84,19 +84,17 @@ export function PricingCard({
         </ul>
       </div>
 
-      {buttonText && (
-        <Button
-          variant={buttonVariant || "primary"}
-          size="lg"
-          className={`relative mt-6 w-full ${
-            isPro ? "shadow-lg transition-shadow hover:shadow-xl" : ""
-          }`}
-          disabled={buttonDisabled}
-          onClick={onButtonClick}
-        >
-          {buttonText}
-        </Button>
-      )}
+      <Button
+        variant={buttonVariant}
+        size="lg"
+        className={`relative mt-6 w-full ${
+          isPro ? "shadow-lg transition-shadow hover:shadow-xl" : ""
+        }`}
+        disabled={buttonDisabled}
+        onClick={onButtonClick}
+      >
+        {buttonText}
+      </Button>
     </motion.div>
   );
 }
