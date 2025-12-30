@@ -90,7 +90,7 @@ export default function PricingPage() {
               priceDescription="/ month"
               description="Perfect for exploring and getting started"
               features={FREE_FEATURES}
-              buttonText="Current plan"
+              buttonText={user ? "Current plan" : undefined}
               buttonVariant="secondary"
               buttonDisabled={true}
               animationDelay={0.3}
@@ -103,7 +103,7 @@ export default function PricingPage() {
               priceDescription="/ month"
               description="For professionals and power users"
               features={PRO_FEATURES}
-              buttonText={user ? "Upgrade to Pro" : "Sign in to upgrade"}
+              buttonText={user ? "Upgrade to Pro" : undefined}
               buttonVariant="primary"
               onButtonClick={handleUpgradeToPro}
               animationDelay={0.4}
