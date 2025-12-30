@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
@@ -41,6 +42,7 @@ export default async function RootLayout({
         <QueryProvider>
           <SessionProvider initialUser={user}>{children}</SessionProvider>
         </QueryProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
