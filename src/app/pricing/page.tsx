@@ -13,13 +13,14 @@ import { PricingHeader } from "./PricingHeader";
 const PRO_PRODUCT_ID = "a127ef8f-a886-49c3-9e8b-3435fd8d1694";
 
 const FREE_FEATURES = [
-  "Limited to 100 credits monthly (5-25 renders)",
-  "Basic image generation",
+  "High-fidelity image generation",
+  "Limited to 100 credits (5-25 renders)",
   "Standard support",
 ];
 
 const PRO_FEATURES = [
-  "1,000 credits monthly included",
+  "High-fidelity image generation",
+  "1,000 credits included each month",
   "Then, unlimited usage at $0.015/credit",
   "Upload reference images",
   "Iterate on visualizations in threads",
