@@ -77,21 +77,6 @@ export const Button = ({
   const shouldScale =
     scaleOnHover !== undefined ? scaleOnHover : variant === "primary";
 
-  // Icon size classes based on button size
-  const iconSizeClass = {
-    sm: "size-3.5",
-    md: "size-4",
-    lg: "size-5",
-  }[size];
-
-  // Wrap icons with size class
-  const wrappedLeftIcon = leftIcon ? (
-    <span className={iconSizeClass}>{leftIcon}</span>
-  ) : null;
-  const wrappedRightIcon = rightIcon ? (
-    <span className={iconSizeClass}>{rightIcon}</span>
-  ) : null;
-
   // Base classes - shared by all variants (except list-item which needs different flex behavior)
   const baseClasses =
     variant === "list-item"
@@ -195,9 +180,9 @@ export const Button = ({
         <LoadingSpinner size={size} />
       ) : (
         <>
-          {wrappedLeftIcon}
+          {leftIcon}
           {children}
-          {wrappedRightIcon}
+          {rightIcon}
         </>
       )}
     </button>
