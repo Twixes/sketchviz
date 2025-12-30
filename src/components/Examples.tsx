@@ -8,6 +8,7 @@ import {
 import { motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/lib/components/ui/Button";
 import type { GenerateRequest } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 
@@ -180,13 +181,15 @@ function ExampleItem({
         </div>
 
         {/* Try this out button */}
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={handleTryExample}
-          className="flex items-center gap-0.5 absolute left-3 bottom-3 whitespace-nowrap rounded-lg bg-white/80 hover:bg-white transition-colors px-2.5 py-1 text-xs font-medium text-black/70 hover:text-black shadow-sm backdrop-blur-sm z-10"
-          type="button"
+          rightIcon={<Pencil1Icon className="size-3.5" />}
+          className="absolute left-3 bottom-3 bg-white/80 hover:bg-white text-black/70 hover:text-black backdrop-blur-sm shadow-sm border-0 z-10"
         >
-          Try this out <Pencil1Icon className="size-3.5" />
-        </button>
+          Try this out
+        </Button>
       </div>
 
       <p className="whitespace-nowrap text-center text-sm font-medium text-black/70">

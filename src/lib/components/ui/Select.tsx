@@ -2,6 +2,7 @@ import { CheckIcon } from "@radix-ui/react-icons";
 import * as Popover from "@radix-ui/react-popover";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useState } from "react";
+import { Button } from "./Button";
 
 export interface SelectOption<T> {
   value: T;
@@ -81,24 +82,18 @@ export function Select<T extends string | null>({
               const isDisabled = !!option.disabledReason;
 
               const button = (
-                <button
+                <Button
                   key={String(option.value ?? "null")}
-                  type="button"
+                  variant="list-item"
+                  isSelected={isSelected}
+                  disabled={isDisabled}
                   onClick={() => {
                     if (!isDisabled) {
                       onChange(option.value);
                       setIsOpen(false);
                     }
                   }}
-                  disabled={isDisabled}
-                  data-selected={isSelected}
-                  className={`group relative text-left flex w-full items-center gap-2 rounded-lg px-3 py-2 pr-8 text-sm outline-none transition-all duration-150 ${
-                    isDisabled
-                      ? "cursor-not-allowed opacity-50"
-                      : isSelected
-                        ? "bg-black text-white cursor-pointer"
-                        : "text-black hover:bg-black/5 focus-visible:bg-black/5 cursor-pointer active:scale-[0.98]"
-                  }`}
+                  className="group relative w-full pr-8"
                 >
                   <option.icon
                     className={`size-4 shrink-0 transition-transform duration-150 ${
@@ -122,7 +117,7 @@ export function Select<T extends string | null>({
                   {isSelected && (
                     <CheckIcon className="absolute right-3 size-4 text-white" />
                   )}
-                </button>
+                </Button>
               );
 
               // Wrap in tooltip if disabled and has tooltip text

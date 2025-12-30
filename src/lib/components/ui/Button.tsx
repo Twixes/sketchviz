@@ -4,7 +4,7 @@ import type React from "react";
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   // Visual variants
-  variant?: "primary" | "secondary" | "ghost" | "icon";
+  variant?: "primary" | "secondary" | "ghost" | "icon" | "list-item";
 
   // Sizes
   size?: "sm" | "md" | "lg";
@@ -15,6 +15,7 @@ export interface ButtonProps
 
   // States
   loading?: boolean; // Shows built-in spinner, hides children
+  isSelected?: boolean; // Shows selected state (list-item variant only)
 
   // Interaction behavior
   scaleOnHover?: boolean; // default: true for primary, false for others
@@ -63,6 +64,7 @@ export const Button = ({
   leftIcon,
   rightIcon,
   loading = false,
+  isSelected = false,
   scaleOnHover,
   colorScheme = "dark",
   className,
@@ -90,8 +92,11 @@ export const Button = ({
     <span className={iconSizeClass}>{rightIcon}</span>
   ) : null;
 
-  // Base classes - shared by all variants
-  const baseClasses = "inline-flex items-center justify-center transition-all";
+  // Base classes - shared by all variants (except list-item which needs different flex behavior)
+  const baseClasses =
+    variant === "list-item"
+      ? "flex items-center transition-all"
+      : "inline-flex items-center justify-center transition-all";
 
   // Variant-specific classes
   const variantClasses = {
@@ -121,6 +126,14 @@ export const Button = ({
         ? "cursor-not-allowed opacity-50"
         : "hover:bg-opacity-90",
     ]),
+    "list-item": clsx([
+      "text-left",
+      loading || disabled
+        ? "cursor-not-allowed opacity-50"
+        : isSelected
+          ? "bg-black text-white cursor-pointer"
+          : "text-black hover:bg-black/5 focus-visible:bg-black/5 cursor-pointer active:scale-[0.98]",
+    ]),
   }[variant];
 
   // Size-specific classes
@@ -145,6 +158,11 @@ export const Button = ({
       md: "p-2 rounded-xl",
       lg: "p-3 rounded-xl",
     },
+    "list-item": {
+      sm: "px-2 py-1.5 text-xs gap-2 rounded-lg",
+      md: "px-3 py-2 text-sm gap-2 rounded-lg",
+      lg: "px-4 py-3 text-sm gap-2 rounded-lg",
+    },
   }[variant][size];
 
   // Scale effect classes
@@ -155,7 +173,7 @@ export const Button = ({
 
   // Additional interaction classes for specific variants
   const interactionClasses =
-    variant !== "icon" && !loading && !disabled
+    variant !== "icon" && variant !== "list-item" && !loading && !disabled
       ? "focus:outline-none focus:ring-2 focus:ring-black/20"
       : "";
 
