@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
@@ -8,8 +7,10 @@ import { type Usable, use, useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
-import { Button } from "@/lib/components/ui/Button";
+import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import type { UserParams } from "@/lib/schemas";
+import { GenerationCard } from "./GenerationCard";
+import { ThreadHeader } from "./ThreadHeader";
 
 interface Generation {
   id: string;
@@ -25,12 +26,6 @@ interface Thread {
   created_at: string;
   generations: Generation[];
 }
-
-const LAYOUT_TRANSITION = {
-  type: "spring",
-  stiffness: 160,
-  damping: 22,
-} as const;
 
 export default function ThreadDetailPage({
   params,
@@ -108,134 +103,26 @@ export default function ThreadDetailPage({
         <Header user={user} />
 
         <motion.section className="space-y-8">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleBackToThreads}
-              leftIcon={<ArrowLeftIcon />}
-            >
-              Back to threads
-            </Button>
-          </div>
-
           {isLoading ? (
             <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
               <p className="text-black/50">Loading thread...</p>
             </div>
           ) : thread ? (
             <div className="space-y-8">
-              <div>
-                <h1 className="text-4xl font-semibold text-black">
-                  {thread.title}
-                </h1>
-                <p className="mt-2 text-lg text-black/70">
-                  {new Date(thread.created_at).toLocaleString()}
-                </p>
-              </div>
+              <ThreadHeader
+                title={thread.title}
+                createdAt={thread.created_at}
+                onBackClick={handleBackToThreads}
+              />
 
               {thread.generations && thread.generations.length > 0 ? (
                 <div className="space-y-6">
                   {thread.generations.map((generation, index) => (
-                    <motion.div
+                    <GenerationCard
                       key={generation.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="rounded-2xl border border-black/10 bg-white/75 p-6 shadow-sm"
-                    >
-                      <div className="mb-4">
-                        <p className="text-sm font-semibold text-black/60">
-                          Generation {index + 1}
-                        </p>
-                        <p className="text-xs text-black/40">
-                          {new Date(generation.created_at).toLocaleString()}
-                        </p>
-                      </div>
-
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {/* Input Image */}
-                        <div>
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-black/40">
-                            Input
-                          </p>
-                          <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
-                            <img
-                              src={generation.input_url}
-                              alt="Input"
-                              width={600}
-                              height={400}
-                              className="h-auto w-full object-contain"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Output Image */}
-                        <div>
-                          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-black/40">
-                            Output
-                          </p>
-                          {generation.output_url ? (
-                            <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
-                              <img
-                                src={generation.output_url}
-                                alt="Output"
-                                width={600}
-                                height={400}
-                                className="h-auto w-full object-contain"
-                              />
-                            </div>
-                          ) : (
-                            <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-black/20 bg-black/5">
-                              <p className="text-sm text-black/40">
-                                No output generated
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Parameters */}
-                      {(generation.user_params.outdoor_light ||
-                        generation.user_params.indoor_light ||
-                        generation.user_params.edit_description ||
-                        generation.user_params.model) && (
-                        <div className="mt-4 space-y-2 rounded-lg bg-black/5 p-3">
-                          <p className="text-xs font-semibold uppercase tracking-widest text-black/40">
-                            Parameters
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {generation.user_params.outdoor_light && (
-                              <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                Outdoor: {generation.user_params.outdoor_light}
-                              </span>
-                            )}
-                            {generation.user_params.indoor_light && (
-                              <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                Indoor: {generation.user_params.indoor_light}
-                              </span>
-                            )}
-                            {generation.user_params.model && (
-                              <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                AI model: {generation.user_params.model}
-                              </span>
-                            )}
-                            {generation.user_params.aspect_ratio && (
-                              <span className="rounded-lg border border-black/10 bg-white px-2 py-1 text-xs text-black">
-                                Aspect ratio:{" "}
-                                {generation.user_params.aspect_ratio ||
-                                  "Preserve"}
-                              </span>
-                            )}
-                          </div>
-                          {generation.user_params.edit_description && (
-                            <p className="text-sm text-black/70">
-                              {generation.user_params.edit_description}
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </motion.div>
+                      generation={generation}
+                      index={index}
+                    />
                   ))}
                 </div>
               ) : (
