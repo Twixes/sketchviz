@@ -220,7 +220,7 @@ export function UploadDropzone({
               src={inputSrc}
               alt="Original"
               onLoad={handleInputLoad}
-              className="absolute inset-0 h-full w-full object-cover rounded-3xl"
+              className="absolute inset-0 h-full w-full bg-black object-cover rounded-3xl"
             />
             <Hint position="top-right">Click to replace image</Hint>
             {outputSrc && (
@@ -229,7 +229,7 @@ export function UploadDropzone({
                   ref={outputRef}
                   src={outputSrc}
                   alt="Result"
-                  className="absolute inset-0 h-full w-full object-cover rounded-3xl opacity-0 transition-opacity duration-300"
+                  className="absolute inset-0 h-full w-full bg-white object-cover rounded-3xl opacity-0 transition-opacity duration-300"
                   style={isComparing ? { visibility: "hidden" } : undefined}
                 />
                 <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
