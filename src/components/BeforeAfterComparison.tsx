@@ -72,10 +72,7 @@ export function BeforeAfterComparison({
       className="flex select-none flex-col gap-3"
       ref={containerRef}
     >
-      <div
-        className="relative aspect-3/2 cursor-ew-resize overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)] touch-none"
-        onPointerDown={() => setIsDragging(true)}
-      >
+      <div className="relative aspect-3/2 overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)]">
         {/* Before image (base layer - left side) */}
         <Image
           src={before}
@@ -115,8 +112,12 @@ export function BeforeAfterComparison({
 
         {/* Drag button - always visible on the divider */}
         <div
-          className="flex items-center gap-0.5 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white px-2 py-1.5 text-xs font-medium text-black shadow-lg"
+          className="flex items-center gap-0.5 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-white px-2 py-1.5 text-xs font-medium text-black shadow-lg cursor-ew-resize touch-none"
           style={{ left: `${revealPercent}%` }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            setIsDragging(true);
+          }}
         >
           <ArrowLeftIcon /> Drag <ArrowRightIcon />
         </div>
