@@ -7,6 +7,7 @@ import { Examples } from "@/components/Examples";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
+import { HeroFeatures } from "@/components/HeroFeatures";
 import { useSession } from "@/components/SessionProvider";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
@@ -107,9 +108,17 @@ export default function Home() {
               : "items-center lg:grid-cols-[1.05fr_0.95fr]",
           ])}
         >
-          {!focusUpload ? <Hero /> : null}
+          {!focusUpload ? (
+            <div className="contents lg:block lg:space-y-8">
+              <Hero />
+              <div className="order-2 lg:order-none">
+                <HeroFeatures />
+              </div>
+            </div>
+          ) : null}
 
           <ControlPanel
+            className="order-1 lg:order-none"
             user={user}
             inputSrc={inputSrc}
             outdoorLight={outdoorLight}

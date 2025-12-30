@@ -36,6 +36,7 @@ interface ControlPanelProps {
   isBusyForUser: boolean;
   outputSrc: string | null;
   focusUpload: boolean;
+  className?: string;
   onFileSelected: (file: File) => Promise<void>;
   onOutdoorLightChange: (value: string | null) => void;
   onIndoorLightChange: (value: string | null) => void;
@@ -56,6 +57,7 @@ export function ControlPanel({
   isBusyForUser,
   outputSrc,
   focusUpload,
+  className,
   onFileSelected,
   onOutdoorLightChange,
   onIndoorLightChange,
@@ -170,6 +172,7 @@ export function ControlPanel({
       className={clsx([
         "relative w-full min-w-0",
         focusUpload ? "max-w-5xl" : "",
+        className,
       ])}
     >
       <FunkyBackgroundMini />
