@@ -14,5 +14,5 @@ export const GET = CustomerPortal({
     process.env.NODE_ENV === "production"
       ? "https://sketchviz.app"
       : "http://localhost:3000",
-  server: "production",
+  server: process.env.NODE_ENV === "production" ? "production" : "sandbox",
 });

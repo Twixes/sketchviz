@@ -10,6 +10,6 @@ export const GET = Checkout({
     process.env.NODE_ENV === "production"
       ? "https://sketchviz.app"
       : "http://localhost:3000",
-  server: "production",
+  server: process.env.NODE_ENV === "production" ? "production" : "sandbox",
   theme: "light", // Enforces the theme - System-preferred theme will be set if left omitted
 });

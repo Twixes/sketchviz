@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { polar } from "@/lib/polar";
+import { FREE_PLAN_PRODUCT_ID, polar } from "@/lib/polar";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
           });
           await polar.subscriptions.create({
             externalCustomerId: user.id,
-            productId: "d603bffa-78e5-468c-bce6-b909577073dc", // Free plan
+            productId: FREE_PLAN_PRODUCT_ID, // Free plan
           });
         } else {
           throw error;
