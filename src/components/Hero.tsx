@@ -1,7 +1,3 @@
-import { motion } from "motion/react";
-
-const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
-
 const FEATURES = [
   {
     label: "Quality",
@@ -23,15 +19,7 @@ const FEATURES = [
 
 export function Hero() {
   return (
-    <motion.div
-      key="hero"
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={FADE_TRANSITION}
-      className="flex flex-col gap-8"
-    >
+    <div key="hero" className="flex flex-col gap-8">
       <div className="space-y-6">
         <h1 className="text-4xl font-semibold leading-tight text-black sm:text-5xl">
           Transform your <span className="outline-title">SketchUp renders</span>{" "}
@@ -59,6 +47,6 @@ export function Hero() {
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }

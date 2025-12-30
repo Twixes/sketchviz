@@ -1,7 +1,6 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion } from "motion/react";
 import { useCallback } from "react";
 import { ControlPanel } from "@/components/ControlPanel";
 import { Examples } from "@/components/Examples";
@@ -12,12 +11,6 @@ import { useSession } from "@/components/SessionProvider";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import { useUploadStore } from "@/stores/upload-store";
-
-const LAYOUT_TRANSITION = {
-  type: "spring",
-  stiffness: 160,
-  damping: 22,
-} as const;
 
 export default function Home() {
   const { user } = useSession();
@@ -103,16 +96,10 @@ export default function Home() {
 
   return (
     <FunkyBackground>
-      <motion.main
-        layout
-        transition={LAYOUT_TRANSITION}
-        className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
-      >
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10">
         <Header user={user} onLogoClick={handleReset} />
 
-        <motion.section
-          layout
-          transition={LAYOUT_TRANSITION}
+        <section
           className={clsx([
             "grid gap-12",
             focusUpload
@@ -120,9 +107,7 @@ export default function Home() {
               : "items-center lg:grid-cols-[1.05fr_0.95fr]",
           ])}
         >
-          <AnimatePresence initial={false}>
-            {!focusUpload ? <Hero /> : null}
-          </AnimatePresence>
+          {!focusUpload ? <Hero /> : null}
 
           <ControlPanel
             user={user}
@@ -143,10 +128,10 @@ export default function Home() {
             onAspectRatioChange={setAspectRatio}
             onGenerate={handleGenerate}
           />
-        </motion.section>
+        </section>
 
         {!focusUpload ? <Examples /> : null}
-      </motion.main>
+      </main>
     </FunkyBackground>
   );
 }

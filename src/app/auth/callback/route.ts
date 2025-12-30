@@ -27,6 +27,8 @@ export async function GET(request: Request) {
             externalCustomerId: user.id,
             productId: "d603bffa-78e5-468c-bce6-b909577073dc", // Free plan
           });
+        } else {
+          throw error;
         }
       }
     }

@@ -19,14 +19,12 @@ export default function NotFound() {
   return (
     <FunkyBackground>
       <motion.main
-        layout
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
       >
         <Header user={user} />
 
         <motion.section
-          layout
           transition={LAYOUT_TRANSITION}
           className="grid min-h-[60vh] place-items-center gap-8"
         >

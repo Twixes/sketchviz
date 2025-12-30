@@ -23,7 +23,7 @@ const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 const PRO_PRODUCT_ID = "a127ef8f-a886-49c3-9e8b-3435fd8d1694";
 
 const FREE_FEATURES = [
-  "Limited to 100 credits monthly",
+  "Limited to 100 credits monthly (5-25 renders)",
   "Basic image generation",
   "Standard support",
 ];
@@ -52,7 +52,6 @@ export default function PricingPage() {
   return (
     <FunkyBackground>
       <motion.main
-        layout
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 pb-24 pt-10 lg:px-10"
       >
@@ -158,8 +157,10 @@ export default function PricingPage() {
               className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-sm"
             >
               <div className="relative flex-1">
-                <h2 className="text-3xl font-bold text-black">Free</h2>
-                <div className="mt-4 flex items-baseline gap-2">
+                <h2 className="text-3xl font-bold text-black leading-none">
+                  Free
+                </h2>
+                <div className="mt-3 flex items-baseline gap-2">
                   <span className="text-6xl font-bold tracking-tight text-black">
                     $0
                   </span>
@@ -169,7 +170,7 @@ export default function PricingPage() {
                   Perfect for exploring and getting started
                 </p>
 
-                <ul className="mt-8 space-y-4">
+                <ul className="mt-4 space-y-4">
                   {FREE_FEATURES.map((feature, index) => (
                     <motion.li
                       key={feature}
@@ -190,7 +191,7 @@ export default function PricingPage() {
               <Button
                 variant="secondary"
                 size="lg"
-                className="relative mt-10 w-full"
+                className="relative mt-6 w-full"
                 disabled
               >
                 Current plan
@@ -205,8 +206,10 @@ export default function PricingPage() {
               className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-sm"
             >
               <div className="relative flex-1">
-                <h2 className="text-3xl font-bold text-black">Pro</h2>
-                <div className="mt-4 flex items-baseline gap-2">
+                <h2 className="text-3xl font-bold text-black leading-none">
+                  Pro
+                </h2>
+                <div className="mt-3 flex items-baseline gap-2">
                   <span className="gradient-title text-6xl font-bold tracking-tight">
                     $15
                   </span>
@@ -216,7 +219,7 @@ export default function PricingPage() {
                   For professionals and power users
                 </p>
 
-                <ul className="mt-8 space-y-4">
+                <ul className="mt-4 space-y-4">
                   {PRO_FEATURES.map((feature, index) => (
                     <motion.li
                       key={feature}
@@ -225,7 +228,7 @@ export default function PricingPage() {
                       transition={{ delay: 0.5 + index * 0.05 }}
                       className="flex items-start gap-3"
                     >
-                      <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[color:var(--accent-cobalt)] to-[color:var(--accent-coral)]">
+                      <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-linear-to-br/oklch from-[color:var(--accent-cobalt)] to-[color:var(--accent-coral)]">
                         <CheckIcon className="size-4 text-white" />
                       </div>
                       <span className="text-base font-medium text-black">
@@ -239,7 +242,7 @@ export default function PricingPage() {
               <Button
                 variant="primary"
                 size="lg"
-                className="relative mt-10 w-full shadow-lg transition-shadow hover:shadow-xl"
+                className="relative mt-6 w-full shadow-lg transition-shadow hover:shadow-xl"
                 onClick={handleUpgradeToPro}
               >
                 {user ? "Upgrade to Pro" : "Sign in to upgrade"}

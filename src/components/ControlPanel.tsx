@@ -5,7 +5,7 @@ import {
 } from "@radix-ui/react-icons";
 import type { User } from "@supabase/supabase-js";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { useRef, useState } from "react";
 import { AspectRatioSelector } from "@/components/AspectRatioSelector";
 import {
@@ -24,13 +24,6 @@ import { Button } from "@/lib/components/ui/Button";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
-
-const LAYOUT_TRANSITION = {
-  type: "spring",
-  stiffness: 160,
-  damping: 22,
-} as const;
-const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 interface ControlPanelProps {
   user: User | null;
@@ -172,10 +165,8 @@ export function ControlPanel({
   };
 
   return (
-    <motion.div
+    <div
       ref={dropzoneRef}
-      layout
-      transition={LAYOUT_TRANSITION}
       className={clsx([
         "relative w-full min-w-0",
         focusUpload ? "max-w-5xl" : "",
@@ -214,113 +205,102 @@ export function ControlPanel({
         ])}
       />
 
-      <AnimatePresence initial={false}>
-        {inputSrc && (
-          <motion.div
-            key="controls"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={FADE_TRANSITION}
-            className="relative mt-6 flex flex-col gap-3 z-10"
-          >
-            <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap *:shrink">
-              <LightSelector
-                label="Outdoor light"
-                value={outdoorLight}
-                options={OUTDOOR_LIGHT_OPTIONS}
-                onChange={onOutdoorLightChange}
-              />
-              <LightSelector
-                label="Indoor lighting"
-                value={indoorLight}
-                options={INDOOR_LIGHT_OPTIONS}
-                onChange={onIndoorLightChange}
-              />
-              <AspectRatioSelector
-                value={aspectRatio}
-                onChange={onAspectRatioChange}
-                hasReferenceImages={referenceImages.length > 0}
-              />
-              <ModelSelector value={model} onChange={onModelChange} />
-            </div>
+      {inputSrc && (
+        <div className="relative mt-6 flex flex-col gap-3 z-10">
+          <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap *:shrink">
+            <LightSelector
+              label="Outdoor light"
+              value={outdoorLight}
+              options={OUTDOOR_LIGHT_OPTIONS}
+              onChange={onOutdoorLightChange}
+            />
+            <LightSelector
+              label="Indoor lighting"
+              value={indoorLight}
+              options={INDOOR_LIGHT_OPTIONS}
+              onChange={onIndoorLightChange}
+            />
+            <AspectRatioSelector
+              value={aspectRatio}
+              onChange={onAspectRatioChange}
+              hasReferenceImages={referenceImages.length > 0}
+            />
+            <ModelSelector value={model} onChange={onModelChange} />
+          </div>
 
-            <div className="flex relative">
-              <textarea
-                id="edit-description"
-                value={editDescription ?? ""}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    onGenerate();
-                  }
-                }}
-                onChange={(e) =>
-                  onEditDescriptionChange(e.target.value || null)
+          <div className="flex relative">
+            <textarea
+              id="edit-description"
+              value={editDescription ?? ""}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  onGenerate();
                 }
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onPaste={handlePaste}
-                placeholder="Request edits or specify materials (optional)"
-                rows={2}
-                className={clsx([
-                  "w-full rounded-xl border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-none transition-colors",
-                  referenceImages.length > 0 ? "pb-16" : "pb-6",
-                  isDraggingOver
-                    ? "border-black/60 bg-black/5"
-                    : "border-black/20",
-                ])}
-              />
-              <ReferenceImageUpload disabled={isBusyForUser} />
-            </div>
+              }}
+              onChange={(e) => onEditDescriptionChange(e.target.value || null)}
+              onDragOver={handleDragOver}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onPaste={handlePaste}
+              placeholder="Request edits or specify materials (optional)"
+              rows={2}
+              className={clsx([
+                "w-full rounded-xl border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-none transition-colors",
+                referenceImages.length > 0 ? "pb-16" : "pb-6",
+                isDraggingOver
+                  ? "border-black/60 bg-black/5"
+                  : "border-black/20",
+              ])}
+            />
+            <ReferenceImageUpload disabled={isBusyForUser} />
+          </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              onClick={
-                !user
-                  ? handleSignIn
-                  : hasInsufficientCredits
-                    ? () => handleUpgradeToPro(user.id)
-                    : onGenerate
-              }
-              disabled={isBusyForUser}
-              leftIcon={!user && !isBusyForUser ? <EnterIcon /> : undefined}
-              className={
-                "relative px-20" /* The horizontal padding is for the credit cost to fit */
-              }
-            >
-              {isBusyForUser ? (
-                "Visualizing…"
-              ) : !user ? (
-                "Log in with Google to complete visualization"
-              ) : hasInsufficientCredits ? (
-                <>
-                  You're out of free credits – upgrade to SketchViz Pro to
-                  visualize
-                  <DoubleArrowUpIcon />
-                </>
-              ) : outputSrc ? (
-                "Visualize again"
-              ) : (
-                "Visualize"
-              )}
-              {user && (
-                <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border border-white/60 text-xs">
-                  {hasInsufficientCredits && (
-                    <ExclamationTriangleIcon className="mr-0.5" />
-                  )}
-                  {creditCost} credits
-                </div>
-              )}
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            onClick={
+              !user
+                ? handleSignIn
+                : hasInsufficientCredits
+                  ? () => handleUpgradeToPro(user.id)
+                  : onGenerate
+            }
+            disabled={isBusyForUser}
+            leftIcon={!user && !isBusyForUser ? <EnterIcon /> : undefined}
+            className={
+              "relative px-20" /* The horizontal padding is for the credit cost to fit */
+            }
+          >
+            {isBusyForUser ? (
+              "Visualizing…"
+            ) : !user ? (
+              "Log in with Google to complete visualization"
+            ) : hasInsufficientCredits ? (
+              <>
+                You're out of free credits – upgrade to SketchViz Pro to
+                visualize
+                <DoubleArrowUpIcon />
+              </>
+            ) : outputSrc ? (
+              "Visualize again"
+            ) : (
+              "Visualize"
+            )}
+            {user && (
+              <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border border-white/60 text-xs">
+                {hasInsufficientCredits && (
+                  <ExclamationTriangleIcon className="mr-0.5" />
+                )}
+                {creditCost} credits
+              </div>
+            )}
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -25,7 +25,6 @@ export default function PrivacyPage() {
   return (
     <FunkyBackground>
       <motion.main
-        layout
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
       >
