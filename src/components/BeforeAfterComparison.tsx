@@ -8,6 +8,7 @@ import {
 import { motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { SLOW_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 import type { GenerateRequest } from "@/lib/schemas";
 import { Hint } from "./Hint";
@@ -68,7 +69,7 @@ export function BeforeAfterComparison({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut", delay: index * 0.05 }}
+      transition={{ ...SLOW_TRANSITION, delay: index * 0.05 }}
       className="flex select-none flex-col gap-3"
       ref={containerRef}
     >

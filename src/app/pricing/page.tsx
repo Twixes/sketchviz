@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { useRouter } from "next/navigation";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";

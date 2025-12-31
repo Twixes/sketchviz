@@ -5,13 +5,8 @@ import Link from "next/link";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
+import { LAYOUT_TRANSITION, SLOW_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
-
-const LAYOUT_TRANSITION = {
-  type: "spring",
-  stiffness: 160,
-  damping: 22,
-} as const;
 
 export default function NotFound() {
   const { user } = useSession();
@@ -32,7 +27,7 @@ export default function NotFound() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={SLOW_TRANSITION}
               className="space-y-4"
             >
               <h1 className="text-9xl font-bold leading-none text-black/10">
@@ -46,7 +41,7 @@ export default function NotFound() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ ...SLOW_TRANSITION, delay: 0.15 }}
             >
               <Link href="/">
                 <Button variant="primary" size="lg" className="cursor-pointer">

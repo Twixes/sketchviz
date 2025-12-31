@@ -7,6 +7,7 @@ import { useCallback, useEffect } from "react";
 import { FunkyBackground } from "@/components/FunkyBackground";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
+import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 
 interface Thread {
@@ -19,12 +20,6 @@ interface Thread {
     input_url: string;
   } | null;
 }
-
-const LAYOUT_TRANSITION = {
-  type: "spring",
-  stiffness: 160,
-  damping: 22,
-} as const;
 
 export default function ThreadsPage() {
   const router = useRouter();
@@ -83,11 +78,6 @@ export default function ThreadsPage() {
     },
     enabled: !!user,
   });
-
-  const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  }, [supabase, router]);
 
   const handleBackHome = useCallback(() => {
     router.push("/");

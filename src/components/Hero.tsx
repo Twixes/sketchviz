@@ -1,14 +1,32 @@
+"use client";
+
+import { motion } from "motion/react";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { FAST_TRANSITION, SLOW_TRANSITION } from "@/lib/animation-constants";
+
 export function Hero() {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-semibold leading-tight text-black sm:text-5xl">
+      <motion.h1
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+        transition={SLOW_TRANSITION}
+        className="text-4xl font-semibold leading-tight text-black sm:text-5xl"
+      >
         Transform your <span className="outline-title">SketchUp renders</span>{" "}
         into <span className="gradient-title">photorealistic visuals</span>.
-      </h1>
-      <p className="max-w-xl text-lg text-black/70">
+      </motion.h1>
+      <motion.p
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+        animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+        transition={{ ...FAST_TRANSITION, delay: 0.1 }}
+        className="max-w-xl text-lg text-black/70"
+      >
         Upload a raw render and get polished, photorealistic output with refined
         lighting, realistic materials, and professional depth.
-      </p>
+      </motion.p>
     </div>
   );
 }

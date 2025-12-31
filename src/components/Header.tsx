@@ -7,9 +7,8 @@ import { useCreditsQuery } from "@/hooks/use-credits-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import GoogleIcon from "@/icons/google.svg";
+import { FADE_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
-
-const FADE_TRANSITION = { duration: 0.35, ease: "easeOut" } as const;
 
 interface HeaderProps {
   user: User | null;

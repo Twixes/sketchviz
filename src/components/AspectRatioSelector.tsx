@@ -1,7 +1,6 @@
 import {
   AspectRatioIcon,
   ContainerIcon,
-  DimensionsIcon,
   SectionIcon,
   SquareIcon,
 } from "@radix-ui/react-icons";

@@ -1,12 +1,8 @@
 import fs from "node:fs/promises";
-import { createGoogleGenerativeAI, google } from "@ai-sdk/google";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { withTracing } from "@posthog/ai";
 import { generateText, type LanguageModel } from "ai";
 import type { AspectRatio } from "./aspect-ratio";
-import {
-  DEFAULT_IMAGE_EDITING_MODEL,
-  DEFAULT_MODEL_PROVIDER,
-} from "./constants";
 import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 

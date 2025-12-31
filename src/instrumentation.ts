@@ -15,7 +15,7 @@ export const onRequestError: Instrumentation.onRequestError = async (
 
     const postHogCookieMatch = cookieString.match(/ph_phc_.*?_posthog=([^;]+)/);
 
-    if (postHogCookieMatch && postHogCookieMatch[1]) {
+    if (postHogCookieMatch?.[1]) {
       try {
         const decodedCookie = decodeURIComponent(postHogCookieMatch[1]);
         const postHogData = JSON.parse(decodedCookie);

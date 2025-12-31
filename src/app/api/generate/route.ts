@@ -12,7 +12,7 @@ import {
 } from "@/lib/constants";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import { getCreditsForUser, polar } from "@/lib/polar";
-import { generateRequestSchema, type Model } from "@/lib/schemas";
+import { generateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
