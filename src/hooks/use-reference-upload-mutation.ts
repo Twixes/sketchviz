@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { upload } from "@vercel/blob/client";
 import posthog from "posthog-js";
 import {
   ACCEPTED_MIME_TYPES,
@@ -7,6 +6,7 @@ import {
   MAX_UPLOAD_BYTES,
   MAX_UPLOAD_MB,
 } from "@/lib/constants";
+import { createClient } from "@/lib/supabase/client";
 
 interface UploadFileParams {
   file: File;
@@ -27,13 +27,43 @@ export function useReferenceUploadMutation() {
         throw new Error(`File too large. Max ${MAX_UPLOAD_MB}MB.`);
       }
 
-      // Upload to Vercel Blob
-      const blob = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/upload",
-      });
+      // Get authenticated Supabase client
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      return blob.url;
+      if (!user) {
+        throw new Error("Authentication required");
+      }
+
+      // Generate unique filename with timestamp
+      const timestamp = new Date().toISOString();
+      const filenameParts = file.name.split(".");
+      const ext = filenameParts.at(-1) || "png";
+      const filenameWithoutExt =
+        filenameParts.slice(0, -1).join(".") || "reference";
+      const filename = `${filenameWithoutExt}-${timestamp}.${ext}`;
+      const filePath = `${user.id}/${filename}`;
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from("input-images")
+        .upload(filePath, file, {
+          contentType: file.type,
+          upsert: false,
+        });
+
+      if (error) {
+        throw new Error(`Upload failed: ${error.message}`);
+      }
+
+      // Get public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("input-images").getPublicUrl(data.path);
+
+      return publicUrl;
     },
     onMutate: ({ file }) => {
       posthog.capture("reference_image_upload_started", {

@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import sharp from "sharp";
 import { generateVisualizationImage, titleVisualizationImage } from "@/lib/ai";
@@ -14,6 +13,13 @@ import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import { getCreditsForUser, polar } from "@/lib/polar";
 import { generateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
+import {
+  type BUCKET_INPUT_IMAGES,
+  BUCKET_OUTPUT_IMAGES,
+  downloadFile,
+  parseStorageUrl,
+  uploadFile,
+} from "@/lib/supabase/storage";
 
 export const runtime = "nodejs";
 
@@ -86,15 +92,26 @@ export async function POST(request: Request) {
   const generationId = generation.id;
 
   try {
-    // Fetch the file from Vercel Blob
-    const blobResponse = await fetch(blobUrl);
-
-    if (!blobResponse.ok) {
-      throw new Error("Failed to fetch blob.");
+    // Parse storage URL to extract bucket and path
+    const parsed = parseStorageUrl(blobUrl);
+    if (!parsed) {
+      console.error("Failed to parse storage URL:", blobUrl);
+      throw new Error(`Invalid storage URL format: ${blobUrl}`);
     }
 
-    const contentType = blobResponse.headers.get("content-type");
-    const contentLength = blobResponse.headers.get("content-length");
+    console.log("Downloading file from storage:", {
+      bucket: parsed.bucket,
+      path: parsed.path,
+    });
+
+    // Download file from Supabase Storage with authentication
+    const blob = await downloadFile({
+      supabase,
+      bucket: parsed.bucket as typeof BUCKET_INPUT_IMAGES,
+      path: parsed.path,
+    });
+
+    const contentType = blob.type;
 
     if (!contentType || !ACCEPTED_MIME_TYPES.includes(contentType)) {
       return NextResponse.json(
@@ -106,14 +123,14 @@ export async function POST(request: Request) {
       );
     }
 
-    if (contentLength && Number(contentLength) > MAX_UPLOAD_BYTES) {
+    if (blob.size > MAX_UPLOAD_BYTES) {
       return NextResponse.json(
         { error: "File too large. Max 20MB." },
         { status: 413 },
       );
     }
 
-    const arrayBuffer = await blobResponse.arrayBuffer();
+    const arrayBuffer = await blob.arrayBuffer();
     let imageBuffer: Buffer = Buffer.from(arrayBuffer);
 
     // Crop image if aspect ratio is specified
@@ -158,16 +175,32 @@ export async function POST(request: Request) {
 
     if (reference_image_urls && reference_image_urls.length > 0) {
       for (const refUrl of reference_image_urls) {
-        const refResponse = await fetch(refUrl);
-        if (refResponse.ok) {
-          const refContentType = refResponse.headers.get("content-type");
+        try {
+          // Parse storage URL to extract bucket and path
+          const refParsed = parseStorageUrl(refUrl);
+          if (!refParsed) {
+            console.warn(`Invalid reference image URL: ${refUrl}`);
+            continue;
+          }
+
+          // Download file from Supabase Storage with authentication
+          const refBlob = await downloadFile({
+            supabase,
+            bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
+            path: refParsed.path,
+          });
+
+          const refContentType = refBlob.type;
           if (refContentType && ACCEPTED_MIME_TYPES.includes(refContentType)) {
-            const refArrayBuffer = await refResponse.arrayBuffer();
+            const refArrayBuffer = await refBlob.arrayBuffer();
             referenceImageBuffers.push({
               buffer: Buffer.from(refArrayBuffer),
               mediaType: refContentType,
             });
           }
+        } catch (error) {
+          console.error(`Failed to fetch reference image ${refUrl}:`, error);
+          // Continue with other reference images
         }
       }
     }
@@ -223,9 +256,13 @@ export async function POST(request: Request) {
       userId: user.id,
     });
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
-    const blob = await put(outputFilename, Buffer.from(result.uint8Array), {
-      access: "public",
+    const { url: outputUrl } = await uploadFile({
+      supabase,
+      bucket: BUCKET_OUTPUT_IMAGES,
+      path: outputFilename,
+      file: Buffer.from(result.uint8Array),
       contentType: result.mediaType,
+      userId: user.id,
     });
 
     // Update generation record with output URL if available
@@ -233,7 +270,7 @@ export async function POST(request: Request) {
       const { error: updateError } = await supabase
         .from("generations")
         .update({
-          output_url: blob.url,
+          output_url: outputUrl,
         })
         .eq("id", generationId);
 
@@ -243,9 +280,10 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      outputImage: blob.url,
+      outputImage: outputUrl,
     });
   } catch (error) {
+    console.error("Generate endpoint error:", error);
     const message =
       error instanceof Error ? error.message : "Failed to generate image.";
 

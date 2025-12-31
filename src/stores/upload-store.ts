@@ -9,7 +9,7 @@ import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 
 export interface ReferenceImage {
   localSrc: string; // Local blob URL for preview
-  blobUrl: string | null; // Uploaded Vercel Blob URL (null while uploading)
+  blobUrl: string | null; // Uploaded blob URL (null while uploading)
 }
 
 interface UploadState {

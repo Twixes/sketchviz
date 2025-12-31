@@ -83,7 +83,6 @@ export async function generateVisualizationImage(params: {
   // Also extract imageSize from model name if present (e.g., "gemini-3-pro-image-preview/4k" -> "4k")
   const [modelProvider, modelName, imageSizeFromModel] =
     params.model.split("/");
-  const imageSize: "2K" | "4K" = imageSizeFromModel === "4k" ? "4K" : "2K";
 
   let imageEditingModel: LanguageModel;
   if (modelProvider === "google") {
@@ -124,16 +123,23 @@ export async function generateVisualizationImage(params: {
   const providerOptions: {
     google: {
       responseModalities: ["IMAGE"];
-      imageConfig?: { aspectRatio?: string; imageSize: "1K" | "2K" | "4K" };
+      imageConfig?: { aspectRatio?: string; imageSize?: "1K" | "2K" | "4K" };
     };
   } = {
     google: {
       responseModalities: ["IMAGE"],
-      imageConfig: { imageSize },
+      imageConfig: {},
     },
   };
 
-  // Add aspect ratio to imageConfig if specified
+  // Only add imageSize for pro models (flash model doesn't support it)
+  const isProModel = params.model.startsWith(
+    "google/gemini-3-pro-image-preview",
+  );
+  if (isProModel) {
+    providerOptions.google.imageConfig!.imageSize =
+      imageSizeFromModel === "4k" ? "4K" : "2K";
+  }
   if (params.aspectRatio) {
     providerOptions.google.imageConfig!.aspectRatio = params.aspectRatio;
   }

@@ -37,7 +37,6 @@ export function ReferenceImageUpload({ disabled }: ReferenceImageUploadProps) {
     addReferenceImage(localSrc, null);
 
     try {
-      // Upload to Vercel Blob
       const blobUrl = await uploadMutation.mutateAsync({ file });
 
       // Update the blobUrl once upload completes

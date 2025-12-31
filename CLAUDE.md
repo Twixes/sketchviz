@@ -29,7 +29,7 @@ pnpm format
 - **UI**: React 19, TailwindCSS 4, Motion (Framer Motion), Radix UI (Select, Tooltip, Popover, Icons, but feel free to add more)
 - **State Management**: Zustand (client state), TanStack Query (server state)
 - **Database**: Supabase (PostgreSQL with Row Level Security)
-- **Storage**: Vercel Blob
+- **Storage**: Supabase Storage (private buckets with RLS)
 - **AI**: Google Gemini via AI SDK
   - Models: `gemini-3-pro-image-preview` (generation 2K, 14 credits), `gemini-3-pro-image-preview/4k` (generation 4K, 24 credits), `gemini-2.5-flash-image-preview` (generation, 4 credits), `gemini-flash-lite-latest` (titles)
 - **Payments**: Polar SDK (credit system, subscriptions)
@@ -38,16 +38,16 @@ pnpm format
 - **Content**: react-markdown (Markdown rendering)
 
 ### Core Flow
-1. User uploads SketchUp render → uploaded to Vercel Blob via `/api/upload`
-2. User optionally uploads up to 3 reference images for materials/textures/style
+1. User uploads SketchUp render → uploaded to Supabase Storage (`input-images` bucket) via `/api/upload`
+2. User optionally uploads up to 3 reference images for materials/textures/style (stored in `input-images` bucket)
 3. User adjusts parameters:
    - Lighting (outdoor: sunny/overcast/night, indoor: all_on/all_off, or custom text)
    - AI model selection (gemini-3-pro or gemini-2.5-flash)
    - Aspect ratio (if using reference images, required due to Gemini limitations)
    - Optional edit description for specific requests
 4. User clicks generate → `/api/generate` validates request and checks credits via Polar
-5. `/api/generate` fetches blobs, sends to Gemini with constructed prompt (base + lighting + edit description + reference images)
-6. Gemini returns photorealistic image → stored in Vercel Blob
+5. `/api/generate` fetches images from Supabase Storage, sends to Gemini with constructed prompt (base + lighting + edit description + reference images)
+6. Gemini returns photorealistic image → stored in Supabase Storage (`output-images` bucket)
 7. Credits deducted via Polar (14 for gemini-3-pro, 4 for gemini-2.5-flash)
 8. Thread + generation records created in Supabase with user params stored as JSONB (authenticated users only)
 9. Thread title auto-generated in background via Gemini Flash
@@ -65,8 +65,8 @@ pnpm format
 - Single source of truth for the main workflow state
 
 **Server State (TanStack Query)**
-- `use-upload-mutation.ts`: handles main image upload to Vercel Blob
-- `use-reference-upload-mutation.ts`: handles reference image uploads to Vercel Blob
+- `use-upload-mutation.ts`: handles main image upload to Supabase Storage
+- `use-reference-upload-mutation.ts`: handles reference image uploads to Supabase Storage
 - `use-generate-mutation.ts`: triggers AI generation via `/api/generate`
 - `use-credits-query.ts`: fetches user's available credits from `/api/credits`
 - Mutations update Zustand store on success/error
@@ -155,9 +155,8 @@ See `.env.example` for required variables. Key ones:
 
 **Required:**
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous/public key
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Supabase anonymous/public key
 - `GOOGLE_GENERATIVE_AI_API_KEY`: Google AI Studio API key for Gemini
-- `BLOB_READ_WRITE_TOKEN`: Vercel Blob storage token
 - `POLAR_ACCESS_TOKEN`: Polar API access token for credit/billing management
 - `NEXT_PUBLIC_POSTHOG_API_KEY`: PostHog project API key
 - `NEXT_PUBLIC_POSTHOG_HOST`: PostHog instance host URL

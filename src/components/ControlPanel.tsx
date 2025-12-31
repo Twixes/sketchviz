@@ -104,7 +104,6 @@ export function ControlPanel({
     addReferenceImage(localSrc, null);
 
     try {
-      // Upload to Vercel Blob
       const blobUrl = await referenceUploadMutation.mutateAsync({ file });
 
       // Update the blobUrl once upload completes
