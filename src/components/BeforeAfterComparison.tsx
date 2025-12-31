@@ -69,7 +69,7 @@ export function BeforeAfterComparison({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ ...SLOW_TRANSITION, delay: index * 0.05 }}
+      transition={{ ...SLOW_TRANSITION, delay: 0.15 + index * 0.05 }}
       className="flex select-none flex-col gap-3"
       ref={containerRef}
     >

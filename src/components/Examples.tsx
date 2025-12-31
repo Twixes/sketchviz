@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import type { GenerateRequest } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 import { BeforeAfterComparison } from "./BeforeAfterComparison";
@@ -74,7 +73,7 @@ export function Examples() {
   };
 
   return (
-    <motion.section className="grid gap-6 sm:grid-cols-3 text-balance">
+    <section className="grid gap-6 sm:grid-cols-3 text-balance">
       {EXAMPLES.map((example, index) => (
         <BeforeAfterComparison
           key={example.label}
@@ -86,6 +85,6 @@ export function Examples() {
           onTryExample={handleTryExample}
         />
       ))}
-    </motion.section>
+    </section>
   );
 }
