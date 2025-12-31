@@ -50,10 +50,10 @@ export function Header({ user, onLogoClick }: HeaderProps) {
       <div className="flex flex-wrap justify-start items-center gap-3 whitespace-nowrap">
         {user ? (
           <>
-            {!isLoadingCredits && credits !== null && (
+            {!!user && (
               <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black">
                 <span className="text-black/50">Credits:</span>
-                <span>{credits}</span>
+                <span>{isLoadingCredits ? "..." : (credits ?? "none")}</span>
               </div>
             )}
             <Link href="/pricing">
