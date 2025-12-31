@@ -31,7 +31,7 @@ pnpm format
 - **Database**: Supabase (PostgreSQL with Row Level Security)
 - **Storage**: Vercel Blob
 - **AI**: Google Gemini via AI SDK
-  - Models: `gemini-3-pro-image-preview` (generation, 14 credits), `gemini-2.5-flash-image-preview` (generation, 4 credits), `gemini-flash-lite-latest` (titles)
+  - Models: `gemini-3-pro-image-preview` (generation 2K, 14 credits), `gemini-3-pro-image-preview/4k` (generation 4K, 24 credits), `gemini-2.5-flash-image-preview` (generation, 4 credits), `gemini-flash-lite-latest` (titles)
 - **Payments**: Polar SDK (credit system, subscriptions)
 - **Analytics**: PostHog (event tracking, AI tracing, error tracking)
 - **Code Quality**: Biome (linting + formatting with Next.js/React domains), Lefthook (pre-commit hooks)
@@ -87,7 +87,7 @@ pnpm format
 
 **Payments & Credits (Polar SDK)**
 - `lib/polar.ts`: Polar client configuration for credit meter and subscriptions
-- Credit costs defined in `lib/credits.ts`: 14 credits for gemini-3-pro, 4 credits for gemini-2.5-flash
+- Credit costs defined in `lib/credits.ts`: 14 credits for gemini-3-pro (2K), 24 credits for gemini-3-pro/4k (4K), 4 credits for gemini-2.5-flash
 - `/api/billing/checkout`: Polar checkout route for purchasing credits
 - `/api/billing/portal`: Polar customer portal for managing subscriptions
 - `/api/credits`: Fetches user's available credits from Polar

@@ -1,5 +1,6 @@
 import { LightningBoltIcon, RocketIcon } from "@radix-ui/react-icons";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
+import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
 
 export interface ModelOption extends SelectOption<Model> {
@@ -13,15 +14,35 @@ interface ModelSelectorProps {
 
 export const MODEL_OPTIONS: ModelOption[] = [
   {
+    value: "google/gemini-3-pro-image-preview/4k",
+    label: (
+      <>
+        Nano Banana Pro{" "}
+        <span className="bg-black rounded-md px-1 text-xs font-semibold border border-white text-white">
+          4K
+        </span>
+      </>
+    ),
+    description: "Highest quality at maximum resolution – in 4K.",
+    icon: RocketIcon,
+  },
+  {
     value: "google/gemini-3-pro-image-preview",
-    label: "Nano Banana Pro",
-    description: "Highest quality (recommended). By Google.",
+    label: (
+      <>
+        Nano Banana Pro{" "}
+        <span className="bg-neutral-200 rounded-md px-1 text-xs font-semibold border border-white text-neutral-800">
+          2K
+        </span>
+      </>
+    ),
+    description: "Highest quality at a good price (recommended).",
     icon: RocketIcon,
   },
   {
     value: "google/gemini-2.5-flash-image-preview",
     label: "Nano Banana",
-    description: "Faster, but less reliable. By Google.",
+    description: "Fast and cheap, but less reliable.",
     icon: LightningBoltIcon,
   },
 ];
@@ -31,7 +52,20 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
     <Select
       label="AI model"
       value={value}
-      options={MODEL_OPTIONS}
+      options={MODEL_OPTIONS.map((option) => ({
+        ...option,
+        description: (
+          <div>
+            {option.description}
+            <br />
+            Credits per generation:{" "}
+            <strong>
+              {determineCreditCostOfImageGeneration({ model: option.value })}
+            </strong>
+            .
+          </div>
+        ),
+      }))}
       onChange={onChange}
     />
   );

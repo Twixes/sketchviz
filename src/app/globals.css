@@ -47,6 +47,11 @@ h6 {
   text-wrap-style: balance;
 }
 
+b,
+strong {
+  font-weight: 600;
+}
+
 .memphis-shell {
   position: relative;
   overflow: hidden;

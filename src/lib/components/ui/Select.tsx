@@ -6,9 +6,9 @@ import { Button } from "./Button";
 
 export interface SelectOption<T> {
   value: T;
-  label: string;
+  label: string | React.ReactNode;
   icon: React.ComponentType<{ className?: string }>;
-  description?: string;
+  description?: string | React.ReactNode;
   disabledReason?: string;
 }
 

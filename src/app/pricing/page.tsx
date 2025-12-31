@@ -14,7 +14,7 @@ const PRO_PRODUCT_ID = "a127ef8f-a886-49c3-9e8b-3435fd8d1694";
 
 const FREE_FEATURES = [
   "High-fidelity image generation",
-  "Limited to 100 credits (5-25 renders)",
+  "Limited to 100 credits (4-25 renders)",
   "Standard support",
 ];
 

@@ -80,7 +80,11 @@ export async function generateVisualizationImage(params: {
   }
 
   // Select the model, stripping the provider prefix (google/)
-  const [modelProvider, modelName] = params.model.split("/");
+  // Also extract imageSize from model name if present (e.g., "gemini-3-pro-image-preview/4k" -> "4k")
+  const [modelProvider, modelName, imageSizeFromModel] =
+    params.model.split("/");
+  const imageSize: "2K" | "4K" = imageSizeFromModel === "4k" ? "4K" : "2K";
+
   let imageEditingModel: LanguageModel;
   if (modelProvider === "google") {
     imageEditingModel = withTracing(
@@ -120,17 +124,18 @@ export async function generateVisualizationImage(params: {
   const providerOptions: {
     google: {
       responseModalities: ["IMAGE"];
-      imageConfig?: { aspectRatio: string };
+      imageConfig?: { aspectRatio?: string; imageSize: "1K" | "2K" | "4K" };
     };
   } = {
     google: {
       responseModalities: ["IMAGE"],
+      imageConfig: { imageSize },
     },
   };
 
-  // Only add imageConfig if aspect ratio is specified
+  // Add aspect ratio to imageConfig if specified
   if (params.aspectRatio) {
-    providerOptions.google.imageConfig = { aspectRatio: params.aspectRatio };
+    providerOptions.google.imageConfig.aspectRatio = params.aspectRatio;
   }
 
   const result = await imageEditingModel.doGenerate({

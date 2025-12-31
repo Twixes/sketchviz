@@ -4,6 +4,7 @@ import { ASPECT_RATIOS } from "./aspect-ratio";
 // Model schema
 export const modelSchema = z.enum([
   "google/gemini-3-pro-image-preview",
+  "google/gemini-3-pro-image-preview/4k",
   "google/gemini-2.5-flash-image-preview",
 ]);
 
