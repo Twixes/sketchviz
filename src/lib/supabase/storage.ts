@@ -1,5 +1,3 @@
-import "server-only";
-
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const BUCKET_INPUT_IMAGES = "input-images";

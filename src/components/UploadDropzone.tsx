@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createNoise2D } from "simplex-noise";
+import { useSignedUrl } from "@/hooks/use-signed-url";
 import { parseAspectRatio } from "@/lib/aspect-ratio";
 import { Button } from "@/lib/components/ui/Button";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
@@ -39,6 +40,10 @@ export function UploadDropzone({
   const [isComparing, setIsComparing] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
   const accept = useMemo(() => ACCEPTED_MIME_TYPES.join(","), []);
+
+  // Get signed URLs for authenticated storage access
+  const inputSignedUrl = useSignedUrl(inputSrc);
+  const outputSignedUrl = useSignedUrl(outputSrc);
 
   const handleFile = useCallback(
     (file: File | null) => {
@@ -84,7 +89,7 @@ export function UploadDropzone({
 
   useEffect(() => {
     const outputEl = outputRef.current;
-    if (!outputEl || !outputSrc) return;
+    if (!outputEl || !outputSignedUrl) return;
 
     let rafId = 0;
     setIsReady(false);
@@ -151,7 +156,7 @@ export function UploadDropzone({
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
     };
-  }, [outputSrc]);
+  }, [outputSignedUrl]);
 
   const handleInputLoad = useCallback(
     (event: SyntheticEvent<HTMLImageElement>) => {
@@ -192,10 +197,10 @@ export function UploadDropzone({
   const handleDownload = useCallback(
     async (event: React.MouseEvent) => {
       event.stopPropagation();
-      if (!outputSrc) return;
+      if (!outputSignedUrl) return;
 
       try {
-        const response = await fetch(outputSrc);
+        const response = await fetch(outputSignedUrl);
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -209,7 +214,7 @@ export function UploadDropzone({
         console.error("Failed to download image:", error);
       }
     },
-    [outputSrc],
+    [outputSignedUrl],
   );
 
   // Calculate the display aspect ratio
@@ -251,20 +256,20 @@ export function UploadDropzone({
         }}
       >
         {isBusyForUser ? <div className="loading-ring" aria-hidden /> : null}
-        {inputSrc ? (
+        {inputSrc && inputSignedUrl ? (
           <>
             <img
-              src={inputSrc}
+              src={inputSignedUrl}
               alt="Original"
               onLoad={handleInputLoad}
               className="absolute inset-0 h-full w-full bg-black object-cover rounded-3xl"
             />
             <Hint position="top-right">Click to replace image</Hint>
-            {outputSrc && (
+            {outputSrc && outputSignedUrl && (
               <>
                 <img
                   ref={outputRef}
-                  src={outputSrc}
+                  src={outputSignedUrl}
                   alt="Result"
                   className="absolute inset-0 h-full w-full bg-white object-cover rounded-3xl opacity-0 transition-opacity duration-300"
                   style={isComparing ? { visibility: "hidden" } : undefined}

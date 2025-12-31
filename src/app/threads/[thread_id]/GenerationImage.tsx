@@ -1,3 +1,7 @@
+"use client";
+
+import { useSignedUrl } from "@/hooks/use-signed-url";
+
 interface GenerationImageProps {
   src: string | null;
   alt: string;
@@ -5,15 +9,18 @@ interface GenerationImageProps {
 }
 
 export function GenerationImage({ src, alt, label }: GenerationImageProps) {
+  // Get signed URL for authenticated access
+  const signedUrl = useSignedUrl(src);
+
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-black/40">
         {label}
       </p>
-      {src ? (
+      {src && signedUrl ? (
         <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
           <img
-            src={src}
+            src={signedUrl}
             alt={alt}
             width={600}
             height={400}
