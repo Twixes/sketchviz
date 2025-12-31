@@ -41,10 +41,10 @@ export function Header({ user, onLogoClick }: HeaderProps) {
           height={64}
         />
         <div className="text-left">
-          <p className="text-base font-semibold tracking-tight text-black">
+          <p className="text-lg font-semibold tracking-tight leading-tight text-black">
             SketchViz
           </p>
-          <p className="text-xs text-black/50">AI visualization studio</p>
+          <p className="text-xs leading-tight text-black/50">Render worlds.</p>
         </div>
       </a>
       <div className="flex flex-wrap justify-start items-center gap-3 whitespace-nowrap">
