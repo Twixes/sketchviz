@@ -1,23 +1,23 @@
-// Fast, minimal animations (0.15-0.25s)
+// Smooth, polished animations (0.2-0.4s)
 export const LAYOUT_TRANSITION = {
   type: "spring",
-  stiffness: 300,
-  damping: 25,
+  stiffness: 200,
+  damping: 30,
 } as const;
 
 export const FADE_TRANSITION = {
-  duration: 0.2,
-  ease: "easeOut",
+  duration: 0.3,
+  ease: "easeInOut",
 } as const;
 
 export const FAST_TRANSITION = {
-  duration: 0.15,
-  ease: "easeOut",
+  duration: 0.2,
+  ease: "easeInOut",
 } as const;
 
 export const SLOW_TRANSITION = {
-  duration: 0.25,
-  ease: "easeOut",
+  duration: 0.4,
+  ease: "easeInOut",
 } as const;
 
 // Common animation variants for entrance/exit
