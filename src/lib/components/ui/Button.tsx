@@ -81,7 +81,7 @@ export const Button = ({
   const baseClasses =
     variant === "list-item"
       ? "flex items-center transition-all"
-      : "inline-flex items-center justify-center transition-all";
+      : "inline-flex items-center justify-center transition-all backdrop-blur-sm";
 
   // Variant-specific classes
   const variantClasses = {
@@ -109,7 +109,9 @@ export const Button = ({
         : "bg-white/80 text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
-        : "hover:bg-opacity-90",
+        : colorScheme === "dark"
+          ? "hover:bg-black/90"
+          : "hover:bg-white/90",
     ]),
     "list-item": clsx([
       "text-left",

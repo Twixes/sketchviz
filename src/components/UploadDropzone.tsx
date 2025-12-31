@@ -1,6 +1,6 @@
 "use client";
 
-import { Half2Icon, UploadIcon } from "@radix-ui/react-icons";
+import { DownloadIcon, Half2Icon, UploadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { motion } from "motion/react";
 import type { DragEvent, SyntheticEvent } from "react";
@@ -171,9 +171,46 @@ export function UploadDropzone({
     event.stopPropagation();
     setIsComparing(true);
   }, []);
-  const handleCompareEnd = useCallback(() => {
-    setIsComparing(false);
-  }, []);
+
+  // Handle document-wide pointer release for compare mode
+  useEffect(() => {
+    if (!isComparing) return;
+
+    const handlePointerUp = () => {
+      setIsComparing(false);
+    };
+
+    document.addEventListener("pointerup", handlePointerUp);
+    document.addEventListener("pointercancel", handlePointerUp);
+
+    return () => {
+      document.removeEventListener("pointerup", handlePointerUp);
+      document.removeEventListener("pointercancel", handlePointerUp);
+    };
+  }, [isComparing]);
+
+  const handleDownload = useCallback(
+    async (event: React.MouseEvent) => {
+      event.stopPropagation();
+      if (!outputSrc) return;
+
+      try {
+        const response = await fetch(outputSrc);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `sketchviz-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Failed to download image:", error);
+      }
+    },
+    [outputSrc],
+  );
 
   // Calculate the display aspect ratio
   const displayAspectRatio = selectedAspectRatio
@@ -232,39 +269,38 @@ export function UploadDropzone({
                   className="absolute inset-0 h-full w-full bg-white object-cover rounded-3xl opacity-0 transition-opacity duration-300"
                   style={isComparing ? { visibility: "hidden" } : undefined}
                 />
-                <div className="absolute left-4 right-4 top-4 flex items-center justify-between gap-2">
-                  <div
-                    className={clsx(
-                      "whitespace-nowrap rounded-lg px-2 py-1 text-xs font-semibold backdrop-blur-sm shadow-sm",
-                      !isComparing
-                        ? "bg-black/80 text-white"
-                        : "bg-white/80 text-black",
-                    )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  leftIcon={<Half2Icon />}
+                  onPointerDown={handleCompareStart}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  title="Compare with original"
+                  aria-label="Compare with original"
+                  className={clsx(
+                    "absolute left-4 top-4 font-semibold backdrop-blur-sm shadow-sm touch-none",
+                    !isComparing
+                      ? "bg-black/80 text-white hover:bg-black/90"
+                      : "bg-white/80 text-black hover:bg-white/90",
+                  )}
+                >
+                  {isComparing ? "Original" : "Result"}
+                </Button>
+                {isReady && !isComparing ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    leftIcon={<DownloadIcon />}
+                    onClick={handleDownload}
+                    title="Download result"
+                    aria-label="Download result"
+                    className="absolute right-4 bottom-4 font-semibold backdrop-blur-sm shadow-sm bg-black/80 text-white hover:bg-black/90"
                   >
-                    {isComparing
-                      ? "Original"
-                      : isReady
-                        ? "Result"
-                        : "Rendering..."}
-                  </div>
-                  {isReady ? (
-                    <Button
-                      variant="icon"
-                      size="sm"
-                      colorScheme={isComparing ? "light" : "dark"}
-                      onPointerDown={handleCompareStart}
-                      onPointerUp={handleCompareEnd}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                      title="Compare with original"
-                      aria-label="Compare with original"
-                      className="backdrop-blur-sm shadow-sm hover:*:rotate-45 touch-none"
-                    >
-                      <Half2Icon />
-                    </Button>
-                  ) : null}
-                </div>
+                    Download
+                  </Button>
+                ) : null}
               </>
             )}
           </>
