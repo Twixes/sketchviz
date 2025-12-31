@@ -11,7 +11,7 @@ export function Footer() {
               href="mailto:hello@sketchviz.app"
               className="hover:text-black/80 transition-colors"
             >
-              Simply email{" "}
+              Just email{" "}
               <span className="underline decoration-dashed">
                 hello@sketchviz.app
               </span>
