@@ -92,26 +92,31 @@ export async function POST(request: Request) {
   const generationId = generation.id;
 
   try {
-    // Parse storage URL to extract bucket and path
+    // Try to parse as Supabase Storage URL first
     const parsed = parseStorageUrl(blobUrl);
-    if (!parsed) {
-      console.error("Failed to parse storage URL:", blobUrl);
-      throw new Error(`Invalid storage URL format: ${blobUrl}`);
+    let blob: Blob;
+    let contentType: string;
+
+    if (parsed) {
+      // Supabase Storage URL - use authenticated download
+      blob = await downloadFile({
+        supabase,
+        bucket: parsed.bucket as typeof BUCKET_INPUT_IMAGES,
+        path: parsed.path,
+      });
+
+      contentType = blob.type;
+    } else {
+      // Public URL or legacy Vercel Blob URL - use regular fetch
+      const blobResponse = await fetch(blobUrl);
+      if (!blobResponse.ok) {
+        throw new Error("Failed to fetch file from URL.");
+      }
+
+      contentType = blobResponse.headers.get("content-type") || "";
+      const blobArrayBuffer = await blobResponse.arrayBuffer();
+      blob = new Blob([blobArrayBuffer], { type: contentType });
     }
-
-    console.log("Downloading file from storage:", {
-      bucket: parsed.bucket,
-      path: parsed.path,
-    });
-
-    // Download file from Supabase Storage with authentication
-    const blob = await downloadFile({
-      supabase,
-      bucket: parsed.bucket as typeof BUCKET_INPUT_IMAGES,
-      path: parsed.path,
-    });
-
-    const contentType = blob.type;
 
     if (!contentType || !ACCEPTED_MIME_TYPES.includes(contentType)) {
       return NextResponse.json(
@@ -176,21 +181,32 @@ export async function POST(request: Request) {
     if (reference_image_urls && reference_image_urls.length > 0) {
       for (const refUrl of reference_image_urls) {
         try {
-          // Parse storage URL to extract bucket and path
+          // Try to parse as Supabase Storage URL first
           const refParsed = parseStorageUrl(refUrl);
-          if (!refParsed) {
-            console.warn(`Invalid reference image URL: ${refUrl}`);
-            continue;
+          let refBlob: Blob;
+          let refContentType: string;
+
+          if (refParsed) {
+            // Supabase Storage URL - use authenticated download
+            refBlob = await downloadFile({
+              supabase,
+              bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
+              path: refParsed.path,
+            });
+            refContentType = refBlob.type;
+          } else {
+            // Public URL or legacy Vercel Blob URL - use regular fetch
+            const refResponse = await fetch(refUrl);
+            if (!refResponse.ok) {
+              console.warn(`Failed to fetch reference image: ${refUrl}`);
+              continue;
+            }
+
+            refContentType = refResponse.headers.get("content-type") || "";
+            const refArrayBuffer = await refResponse.arrayBuffer();
+            refBlob = new Blob([refArrayBuffer], { type: refContentType });
           }
 
-          // Download file from Supabase Storage with authentication
-          const refBlob = await downloadFile({
-            supabase,
-            bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
-            path: refParsed.path,
-          });
-
-          const refContentType = refBlob.type;
           if (refContentType && ACCEPTED_MIME_TYPES.includes(refContentType)) {
             const refArrayBuffer = await refBlob.arrayBuffer();
             referenceImageBuffers.push({
