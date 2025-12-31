@@ -135,7 +135,7 @@ export async function generateVisualizationImage(params: {
 
   // Add aspect ratio to imageConfig if specified
   if (params.aspectRatio) {
-    providerOptions.google.imageConfig.aspectRatio = params.aspectRatio;
+    providerOptions.google.imageConfig!.aspectRatio = params.aspectRatio;
   }
 
   const result = await imageEditingModel.doGenerate({
