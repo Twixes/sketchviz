@@ -44,7 +44,9 @@ export function Header({ user, onLogoClick }: HeaderProps) {
           <p className="text-lg font-semibold tracking-tight leading-tight text-black">
             SketchViz
           </p>
-          <p className="text-xs leading-tight text-black/50">Render worlds.</p>
+          <p className="text-xs leading-tight text-black/50 italic">
+            Render worlds.
+          </p>
         </div>
       </a>
       <div className="flex flex-wrap justify-start items-center gap-3 whitespace-nowrap">
