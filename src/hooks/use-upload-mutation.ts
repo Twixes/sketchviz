@@ -31,15 +31,8 @@ export function useUploadMutation() {
         throw new Error(`File too large. Max ${MAX_UPLOAD_MB}MB.`);
       }
 
-      // Get authenticated Supabase client
+      // Get Supabase client
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        throw new Error("Authentication required");
-      }
 
       // Generate unique filename with timestamp
       const timestamp = new Date().toISOString();
@@ -48,12 +41,11 @@ export function useUploadMutation() {
       const filenameWithoutExt =
         filenameParts.slice(0, -1).join(".") || "upload";
       const filename = `${filenameWithoutExt}-${timestamp}.${ext}`;
-      const filePath = `${user.id}/${filename}`;
 
-      // Upload to Supabase Storage
+      // Upload to public Supabase Storage bucket (no user-specific path)
       const { data, error } = await supabase.storage
         .from("input-images")
-        .upload(filePath, file, {
+        .upload(filename, file, {
           contentType: file.type,
           upsert: false,
         });

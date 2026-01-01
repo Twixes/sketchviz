@@ -3,18 +3,29 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export const BUCKET_INPUT_IMAGES = "input-images";
 export const BUCKET_OUTPUT_IMAGES = "output-images";
 
-export interface UploadFileParams {
+interface UploadFileParamsBase {
   supabase: SupabaseClient;
-  bucket: typeof BUCKET_INPUT_IMAGES | typeof BUCKET_OUTPUT_IMAGES;
   path: string;
   file: Buffer | Blob | File;
   contentType: string;
+}
+
+interface UploadFileParamsOutput extends UploadFileParamsBase {
+  bucket: typeof BUCKET_OUTPUT_IMAGES;
   userId: string;
 }
 
+interface UploadFileParamsInput extends UploadFileParamsBase {
+  bucket: typeof BUCKET_INPUT_IMAGES;
+  userId?: never;
+}
+
+export type UploadFileParams = UploadFileParamsOutput | UploadFileParamsInput;
+
 /**
  * Upload a file to Supabase Storage
- * Files are organized by user ID to maintain isolation
+ * For output-images: files are organized by user ID for isolation (userId required)
+ * For input-images: files are stored in the public bucket root (userId omitted)
  */
 export async function uploadFile({
   supabase,
@@ -24,8 +35,8 @@ export async function uploadFile({
   contentType,
   userId,
 }: UploadFileParams): Promise<{ url: string; path: string }> {
-  // Prefix path with user ID for isolation
-  const fullPath = `${userId}/${path}`;
+  // Prefix path with user ID for isolation (output-images only)
+  const fullPath = userId ? `${userId}/${path}` : path;
 
   const { data, error } = await supabase.storage
     .from(bucket)
@@ -38,7 +49,7 @@ export async function uploadFile({
     throw new Error(`Failed to upload file: ${error.message}`);
   }
 
-  // Get public URL (requires authentication to access due to RLS)
+  // Get public URL
   const {
     data: { publicUrl },
   } = supabase.storage.from(bucket).getPublicUrl(data.path);
