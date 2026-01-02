@@ -10,6 +10,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { extractFirstName } from "@/lib/language-utils";
 import { createClient } from "@/lib/supabase/client";
 
 type SessionContextType = {
@@ -38,6 +39,7 @@ export function SessionProvider({
         posthog.identify(session?.user?.id, {
           email: session?.user?.email,
           name: session?.user?.user_metadata.full_name,
+          first_name: extractFirstName(session?.user?.user_metadata.full_name),
         });
         sendGAEvent("event", "conversion", {
           send_to: "AW-971292206/OnR4CMWIxdsbEK78ks8D",

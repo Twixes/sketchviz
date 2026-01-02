@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { FREE_PLAN_PRODUCT_ID } from "@/lib/constants";
+import { extractFirstName } from "@/lib/language-utils";
 import { polar } from "@/lib/polar";
 import { posthogNode } from "@/lib/posthog/server";
 import { createClient } from "@/lib/supabase/server";
@@ -36,6 +37,7 @@ export async function GET(request: Request) {
               $set: {
                 email: user.email,
                 name: user.user_metadata.full_name,
+                first_name: extractFirstName(user.user_metadata.full_name),
               },
             },
           });
