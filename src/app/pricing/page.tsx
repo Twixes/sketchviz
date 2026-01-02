@@ -12,17 +12,19 @@ import { PricingContactCTA } from "./PricingContactCTA";
 import { PricingHeader } from "./PricingHeader";
 
 const FREE_FEATURES = [
-  "High-fidelity image generation",
+  "High-fidelity visualization",
+  "Output in maximum resolution (4K)",
+  "Reference images for materials/textures/style",
   "Limited to 100 credits (4-25 renders)",
   "Standard support",
 ];
 
 const PRO_FEATURES = [
-  "High-fidelity image generation",
-  "1,000 credits included each month",
-  "Then, unlimited usage at $0.015/credit",
+  "High-fidelity visualization",
+  "Output in maximum resolution (4K)",
   "Reference images for materials/textures/style",
-  "Threading for iterative tweaks",
+  "1,000 credits included each month (40-250 renders)",
+  "Then, unlimited usage at $0.015/credit",
   "Priority support",
 ];
 

@@ -65,17 +65,17 @@ export function PricingCard({
             >
               <div
                 className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full ${
-                  isPro || index === 0
+                  isPro || index < features.length - 2
                     ? "bg-linear-to-br/oklch from-[color:var(--accent-cobalt)] to-[color:var(--accent-coral)]"
                     : "bg-black/10"
                 }`}
               >
                 <CheckIcon
-                  className={`size-4 ${isPro || index === 0 ? "text-white" : "text-black/70"}`}
+                  className={`size-4 ${isPro || index < features.length - 2 ? "text-white" : "text-black/70"}`}
                 />
               </div>
               <span
-                className={`text-base ${isPro || index === 0 ? "font-medium text-black" : "text-black/80"}`}
+                className={`text-base ${isPro || index < features.length - 2 ? "font-medium text-black" : "text-black/80"}`}
               >
                 {feature}
               </span>
