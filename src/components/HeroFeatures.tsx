@@ -13,7 +13,7 @@ const FEATURES = [
     label: "Speed",
     value: "Done in 30 s",
     detail:
-      "Too quick to get a cup of coffee – iterate on your visualizations rapidly",
+      "Too quick to get a cup of coffee – iterate on visualizations rapidly",
   },
   {
     label: "Control",

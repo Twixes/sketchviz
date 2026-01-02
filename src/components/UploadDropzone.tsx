@@ -326,7 +326,7 @@ export function UploadDropzone({
               <span className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white">
                 {isBusyForUser ? "Generating..." : "Choose file"}
               </span>
-              <span className="text-xs text-black/40">Try for free</span>
+              <span className="text-xs text-black/40">Try for free now</span>
             </div>
           </>
         )}

@@ -56,7 +56,7 @@ export function PricingHeader() {
         transition={{ delay: 0.2, ...FADE_TRANSITION }}
         className="mx-auto mt-4 max-w-2xl text-base text-black/60 text-balance lg:text-xl"
       >
-        Start free, upgrade when you need more power
+        Start free – upgrade when you need more power
       </motion.p>
     </div>
   );
