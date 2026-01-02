@@ -36,6 +36,7 @@ export function SessionProvider({
       if (session?.user) {
         posthog.identify(session?.user?.id, {
           email: session?.user?.email,
+          name: session?.user?.user_metadata.full_name,
         });
       } else {
         posthog.reset();

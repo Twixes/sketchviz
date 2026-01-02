@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { FREE_PLAN_PRODUCT_ID, polar } from "@/lib/polar";
+import { posthogNode } from "@/lib/posthog/server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
@@ -26,6 +27,16 @@ export async function GET(request: Request) {
           await polar.subscriptions.create({
             externalCustomerId: user.id,
             productId: FREE_PLAN_PRODUCT_ID, // Free plan
+          });
+          posthogNode.capture({
+            distinctId: user.id,
+            event: "signed_up",
+            properties: {
+              $set: {
+                email: user.email,
+                name: user.user_metadata.full_name,
+              },
+            },
           });
         } else {
           throw error;
