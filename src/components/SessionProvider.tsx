@@ -1,5 +1,6 @@
 "use client";
 
+import { sendGAEvent } from "@next/third-parties/google";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import posthog from "posthog-js";
 import {
@@ -37,6 +38,9 @@ export function SessionProvider({
         posthog.identify(session?.user?.id, {
           email: session?.user?.email,
           name: session?.user?.user_metadata.full_name,
+        });
+        sendGAEvent("event", "conversion", {
+          send_to: "AW-971292206/OnR4CMWIxdsbEK78ks8D",
         });
       } else {
         posthog.reset();
