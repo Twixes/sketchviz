@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { type Usable, use, useCallback, useEffect } from "react";
-import { FunkyBackground } from "@/components/FunkyBackground";
+import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
@@ -95,7 +95,7 @@ export default function ThreadDetailPage({
   }
 
   return (
-    <FunkyBackground>
+    <FunkyBackgroundFuzz>
       <motion.main
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
@@ -140,6 +140,6 @@ export default function ThreadDetailPage({
           )}
         </motion.section>
       </motion.main>
-    </FunkyBackground>
+    </FunkyBackgroundFuzz>
   );
 }

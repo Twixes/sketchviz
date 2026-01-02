@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
-import { FunkyBackground } from "@/components/FunkyBackground";
+import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
 import { LAYOUT_TRANSITION, SLOW_TRANSITION } from "@/lib/animation-constants";
@@ -12,7 +12,7 @@ export default function NotFound() {
   const { user } = useSession();
 
   return (
-    <FunkyBackground>
+    <FunkyBackgroundFuzz>
       <motion.main
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
@@ -52,6 +52,6 @@ export default function NotFound() {
           </div>
         </motion.section>
       </motion.main>
-    </FunkyBackground>
+    </FunkyBackgroundFuzz>
   );
 }

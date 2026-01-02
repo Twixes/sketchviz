@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { FunkyBackground } from "@/components/FunkyBackground";
+import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { Header } from "@/components/Header";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import { useSession } from "@/components/SessionProvider";
@@ -13,7 +13,7 @@ export default function TermsPage() {
   const { user } = useSession();
 
   return (
-    <FunkyBackground>
+    <FunkyBackgroundFuzz>
       <motion.main
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
@@ -31,6 +31,6 @@ export default function TermsPage() {
           </div>
         </motion.div>
       </motion.main>
-    </FunkyBackground>
+    </FunkyBackgroundFuzz>
   );
 }

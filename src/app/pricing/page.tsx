@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import { FunkyBackground } from "@/components/FunkyBackground";
+import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
+import { FunkyBackgroundShapes2 } from "@/components/FunkyBackgroundShapes2";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
@@ -42,7 +43,7 @@ export default function PricingPage() {
   };
 
   return (
-    <FunkyBackground>
+    <FunkyBackgroundFuzz>
       <motion.main
         transition={LAYOUT_TRANSITION}
         className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 pb-24 pt-10 lg:px-10"
@@ -57,64 +58,40 @@ export default function PricingPage() {
         >
           <PricingHeader />
 
-          <div className="relative grid gap-8 md:grid-cols-2 lg:gap-10">
-            {/* Background decorative shapes - kept inline */}
-            <motion.div
-              animate={{
-                rotate: 360,
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 25,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
-              className="pointer-events-none absolute -left-20 top-1/4 hidden size-32 rounded-full bg-[color:var(--accent-mint)] opacity-20 blur-xl lg:block"
-            />
-            <motion.div
-              animate={{
-                rotate: -360,
-                x: [0, 20, 0],
-              }}
-              transition={{
-                duration: 30,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-              className="pointer-events-none absolute -right-16 bottom-1/4 hidden size-40 rounded-2xl border-8 border-[color:var(--accent-coral)] opacity-15 lg:block"
-            />
+          <FunkyBackgroundShapes2>
+            <div className="grid gap-8 md:grid-cols-2 lg:gap-10">
+              <PricingCard
+                tier="free"
+                title="Free"
+                price={0}
+                priceDescription="/ month"
+                description="Perfect for exploring and getting started"
+                features={FREE_FEATURES}
+                buttonText={user ? "Current plan" : "Sign up for free"}
+                buttonVariant={user ? "secondary" : "primary"}
+                buttonDisabled={!!user}
+                onButtonClick={!user ? handleSignIn : undefined}
+                animationDelay={0.3}
+              />
 
-            <PricingCard
-              tier="free"
-              title="Free"
-              price={0}
-              priceDescription="/ month"
-              description="Perfect for exploring and getting started"
-              features={FREE_FEATURES}
-              buttonText={user ? "Current plan" : "Sign up for free"}
-              buttonVariant={user ? "secondary" : "primary"}
-              buttonDisabled={!!user}
-              onButtonClick={!user ? handleSignIn : undefined}
-              animationDelay={0.3}
-            />
-
-            <PricingCard
-              tier="pro"
-              title="Pro"
-              price={15}
-              priceDescription="/ month"
-              description="For professionals and power users"
-              features={PRO_FEATURES}
-              buttonText={user ? "Upgrade to Pro" : "Get Pro"}
-              buttonVariant={user ? "primary" : "secondary"}
-              onButtonClick={handleUpgradeToPro}
-              animationDelay={0.4}
-            />
-          </div>
+              <PricingCard
+                tier="pro"
+                title="Pro"
+                price={15}
+                priceDescription="/ month"
+                description="For professionals and power users"
+                features={PRO_FEATURES}
+                buttonText={user ? "Upgrade to Pro" : "Get Pro"}
+                buttonVariant={user ? "primary" : "secondary"}
+                onButtonClick={handleUpgradeToPro}
+                animationDelay={0.4}
+              />
+            </div>
+          </FunkyBackgroundShapes2>
 
           <PricingContactCTA animationDelay={0.6} />
         </motion.section>
       </motion.main>
-    </FunkyBackground>
+    </FunkyBackgroundFuzz>
   );
 }

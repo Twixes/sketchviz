@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { useCallback } from "react";
 import { ControlPanel } from "@/components/ControlPanel";
 import { Examples } from "@/components/Examples";
-import { FunkyBackground } from "@/components/FunkyBackground";
+import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HeroFeatures } from "@/components/HeroFeatures";
@@ -96,7 +96,7 @@ export default function Home() {
   ]);
 
   return (
-    <FunkyBackground>
+    <FunkyBackgroundFuzz>
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10">
         <Header user={user} onLogoClick={handleReset} />
 
@@ -141,6 +141,6 @@ export default function Home() {
 
         {!focusUpload ? <Examples /> : null}
       </main>
-    </FunkyBackground>
+    </FunkyBackgroundFuzz>
   );
 }

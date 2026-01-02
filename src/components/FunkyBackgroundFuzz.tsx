@@ -4,11 +4,11 @@ import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { Footer } from "./Footer";
 
-interface FunkyBackgroundProps {
+interface FunkyBackgroundFuzzProps {
   children: ReactNode;
 }
 
-export function FunkyBackground({ children }: FunkyBackgroundProps) {
+export function FunkyBackgroundFuzz({ children }: FunkyBackgroundFuzzProps) {
   return (
     <div className="memphis-shell min-h-screen flex flex-col">
       {/* Background Memphis shapes - fixed to viewport, won't affect layout */}

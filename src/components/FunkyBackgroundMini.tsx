@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 
-export function FunkyBackgroundMini() {
+export function FunkyBackgroundShapes1() {
   return (
     <>
       {/* Enhanced Memphis decorative shapes */}

@@ -7,7 +7,7 @@ import type { User } from "@supabase/supabase-js";
 import clsx from "clsx";
 import { useRef, useState } from "react";
 import { AspectRatioSelector } from "@/components/AspectRatioSelector";
-import { FunkyBackgroundMini } from "@/components/FunkyBackgroundMini";
+import { FunkyBackgroundShapes1 } from "@/components/FunkyBackgroundMini";
 import {
   INDOOR_LIGHT_OPTIONS,
   LightSelector,
@@ -175,7 +175,7 @@ export function ControlPanel({
         className,
       ])}
     >
-      <FunkyBackgroundMini />
+      <FunkyBackgroundShapes1 />
       <UploadDropzone
         onFileSelected={onFileSelected}
         frame={false}
