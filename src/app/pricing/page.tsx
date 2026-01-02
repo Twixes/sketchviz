@@ -6,11 +6,10 @@ import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { FADE_TRANSITION, LAYOUT_TRANSITION } from "@/lib/animation-constants";
+import { PRO_PLAN_PRODUCT_ID } from "@/lib/constants";
 import { PricingCard } from "./PricingCard";
 import { PricingContactCTA } from "./PricingContactCTA";
 import { PricingHeader } from "./PricingHeader";
-
-const PRO_PRODUCT_ID = "a127ef8f-a886-49c3-9e8b-3435fd8d1694";
 
 const FREE_FEATURES = [
   "High-fidelity image generation",
@@ -36,7 +35,7 @@ export default function PricingPage() {
       user = await handleSignIn();
     }
     if (user) {
-      window.location.href = `/billing/checkout?products=${PRO_PRODUCT_ID}&customerExternalId=${user.id}`;
+      window.location.href = `/billing/checkout?products=${PRO_PLAN_PRODUCT_ID}&customerExternalId=${user.id}`;
     }
   };
 

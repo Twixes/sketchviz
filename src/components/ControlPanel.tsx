@@ -21,6 +21,7 @@ import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutatio
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import { Button } from "@/lib/components/ui/Button";
+import { PRO_PLAN_PRODUCT_ID } from "@/lib/constants";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
@@ -287,6 +288,5 @@ export function ControlPanel({
 }
 
 function handleUpgradeToPro(userId: string) {
-  const PRO_PRODUCT_ID = "a127ef8f-a886-49c3-9e8b-3435fd8d1694";
-  window.location.href = `/billing/checkout?products=${PRO_PRODUCT_ID}&customerExternalId=${userId}`;
+  window.location.href = `/billing/checkout?products=${PRO_PLAN_PRODUCT_ID}&customerExternalId=${userId}`;
 }
