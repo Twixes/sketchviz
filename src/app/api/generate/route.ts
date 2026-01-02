@@ -11,6 +11,7 @@ import {
 } from "@/lib/constants";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import { getCreditsForUser, polar } from "@/lib/polar";
+import { posthogNode } from "@/lib/posthog/server";
 import { generateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -252,12 +253,19 @@ export async function POST(request: Request) {
           name: "image_generation_started",
           externalCustomerId: user.id,
           metadata: {
-            route: "/api/generate",
             model,
             credit_count: creditCost,
           },
         },
       ],
+    });
+    posthogNode.capture({
+      distinctId: user.id,
+      event: "image_generation_started",
+      properties: {
+        model,
+        credit_count: creditCost,
+      },
     });
     const result = await generateVisualizationImage({
       imageBuffer,
