@@ -1,7 +1,6 @@
 import "server-only";
 
 import { Polar } from "@polar-sh/sdk";
-import type { Subscription } from "@polar-sh/sdk/models/components/subscription";
 import { CREDIT_METER_ID, PRO_PLAN_PRODUCT_ID } from "./constants";
 import { posthogNode } from "./posthog/server";
 

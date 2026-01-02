@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { FREE_PLAN_PRODUCT_ID, polar } from "@/lib/polar";
+import { FREE_PLAN_PRODUCT_ID } from "@/lib/constants";
+import { polar } from "@/lib/polar";
 import { posthogNode } from "@/lib/posthog/server";
 import { createClient } from "@/lib/supabase/server";
 
