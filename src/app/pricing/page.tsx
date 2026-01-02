@@ -22,8 +22,8 @@ const PRO_FEATURES = [
   "High-fidelity image generation",
   "1,000 credits included each month",
   "Then, unlimited usage at $0.015/credit",
-  "Upload reference images",
-  "Iterate on visualizations in threads",
+  "Reference images for materials/textures/style",
+  "Threading for iterative tweaks",
   "Priority support",
 ];
 

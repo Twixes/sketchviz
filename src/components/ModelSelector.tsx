@@ -58,7 +58,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
           <div>
             {option.description}
             <br />
-            Credits per generation:{" "}
+            Credits per visualization:{" "}
             <strong>
               {determineCreditCostOfImageGeneration({ model: option.value })}
             </strong>
