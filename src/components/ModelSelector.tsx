@@ -23,7 +23,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
         </span>
       </>
     ),
-    description: "Highest quality at maximum resolution – in 4K.",
+    description: "Highest quality in maximum resolution.",
     icon: RocketIcon,
   },
   {
@@ -36,7 +36,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
         </span>
       </>
     ),
-    description: "Highest quality at a good price (recommended).",
+    description: "Highest quality in standard resolution (recommended).",
     icon: RocketIcon,
   },
   {
