@@ -2,6 +2,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { QueryProvider } from "@/components/QueryProvider";
 import { SessionProvider } from "@/components/SessionProvider";
 import { createClient } from "@/lib/supabase/server";
@@ -30,6 +31,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <GoogleTagManager gtmId="AW-971292206" />
       <body
         className={`${outfit.variable} antialiased`}
         style={
