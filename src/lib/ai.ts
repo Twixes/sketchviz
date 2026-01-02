@@ -1,7 +1,7 @@
-import fs from "node:fs/promises";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { withTracing } from "@posthog/ai";
 import { generateText, type LanguageModel } from "ai";
+import sharp from "sharp";
 import type { AspectRatio } from "./aspect-ratio";
 import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
@@ -30,14 +30,21 @@ export async function generateVisualizationImage(params: {
   userId: string;
 }): Promise<GeneratedImage> {
   if (process.env.SKIP_AI === "1") {
-    const base64 = await fs.readFile(
-      `src/test-data/octocat-base64-png.txt`,
-      "utf8",
-    );
+    // "Deep fry" the input image with extreme processing
+    const deepFriedBuffer = await sharp(params.imageBuffer)
+      .modulate({
+        saturation: 10, // 1000% saturation
+        brightness: 1.2, // 20% brighter
+      })
+      .linear(1.5, -(128 * 0.5)) // Increase contrast
+      .sharpen({ sigma: 2 }) // Heavy sharpening
+      .jpeg({ quality: 20 }) // Low quality JPEG for compression artifacts
+      .toBuffer();
+    const base64 = deepFriedBuffer.toString("base64");
     return {
-      mediaType: "image/png",
+      mediaType: "image/jpeg",
       base64,
-      uint8Array: Buffer.from(base64, "base64"),
+      uint8Array: deepFriedBuffer,
     };
   }
 
