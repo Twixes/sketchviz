@@ -31,7 +31,7 @@ const EXAMPLES: {
   {
     before: "/anything-before.webp",
     after: "/anything-after.webp",
-    label: "For absolutely anything",
+    label: "For industrial design",
   },
 ];
 
