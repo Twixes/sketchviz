@@ -31,7 +31,8 @@ body {
       transparent 60%
     ), linear-gradient(180deg, #fdf7ef 0%, #fff9f2 100%);
   color: var(--foreground);
-  font-family: var(--font-outfit), "Outfit", system-ui, sans-serif;
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  text-underline-offset: 0.15em;
 }
 
 button {

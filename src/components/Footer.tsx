@@ -11,10 +11,11 @@ export function Footer() {
               href="mailto:hello@sketchviz.app"
               className="hover:text-black/80 transition-colors"
             >
-              Just email{" "}
+              Email{" "}
               <span className="underline decoration-dashed">
                 hello@sketchviz.app
-              </span>
+              </span>{" "}
+              with feedback
             </Link>
             •
             <div className="flex flex-wrap gap-2">
