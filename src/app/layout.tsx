@@ -31,7 +31,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <GoogleTagManager gtmId="AW-971292206" />
+      <GoogleTagManager gtmScriptUrl="https://www.googletagmanager.com/gtag/js?id=AW-971292206" />
       <body
         className={`${outfit.variable} antialiased`}
         style={
