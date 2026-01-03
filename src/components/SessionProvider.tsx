@@ -1,7 +1,8 @@
 "use client";
 
-import { sendGAEvent } from "@next/third-parties/google";
+import { sendGAEvent, sendGTMEvent } from "@next/third-parties/google";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { usePathname } from "next/navigation";
 import posthog from "posthog-js";
 import {
   createContext,
@@ -29,6 +30,19 @@ export function SessionProvider({
 }) {
   const [supabase] = useState(() => createClient());
   const [user, setUser] = useState<User | null>(initialUser);
+  const pathname = usePathname();
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we want this to run on every page change
+  useEffect(() => {
+    sendGTMEvent({
+      event: "conversion",
+      value: {
+        send_to: "AW-971292206/UqMnCMns6ekZEK78ks8D",
+        value: 1.0,
+        currency: "PLN",
+      },
+    });
+  }, [pathname]);
 
   useEffect(() => {
     const {
@@ -41,8 +55,9 @@ export function SessionProvider({
           name: session?.user?.user_metadata.full_name,
           first_name: extractFirstName(session?.user?.user_metadata.full_name),
         });
-        sendGAEvent("event", "conversion", {
-          send_to: "AW-971292206/OnR4CMWIxdsbEK78ks8D",
+        sendGTMEvent({
+          event: "conversion",
+          value: { send_to: "AW-971292206/OnR4CMWIxdsbEK78ks8D" },
         });
       } else {
         posthog.reset();
