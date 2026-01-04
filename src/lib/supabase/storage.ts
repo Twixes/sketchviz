@@ -51,9 +51,10 @@ export async function uploadFile({
 
   // Get public URL
   const {
-    data: { publicUrl },
+    data: { publicUrl: encodedPublicUrl },
   } = supabase.storage.from(bucket).getPublicUrl(data.path);
 
+  const publicUrl = decodeURI(encodedPublicUrl);
   return {
     url: publicUrl,
     path: data.path,
