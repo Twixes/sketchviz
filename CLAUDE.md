@@ -56,21 +56,14 @@ pnpm format
 ### Key Architectural Patterns
 
 **Client State (Zustand)**
-- `upload-store.ts` manages upload/generation UI state
-  - Image sources (inputSrc, outputSrc, blobUrl)
-  - Reference images (array with up to 3 images, with add/remove/update methods)
-  - UI parameters (outdoorLight, indoorLight, editDescription, model, aspectRatio)
-  - Loading states (isUploading, isGenerating, isBusyForUser)
-- Uses persist middleware to save only `model` selection to localStorage
-- Single source of truth for the main workflow state
+- Stores in `src/stores/` manage client-side UI state
+- Uses persist middleware selectively for user preferences
+- Single source of truth for workflow state
 
 **Server State (TanStack Query)**
-- `use-upload-mutation.ts`: handles main image upload to Supabase Storage
-- `use-reference-upload-mutation.ts`: handles reference image uploads to Supabase Storage
-- `use-generate-mutation.ts`: triggers AI generation via `/api/generate`
-- `use-credits-query.ts`: fetches user's available credits from `/api/credits`
+- Mutation hooks in `src/hooks/` handle API calls (uploads, generation)
+- Query hooks fetch server data (credits, user info)
 - Mutations update Zustand store on success/error
-- Auth navigation hooks: `use-sign-in-callback.ts`, `use-sign-out-callback.ts`
 
 **Authentication**
 - Supabase Auth with Google OAuth
@@ -83,64 +76,41 @@ pnpm format
 - `generations` table: individual image generations linked to threads
 - UUIDv7 for chronological ordering
 - RLS policies ensure users only access their own data
-- See `supabase/migrations/20251222231950_add_threads_and_generations.sql`
+- See `supabase/migrations/` for schema definitions
 
 **Payments & Credits (Polar SDK)**
-- `lib/polar.ts`: Polar client configuration for credit meter and subscriptions
-- Credit costs defined in `lib/credits.ts`: 14 credits for gemini-3-pro (2K), 24 credits for gemini-3-pro/4k (4K), 4 credits for gemini-2.5-flash
-- `/api/billing/checkout`: Polar checkout route for purchasing credits
-- `/api/billing/portal`: Polar customer portal for managing subscriptions
-- `/api/credits`: Fetches user's available credits from Polar
+- `lib/polar.ts`: Polar client configuration
+- Credit costs defined in `lib/credits.ts`
+- Billing API routes in `/api/billing/` for checkout and portal
 - Credits checked and deducted in `/api/generate` before AI generation
 
 **Analytics (PostHog)**
-- `lib/posthog/server.ts`: Server-side PostHog client with AI tracing wrapper
-- `instrumentation-client.ts`: Client-side PostHog initialization
+- `lib/posthog/`: PostHog client setup (server-side with AI tracing)
 - AI calls wrapped with `withTracing()` for observability
 - Event tracking for generation steps and error capture
-- User identification via `posthogDistinctId`
 
 **AI Integration**
-- `lib/ai.ts` exports two functions:
-  - `generateVisualizationImage()`: main photorealistic transformation with multi-model support
-    - Accepts: image buffer, lighting params, edit description, model selection, reference images (up to 3), aspect ratio
-    - Returns: generated image as base64 + Uint8Array
-  - `titleVisualizationImage()`: generates descriptive title from input image using gemini-flash-lite-latest
-- Prompt engineering: base prompt + conditional light parameters + reference image instructions + optional edit description
-- Model selection: supports `google/gemini-3-pro-image-preview` and `google/gemini-2.5-flash-image-preview`
-- Reference images added to content array before main image
-- Aspect ratio passed via Google provider options when specified
+- `lib/ai.ts`: Core AI functions for image generation and titling
+- Prompt engineering: base prompt + conditional parameters + reference images
 - Set `SKIP_AI=1` in `.env.local` to use test data instead of calling Gemini
 
 **Validation**
 - Zod schemas in `lib/schemas.ts` validate API inputs
-- Schemas include: `modelSchema`, `aspectRatioSchema`, `outdoorLightSchema`, `indoorLightSchema`, `generateRequestSchema`
-- Custom validation via `superRefine`: aspect ratio required when reference images provided (Gemini limitation)
 - Type safety flows from schemas to React components via TypeScript inference
-- `UserParams` type derived from schema (excludes ephemeral blobUrl) for database storage
 
 ### File Structure Conventions
 - `src/app/`: Next.js App Router pages and API routes
-  - Pages: `/` (home), `/pricing`, `/privacy`, `/terms`, `/auth/signin`, `/auth/success`, `/threads`, `/threads/[thread_id]`
-  - API routes: `/api/upload`, `/api/generate`, `/api/credits`, `/api/billing/checkout`, `/api/billing/portal`, `/auth/callback`
-  - Thread detail components: `GenerationCard.tsx`, `GenerationImage.tsx`, `GenerationParameters.tsx`, `ThreadHeader.tsx`
-  - Pricing components: `PricingCard.tsx`, `PricingHeader.tsx`, `PricingContactCTA.tsx`
-- `src/components/`: React components (18 files, **no sub-folders**)
-  - Core: `UploadDropzone.tsx`, `ControlPanel.tsx`, `BeforeAfterComparison.tsx`, `Header.tsx`, `Hero.tsx`, `HeroFeatures.tsx`, `Examples.tsx`
-  - Configuration: `LightSelector.tsx`, `AspectRatioSelector.tsx`, `ModelSelector.tsx`, `ReferenceImageUpload.tsx`
-  - Utility: `SessionProvider.tsx`, `QueryProvider.tsx`, `MarkdownContent.tsx`, `Footer.tsx`, `Hint.tsx`, `FunkyBackground.tsx`, `FunkyBackgroundMini.tsx`
-- `src/hooks/`: Custom React hooks (6 files)
-  - Query hooks: `use-credits-query.ts`, `use-generate-mutation.ts`, `use-upload-mutation.ts`, `use-reference-upload-mutation.ts`
-  - Auth hooks: `use-sign-in-callback.ts`, `use-sign-out-callback.ts`
-- `src/stores/`: Zustand stores (1 file: `upload-store.ts`)
+  - Page-specific components are co-located with their routes
+  - API routes in `/api/` subdirectories
+- `src/components/`: Shared React components (**flat structure, no sub-folders**)
+- `src/hooks/`: Custom React hooks (TanStack Query mutations/queries, auth callbacks)
+- `src/stores/`: Zustand stores for client-side state
 - `src/lib/`: Shared utilities and integrations
-  - Core utilities: `ai.ts`, `schemas.ts`, `constants.ts`, `credits.ts`, `aspect-ratio.ts`, `animation-constants.ts`, `polar.ts`
-  - `supabase/`: Supabase client setup (client/server/proxy patterns)
-  - `components/ui/`: Reusable UI primitives (`Button.tsx`, `Select.tsx` - Radix UI based)
-  - `posthog/`: Analytics integration (`server.ts`)
+  - `supabase/`: Supabase client setup (client/server patterns)
+  - `components/ui/`: Reusable UI primitives (Radix UI based)
+  - `posthog/`: Analytics integration
 - `src/types/`: TypeScript type definitions
 - `src/icons/`: SVG icons (imported as React components)
-- `src/content/`: Content files (empty, reserved for future use)
 - `src/test-data/`: Test data for SKIP_AI mode development
 
 ### Asset Handling
@@ -165,25 +135,25 @@ See `.env.example` for required variables. Key ones:
 - `SKIP_AI=1`: Skip AI calls during development (uses test data from `src/test-data/`)
 
 ## Working with Supabase
-- Local Supabase CLI not configured (no `supabase/config.toml`)
+- Local Supabase CLI is configured (at `supabase/config.toml`)
 - Migrations are manually written SQL files in `supabase/migrations/`
 - Apply migrations via Supabase dashboard or CLI: `supabase db push`
 - RLS policies are defined in migration files alongside table schemas
 
 ## File Naming Conventions
-- **Components**: `PascalCase.tsx` (e.g., `ControlPanel.tsx`, `BeforeAfterComparison.tsx`)
-- **Hooks**: `kebab-case.ts` with `use-` prefix (e.g., `use-upload-mutation.ts`, `use-credits-query.ts`)
-- **Stores**: `kebab-case.ts` (e.g., `upload-store.ts`)
-- **Utilities**: `kebab-case.ts` (e.g., `aspect-ratio.ts`, `animation-constants.ts`)
+- **Components**: `PascalCase.tsx`
+- **Hooks**: `kebab-case.ts` with `use-` prefix
+- **Stores**: `kebab-case.ts` with `-store` suffix
+- **Utilities**: `kebab-case.ts`
 - **Pages**: Next.js conventions (`page.tsx`, `layout.tsx`, `not-found.tsx`)
 - **API routes**: `route.ts` in feature directories
 
 ## Component Organization Principles
 - **Flat structure**: All shared components in `src/components/` with **no sub-folders**
-- **Co-location**: Page-specific components live in their route directory (e.g., `/threads/[thread_id]/GenerationCard.tsx`)
-- **UI primitives**: Reusable UI components in `src/lib/components/ui/` (e.g., `Button.tsx`, `Select.tsx`)
+- **Co-location**: Page-specific components live in their route directory
+- **UI primitives**: Reusable UI components in `src/lib/components/ui/`
 - **Single responsibility**: Each component focuses on one clear purpose
-- **Composition**: Complex UIs built by composing simpler components (e.g., `ControlPanel` composes `LightSelector`, `ModelSelector`, `AspectRatioSelector`)
+- **Composition**: Complex UIs built by composing simpler components
 
 ## Code Quality
 - Biome handles both linting and formatting (no ESLint/Prettier)
