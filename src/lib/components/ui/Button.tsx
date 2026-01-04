@@ -194,7 +194,7 @@ export const Button = ({
     </button>
   );
   return link ? (
-    <Link href={link} className="flex justify-stretch">
+    <Link href={link} className="flex flex-col items-stretch">
       {button}
     </Link>
   ) : (
