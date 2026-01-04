@@ -37,10 +37,12 @@ export function useUploadMutation() {
       // Generate unique filename with timestamp
       const timestamp = new Date().toISOString();
       const filenameParts = file.name.split(".");
-      const ext = filenameParts.at(-1) || "png";
+      const ext = filenameParts.at(-1);
       const filenameWithoutExt =
         filenameParts.slice(0, -1).join(".") || "upload";
-      const filename = `${filenameWithoutExt}-${timestamp}.${ext}`;
+      const filename = ext
+        ? `${filenameWithoutExt}-${timestamp}.${ext}`
+        : `${filenameWithoutExt}-${timestamp}`;
 
       // Upload to public Supabase Storage bucket (no user-specific path)
       const { data, error } = await supabase.storage
