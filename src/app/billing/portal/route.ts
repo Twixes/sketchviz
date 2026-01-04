@@ -5,10 +5,8 @@ export const GET = CustomerPortal({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
   getExternalCustomerId: async (_req) => {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    return user?.id ?? "";
+    const { data } = await supabase.auth.getClaims();
+    return data?.claims.sub ?? "";
   },
   returnUrl:
     process.env.NODE_ENV === "production"

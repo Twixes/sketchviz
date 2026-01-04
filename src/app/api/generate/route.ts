@@ -46,11 +46,10 @@ export async function POST(request: Request) {
 
   // Get user session
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
 
-  if (!user) {
+  const userId = data?.claims?.sub;
+  if (!userId) {
     throw new Error("Cannot use this endpoint unauthenticated"); // TODO: Raise 401 specifically
   }
 
@@ -58,7 +57,7 @@ export async function POST(request: Request) {
   const { data: thread, error: threadError } = await supabase
     .from("threads")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       title: "",
     })
     .select("id")
@@ -170,7 +169,7 @@ export async function POST(request: Request) {
       buffer: imageBuffer,
       mediaType: contentType,
       threadId,
-      userId: user.id,
+      userId,
     }); // Update thread with title in background
 
     // Fetch reference images if provided
@@ -233,7 +232,7 @@ export async function POST(request: Request) {
 
     const creditCost = determineCreditCostOfImageGeneration({ model });
 
-    const creditsAvailable = await getCreditsForUser(user.id);
+    const creditsAvailable = await getCreditsForUser(userId);
     if (creditsAvailable === null) {
       return NextResponse.json(
         { error: "Failed to fetch available credits" },
@@ -251,7 +250,7 @@ export async function POST(request: Request) {
       events: [
         {
           name: "image_generation_started",
-          externalCustomerId: user.id,
+          externalCustomerId: userId,
           metadata: {
             model,
             credit_count: creditCost,
@@ -260,7 +259,7 @@ export async function POST(request: Request) {
       ],
     });
     posthogNode.capture({
-      distinctId: user.id,
+      distinctId: userId,
       event: "image_generation_started",
       properties: {
         model,
@@ -277,7 +276,7 @@ export async function POST(request: Request) {
       model,
       referenceImages: referenceImageBuffers,
       aspectRatio: aspect_ratio,
-      userId: user.id,
+      userId,
     });
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
     const { url: outputUrl } = await uploadFile({
@@ -286,11 +285,11 @@ export async function POST(request: Request) {
       path: outputFilename,
       file: Buffer.from(result.uint8Array),
       contentType: result.mediaType,
-      userId: user.id,
+      userId,
     });
 
     // Update generation record with output URL if available
-    if (user && generationId) {
+    if (userId && generationId) {
       const { error: updateError } = await supabase
         .from("generations")
         .update({
@@ -305,6 +304,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       outputImage: outputUrl,
+      threadId,
+      generationId,
     });
   } catch (error) {
     console.error("Generate endpoint error:", error);
