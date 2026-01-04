@@ -49,7 +49,7 @@ export const FREE_PLAN_PRODUCT_ID =
 export const PRO_PLAN_PRODUCT_ID =
   process.env.NODE_ENV === "production"
     ? "a127ef8f-a886-49c3-9e8b-3435fd8d1694"
-    : "537cb58c-dc25-4021-aa4d-37fc4c3680d6";
+    : "9679f6d9-59c8-4cf5-bd82-8c12379c84e9";
 export const CREDIT_METER_ID =
   process.env.NODE_ENV === "production"
     ? "37470072-5831-4972-a30f-3e96e8e02f9f"
