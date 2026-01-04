@@ -244,7 +244,7 @@ export function ControlPanel({
               !user
                 ? handleSignIn
                 : !hasInsufficientCredits
-                  ? props.onGenerate
+                  ? onGenerate
                   : undefined
             }
             disabled={isBusyForUser}
