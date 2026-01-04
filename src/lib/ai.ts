@@ -17,7 +17,7 @@ type GeneratedImage = {
   mediaType: string;
 };
 
-export async function generateVisualizationImage(params: {
+type GenerateImageParams = {
   imageBuffer: Buffer;
   mediaType: string;
   filename?: string;
@@ -28,7 +28,12 @@ export async function generateVisualizationImage(params: {
   referenceImages?: Array<{ buffer: Buffer; mediaType: string }>;
   aspectRatio?: AspectRatio | null;
   userId: string;
-}): Promise<GeneratedImage> {
+};
+
+async function generateImageFromPrompt(
+  params: GenerateImageParams,
+  prompt: string,
+): Promise<GeneratedImage> {
   if (process.env.SKIP_AI === "1") {
     // "Deep fry" the input image with extreme processing
     const deepFriedBuffer = await sharp(params.imageBuffer)
@@ -46,44 +51,6 @@ export async function generateVisualizationImage(params: {
       base64,
       uint8Array: deepFriedBuffer,
     };
-  }
-
-  // Build the prompt based on light conditions and edit description
-  let prompt =
-    "Turn this Sketchup render into a realistic 3D visualization with full lighting";
-  // Handle outdoor lighting
-  if (params.outdoorLight === "sunny") {
-    prompt += " with sunny outdoor light";
-  } else if (params.outdoorLight === "overcast") {
-    prompt += " with overcast outdoor light";
-  } else if (params.outdoorLight === "night") {
-    prompt += " with night-time outdoor light";
-  } else if (params.outdoorLight) {
-    // Custom outdoor lighting description
-    prompt += ` with outdoor light as follows: ${params.outdoorLight}`;
-  }
-
-  // Handle indoor lighting
-  if (params.indoorLight === "all_off") {
-    prompt += ", all indoor lights are off";
-  } else if (params.indoorLight === "all_on") {
-    prompt += ", all visible indoor lights are on";
-  } else if (params.indoorLight) {
-    // Custom indoor lighting description
-    prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
-  }
-  prompt +=
-    ". Use the last image of the first message as the base. Preserve the current perspective unless user asks otherwise";
-
-  if (params.editDescription) {
-    prompt += `. Specific requests from the user: ${params.editDescription}`;
-  }
-
-  // Add reference to provided reference images
-  if (params.referenceImages && params.referenceImages.length > 0) {
-    prompt += `. Use the reference image${
-      params.referenceImages.length > 1 ? "s" : ""
-    } provided for materials, textures, and style`;
   }
 
   // Select the model, stripping the provider prefix (google/)
@@ -181,6 +148,96 @@ export async function generateVisualizationImage(params: {
     base64: imagePart.data,
     uint8Array: Buffer.from(imagePart.data, "base64"),
   };
+}
+
+export async function generateVisualizationImage(
+  params: GenerateImageParams,
+): Promise<GeneratedImage> {
+  // Build the prompt based on light conditions and edit description
+  let prompt =
+    "Turn this Sketchup render into a realistic 3D visualization with full lighting";
+  // Handle outdoor lighting
+  if (params.outdoorLight === "sunny") {
+    prompt += " with sunny outdoor light";
+  } else if (params.outdoorLight === "overcast") {
+    prompt += " with overcast outdoor light";
+  } else if (params.outdoorLight === "night") {
+    prompt += " with night-time outdoor light";
+  } else if (params.outdoorLight) {
+    // Custom outdoor lighting description
+    prompt += ` with outdoor light as follows: ${params.outdoorLight}`;
+  }
+
+  // Handle indoor lighting
+  if (params.indoorLight === "all_off") {
+    prompt += ", all indoor lights are off";
+  } else if (params.indoorLight === "all_on") {
+    prompt += ", all visible indoor lights are on";
+  } else if (params.indoorLight) {
+    // Custom indoor lighting description
+    prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
+  }
+  prompt +=
+    ". Use the last image of the first message as the base. Preserve the current perspective unless user asks otherwise";
+
+  if (params.editDescription) {
+    prompt += `. Specific requests from the user: ${params.editDescription}`;
+  }
+
+  // Add reference to provided reference images
+  if (params.referenceImages && params.referenceImages.length > 0) {
+    prompt += `. Use the reference image${
+      params.referenceImages.length > 1 ? "s" : ""
+    } provided for materials, textures, and style`;
+  }
+
+  return generateImageFromPrompt(params, prompt);
+}
+
+/**
+ * Generate an iteration of an existing visualization.
+ * Unlike generateVisualizationImage, this doesn't include the "Turn this SketchUp render..." prompt,
+ * as the input is already a visualization that needs refinement.
+ */
+export async function generateIterationImage(
+  params: GenerateImageParams,
+): Promise<GeneratedImage> {
+  // Build the prompt for iteration - no "Turn this SketchUp render" prefix
+  let prompt =
+    "Refine this visualization based on the user's feedback. Preserve the overall style, perspective, and composition unless specifically asked to change them";
+
+  // Handle outdoor lighting
+  if (params.outdoorLight === "sunny") {
+    prompt += ". Apply sunny outdoor lighting";
+  } else if (params.outdoorLight === "overcast") {
+    prompt += ". Apply overcast outdoor lighting";
+  } else if (params.outdoorLight === "night") {
+    prompt += ". Apply night-time outdoor lighting";
+  } else if (params.outdoorLight) {
+    prompt += `. Apply outdoor lighting as follows: ${params.outdoorLight}`;
+  }
+
+  // Handle indoor lighting
+  if (params.indoorLight === "all_off") {
+    prompt += ", all indoor lights should be off";
+  } else if (params.indoorLight === "all_on") {
+    prompt += ", all visible indoor lights should be on";
+  } else if (params.indoorLight) {
+    prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
+  }
+
+  if (params.editDescription) {
+    prompt += `. User's specific requests: ${params.editDescription}`;
+  }
+
+  // Add reference to provided reference images
+  if (params.referenceImages && params.referenceImages.length > 0) {
+    prompt += `. Use the reference image${
+      params.referenceImages.length > 1 ? "s" : ""
+    } provided for materials, textures, and style`;
+  }
+
+  return generateImageFromPrompt(params, prompt);
 }
 
 export async function titleVisualizationImage(params: {
