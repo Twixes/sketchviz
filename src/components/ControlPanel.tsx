@@ -16,7 +16,7 @@ import {
 import { ModelSelector } from "@/components/ModelSelector";
 import { ReferenceImageUpload } from "@/components/ReferenceImageUpload";
 import { UploadDropzone } from "@/components/UploadDropzone";
-import { useCreditsQuery } from "@/hooks/use-credits-query";
+import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import type { AspectRatio } from "@/lib/aspect-ratio";
@@ -78,18 +78,13 @@ export function ControlPanel({
   } = useUploadStore();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
-  // Fetch user's credits when logged in
-  const { data: credits } = useCreditsQuery(!!user);
-
-  // Calculate credit cost for current generation
+  const { data: creditsData } = usePlanQuery(!!user);
   const creditCost = determineCreditCostOfImageGeneration({ model });
-
-  // Check if user has insufficient credits
   const hasInsufficientCredits = !!(
     user &&
-    credits !== null &&
-    credits !== undefined &&
-    credits < creditCost
+    creditsData !== undefined &&
+    creditsData.credits !== null &&
+    creditsData.credits < creditCost
   );
 
   const handleReferenceImageDrop = async (file: File) => {
@@ -244,12 +239,13 @@ export function ControlPanel({
             type="submit"
             variant="primary"
             size="lg"
+            link={hasInsufficientCredits ? "/billing/upgrade" : undefined}
             onClick={
               !user
                 ? handleSignIn
-                : hasInsufficientCredits
-                  ? () => handleUpgradeToPro(user.id)
-                  : onGenerate
+                : !hasInsufficientCredits
+                  ? props.onGenerate
+                  : undefined
             }
             disabled={isBusyForUser}
             leftIcon={!user && !isBusyForUser ? <EnterIcon /> : undefined}
@@ -285,8 +281,4 @@ export function ControlPanel({
       )}
     </div>
   );
-}
-
-function handleUpgradeToPro(userId: string) {
-  window.location.href = `/billing/checkout?products=${PRO_PLAN_PRODUCT_ID}&customerExternalId=${userId}`;
 }

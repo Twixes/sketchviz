@@ -5,9 +5,9 @@ import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { FunkyBackgroundShapes2 } from "@/components/FunkyBackgroundShapes2";
 import { Header } from "@/components/Header";
 import { useSession } from "@/components/SessionProvider";
+import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { FADE_TRANSITION, LAYOUT_TRANSITION } from "@/lib/animation-constants";
-import { PRO_PLAN_PRODUCT_ID } from "@/lib/constants";
 import { PricingCard } from "./PricingCard";
 import { PricingContactCTA } from "./PricingContactCTA";
 import { PricingHeader } from "./PricingHeader";
@@ -32,13 +32,22 @@ const PRO_FEATURES = [
 export default function PricingPage() {
   let { user } = useSession();
   const handleSignIn = useSignInCallback();
+  const { data: planData } = usePlanQuery(!!user);
 
   const handleUpgradeToPro = async () => {
     if (!user) {
       user = await handleSignIn();
     }
     if (user) {
-      window.location.href = `/billing/checkout?products=${PRO_PLAN_PRODUCT_ID}&customerExternalId=${user.id}`;
+      window.location.href = "/billing/upgrade";
+    }
+  };
+  const handleManagePlan = async () => {
+    if (!user) {
+      user = await handleSignIn();
+    }
+    if (user) {
+      window.location.href = "/billing/portal";
     }
   };
 
@@ -67,10 +76,22 @@ export default function PricingPage() {
                 priceDescription="/ month"
                 description="Perfect for exploring and getting started"
                 features={FREE_FEATURES}
-                buttonText={user ? "Current plan" : "Sign up for free"}
+                buttonText={
+                  user
+                    ? planData?.planType === "pro"
+                      ? "Manage plan"
+                      : "Current plan"
+                    : "Sign up for free"
+                }
                 buttonVariant={user ? "secondary" : "primary"}
-                buttonDisabled={!!user}
-                onButtonClick={!user ? handleSignIn : undefined}
+                buttonDisabled={!!user && planData?.planType === "free"}
+                onButtonClick={
+                  !user
+                    ? handleSignIn
+                    : planData?.planType === "pro"
+                      ? handleManagePlan
+                      : undefined
+                }
                 animationDelay={0.3}
               />
 
@@ -81,7 +102,14 @@ export default function PricingPage() {
                 priceDescription="/ month"
                 description="For professionals and power users"
                 features={PRO_FEATURES}
-                buttonText={user ? "Upgrade to Pro" : "Get Pro"}
+                buttonDisabled={planData?.planType === "pro"}
+                buttonText={
+                  user
+                    ? planData?.planType === "pro"
+                      ? "Current plan"
+                      : "Upgrade to Pro"
+                    : "Get Pro"
+                }
                 buttonVariant={user ? "primary" : "secondary"}
                 onButtonClick={handleUpgradeToPro}
                 animationDelay={0.4}

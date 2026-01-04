@@ -3,7 +3,7 @@ import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useCreditsQuery } from "@/hooks/use-credits-query";
+import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import GoogleIcon from "@/icons/google.svg";
@@ -18,7 +18,7 @@ interface HeaderProps {
 export function Header({ user, onLogoClick }: HeaderProps) {
   const handleSignIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
-  const { data: credits, isLoading: isLoadingCredits } = useCreditsQuery(
+  const { data: creditsData, isLoading: isLoadingCredits } = usePlanQuery(
     !!user,
   );
 
@@ -53,7 +53,9 @@ export function Header({ user, onLogoClick }: HeaderProps) {
             {!!user && (
               <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black">
                 <span className="text-black/50">Credits:</span>
-                <span>{isLoadingCredits ? "..." : (credits ?? "none")}</span>
+                <span>
+                  {isLoadingCredits ? "..." : (creditsData?.credits ?? "none")}
+                </span>
               </div>
             )}
             <Link href="/pricing">

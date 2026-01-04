@@ -34,11 +34,23 @@ export async function getCreditsForUser(
   }
 }
 
-export async function isUserOnProPlan(userId: string): Promise<boolean> {
+export async function getPlanForUser(
+  userId: string,
+): Promise<[type: "free" | "pro", subscriptionId: string | null]> {
   const subscriptions = await polar.subscriptions.list({
     externalCustomerId: userId,
   });
-  return subscriptions.result.items.some(
-    (subscription) => subscription.productId === PRO_PLAN_PRODUCT_ID,
-  );
+  const firstSubscription = subscriptions.result.items[0];
+  if (!firstSubscription) {
+    return ["free", null];
+  }
+  if (subscriptions.result.items.length > 1) {
+    console.warn(
+      `User ${userId} oddly has multiple subscriptions! Only the first one will be used.`,
+    );
+  }
+  return [
+    firstSubscription.productId === PRO_PLAN_PRODUCT_ID ? "pro" : "free",
+    firstSubscription.id,
+  ];
 }

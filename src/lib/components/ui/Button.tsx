@@ -1,8 +1,11 @@
 import clsx from "clsx";
+import Link from "next/link";
 import type React from "react";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  link?: string;
+
   // Visual variants
   variant?: "primary" | "secondary" | "ghost" | "icon" | "list-item";
 
@@ -59,6 +62,7 @@ const LoadingSpinner = ({ size }: { size: "sm" | "md" | "lg" }) => {
 };
 
 export const Button = ({
+  link,
   variant = "primary",
   size = "md",
   leftIcon,
@@ -164,7 +168,7 @@ export const Button = ({
       ? "focus:outline-none focus:ring-2 focus:ring-black/20"
       : "";
 
-  return (
+  const button = (
     <button
       type={type}
       disabled={loading || disabled}
@@ -188,5 +192,12 @@ export const Button = ({
         </>
       )}
     </button>
+  );
+  return link ? (
+    <Link href={link} className="flex justify-stretch">
+      {button}
+    </Link>
+  ) : (
+    button
   );
 };
