@@ -18,9 +18,7 @@ interface HeaderProps {
 export function Header({ user, onLogoClick }: HeaderProps) {
   const handleSignIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
-  const { data: creditsData, isLoading: isLoadingCredits } = usePlanQuery(
-    !!user,
-  );
+  const { data: creditsData, isLoading: isLoadingCredits } = usePlanQuery();
 
   return (
     <motion.header

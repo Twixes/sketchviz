@@ -1,5 +1,6 @@
 import { CheckIcon } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
+import { usePlanQuery } from "@/hooks/use-plan-query";
 import { FADE_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 
@@ -30,6 +31,8 @@ export function PricingCard({
   onButtonClick,
   animationDelay,
 }: PricingCardProps) {
+  const { data: planData } = usePlanQuery();
+
   const isPro = tier === "pro";
   const featureBaseDelay = isPro ? 0.5 : 0.4;
 
@@ -42,7 +45,7 @@ export function PricingCard({
     >
       <div className="relative flex-1">
         <h2 className="text-3xl font-bold text-black leading-none">{title}</h2>
-        <div className="mt-3 flex items-baseline gap-2">
+        <div className="mt-3 flex items-end gap-2">
           <span
             className={`text-6xl font-bold tracking-tight ${
               isPro ? "gradient-title" : "text-black"
@@ -50,7 +53,13 @@ export function PricingCard({
           >
             ${price}
           </span>
-          <span className="text-lg text-black/50">{priceDescription}</span>
+          <span className="text-lg text-black/50">
+            {" "}
+            {price > 0 && planData?.isVatApplicable && (
+              <div className="text-base leading-tight"> + VAT</div>
+            )}
+            {priceDescription}
+          </span>
         </div>
         <p className="mt-3 text-base text-black/60">{description}</p>
 

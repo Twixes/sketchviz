@@ -1,5 +1,6 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import type { PlanResponse } from "@/app/api/plan/types";
+import { useSession } from "@/components/SessionProvider";
 
 async function fetchPlan(): Promise<PlanResponse> {
   const response = await fetch("/api/plan");
@@ -10,13 +11,10 @@ async function fetchPlan(): Promise<PlanResponse> {
   return data;
 }
 
-export function usePlanQuery(
-  enabled: boolean,
-): UseQueryResult<PlanResponse, Error> {
+export function usePlanQuery(): UseQueryResult<PlanResponse, Error> {
   return useQuery({
-    queryKey: ["credits"],
+    queryKey: ["plan"],
     queryFn: fetchPlan,
-    enabled,
     refetchOnWindowFocus: true,
     staleTime: 30000, // Consider data fresh for 30 seconds
   });

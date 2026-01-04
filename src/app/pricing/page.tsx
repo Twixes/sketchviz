@@ -32,7 +32,7 @@ const PRO_FEATURES = [
 export default function PricingPage() {
   let { user } = useSession();
   const handleSignIn = useSignInCallback();
-  const { data: planData } = usePlanQuery(!!user);
+  const { data: planData } = usePlanQuery();
 
   const handleUpgradeToPro = async () => {
     if (!user) {
