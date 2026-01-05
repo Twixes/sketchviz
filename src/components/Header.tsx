@@ -29,7 +29,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
       <a
         href="/"
         onClick={onLogoClick}
-        className="flex items-center gap-4 cursor-pointer whitespace-nowrap"
+        className="flex items-center gap-3 cursor-pointer whitespace-nowrap"
       >
         <Image
           src="/icon.png"
@@ -38,12 +38,9 @@ export function Header({ user, onLogoClick }: HeaderProps) {
           width={64}
           height={64}
         />
-        <div className="text-left">
-          <p className="text-lg font-semibold tracking-tight leading-tight text-black">
-            SketchViz
-          </p>
-          <p className="text-xs leading-tight text-black/50">Render worlds.</p>
-        </div>
+        <p className="text-lg font-semibold tracking-tight leading-tight text-black">
+          SketchViz
+        </p>
       </a>
       <div className="flex flex-wrap justify-start items-center gap-3 whitespace-nowrap">
         {user ? (
