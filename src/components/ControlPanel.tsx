@@ -78,7 +78,7 @@ export function ControlPanel({
   } = useUploadStore();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
-  const { data: creditsData } = usePlanQuery(!!user);
+  const { data: creditsData } = usePlanQuery();
   const creditCost = determineCreditCostOfImageGeneration({ model });
   const hasInsufficientCredits = !!(
     user &&
