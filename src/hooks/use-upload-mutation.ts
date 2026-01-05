@@ -14,7 +14,7 @@ interface UploadFileParams {
 }
 
 export function useUploadMutation() {
-  const { setInputSrc, setOutputSrc, setBlobUrl, setError, setIsUploading } =
+  const { setInputSrc, setBlobUrl, setError, setIsUploading } =
     useUploadStore();
 
   return useMutation({
@@ -76,7 +76,6 @@ export function useUploadMutation() {
       // Create local object URL for immediate preview
       const objectUrl = URL.createObjectURL(file);
       setInputSrc(objectUrl);
-      setOutputSrc(null);
       setBlobUrl(null);
     },
 

@@ -123,7 +123,7 @@ strong {
 
 .loading-ring {
   --ring-size: 6px;
-  --ring-radius: 1.5rem;
+  --ring-radius: 24px;
   position: absolute;
   border-radius: calc(var(--ring-radius) + var(--ring-size));
   padding: var(--ring-size);
@@ -143,7 +143,6 @@ strong {
   mask-composite: exclude;
   box-sizing: border-box;
   animation: ring-progress 3600s ease-in-out infinite;
-  opacity: 0.75;
   pointer-events: none;
 }
 

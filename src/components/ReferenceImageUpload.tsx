@@ -7,44 +7,75 @@ import { Button } from "@/lib/components/ui/Button";
 import type { ReferenceImage } from "@/stores/upload-store";
 import { useUploadStore } from "@/stores/upload-store";
 
-interface ReferenceImageUploadProps {
+interface ReferenceImageUploadBaseProps {
   disabled?: boolean;
 }
 
-export function ReferenceImageUpload({ disabled }: ReferenceImageUploadProps) {
+interface ReferenceImageUploadInternalProps
+  extends ReferenceImageUploadBaseProps {
+  // Uses internal useUploadStore
+  referenceImages?: undefined;
+  onFileDrop?: undefined;
+  onRemove?: undefined;
+}
+
+interface ReferenceImageUploadExternalProps
+  extends ReferenceImageUploadBaseProps {
+  // Uses externally provided reference images and callbacks
+  referenceImages: ReferenceImage[];
+  onFileDrop: (file: File) => Promise<void>;
+  onRemove: (index: number) => void;
+}
+
+type ReferenceImageUploadProps =
+  | ReferenceImageUploadInternalProps
+  | ReferenceImageUploadExternalProps;
+
+export function ReferenceImageUpload(props: ReferenceImageUploadProps) {
+  const { disabled } = props;
+  const isExternalMode = props.referenceImages !== undefined;
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const {
-    referenceImages,
-    addReferenceImage,
-    updateReferenceImageBlobUrl,
-    removeReferenceImage,
-  } = useUploadStore();
+  const uploadStore = useUploadStore();
   const uploadMutation = useReferenceUploadMutation();
   const [fullViewImage, setFullViewImage] = useState<ReferenceImage | null>(
     null,
   );
+
+  // Get reference images from props or store
+  const referenceImages = isExternalMode
+    ? props.referenceImages
+    : uploadStore.referenceImages;
 
   const handleFileSelect = async (file: File) => {
     if (referenceImages.length >= 3) {
       return;
     }
 
-    // Create local preview immediately
-    const localSrc = URL.createObjectURL(file);
+    if (isExternalMode) {
+      // External mode: use callback from props
+      await props.onFileDrop(file);
+    } else {
+      // Internal mode: use upload store
+      const localSrc = URL.createObjectURL(file);
+      const imageIndex = referenceImages.length;
+      uploadStore.addReferenceImage(localSrc, null);
 
-    // Add to store with null blobUrl (loading state)
-    const imageIndex = referenceImages.length;
-    addReferenceImage(localSrc, null);
+      try {
+        const blobUrl = await uploadMutation.mutateAsync({ file });
+        uploadStore.updateReferenceImageBlobUrl(imageIndex, blobUrl);
+      } catch (error) {
+        console.error("Failed to upload reference image:", error);
+        uploadStore.removeReferenceImage(imageIndex);
+      }
+    }
+  };
 
-    try {
-      const blobUrl = await uploadMutation.mutateAsync({ file });
-
-      // Update the blobUrl once upload completes
-      updateReferenceImageBlobUrl(imageIndex, blobUrl);
-    } catch (error) {
-      console.error("Failed to upload reference image:", error);
-      // Remove the failed upload
-      removeReferenceImage(imageIndex);
+  const handleRemove = (index: number) => {
+    if (isExternalMode) {
+      props.onRemove(index);
+    } else {
+      uploadStore.removeReferenceImage(index);
     }
   };
 
@@ -75,7 +106,7 @@ export function ReferenceImageUpload({ disabled }: ReferenceImageUploadProps) {
           <ReferenceImagePreview
             key={refImage.localSrc}
             image={refImage}
-            onRemove={() => removeReferenceImage(index)}
+            onRemove={() => handleRemove(index)}
             onClick={() => setFullViewImage(refImage)}
           />
         ))}

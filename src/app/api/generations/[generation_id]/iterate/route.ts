@@ -1,7 +1,6 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import sharp from "sharp";
-import { generateVisualizationImage, titleVisualizationImage } from "@/lib/ai";
+import { generateIterationImage, generateVisualizationImage } from "@/lib/ai";
 import { calculateCropDimensions } from "@/lib/aspect-ratio";
 import {
   ACCEPTED_MIME_TYPES,
@@ -12,7 +11,7 @@ import {
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import { getCreditsForUser, polar } from "@/lib/polar";
 import { posthogNode } from "@/lib/posthog/server";
-import { generateRequestSchema } from "@/lib/schemas";
+import { iterateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 import {
   type BUCKET_INPUT_IMAGES,
@@ -24,58 +23,85 @@ import {
 
 export const runtime = "nodejs";
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ generation_id: string }> },
+) {
+  const { generation_id: generationId } = await params;
   const body = await request.json();
 
   // Validate request body with Zod
-  const validation = generateRequestSchema.safeParse(body);
+  const validation = iterateRequestSchema.safeParse(body);
   if (!validation.success) {
     const firstError = validation.error.issues[0];
     return NextResponse.json({ error: firstError.message }, { status: 400 });
   }
 
   const {
-    blobUrl,
-    thread_id: clientThreadId,
     outdoor_light,
     indoor_light,
     edit_description,
     model = `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
     reference_image_urls,
     aspect_ratio,
+    use_base_prompt,
   } = validation.data;
 
   // Get user session
   const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const userId = data?.claims?.sub;
-  if (!userId) {
-    throw new Error("Cannot use this endpoint unauthenticated"); // TODO: Raise 401 specifically
+  if (!user) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 },
+    );
   }
 
-  // Create a new thread (use client-provided ID if available)
-  const { data: thread, error: threadError } = await supabase
-    .from("threads")
-    .insert({
-      ...(clientThreadId ? { id: clientThreadId } : {}),
-      user_id: userId,
-      title: "",
-    })
-    .select("id")
+  // Fetch the previous generation and verify ownership through RLS
+  const { data: previousGeneration, error: fetchError } = await supabase
+    .from("generations")
+    .select(
+      `
+      id,
+      thread_id,
+      input_url,
+      output_url,
+      threads!inner (
+        id,
+        user_id
+      )
+    `,
+    )
+    .eq("id", generationId)
     .single();
 
-  if (threadError) {
-    throw threadError;
+  if (fetchError || !previousGeneration) {
+    return NextResponse.json(
+      { error: "Generation not found or access denied" },
+      { status: 404 },
+    );
   }
-  const threadId = thread.id;
+
+  // Verify the generation has an output to iterate on
+  if (!previousGeneration.output_url) {
+    return NextResponse.json(
+      { error: "Cannot iterate on a generation that has no output" },
+      { status: 400 },
+    );
+  }
+
+  const threadId = previousGeneration.thread_id;
+  const inputUrl = decodeURI(previousGeneration.output_url); // Use previous output as new input
 
   // Create a new generation record
-  const { data: generation, error: generationError } = await supabase
+  const { data: newGeneration, error: generationError } = await supabase
     .from("generations")
     .insert({
       thread_id: threadId,
-      input_url: blobUrl,
+      input_url: inputUrl,
       output_url: null,
       user_params: {
         outdoor_light,
@@ -91,11 +117,11 @@ export async function POST(request: Request) {
   if (generationError) {
     throw generationError;
   }
-  const generationId = generation.id;
+  const newGenerationId = newGeneration.id;
 
   try {
-    // Try to parse as Supabase Storage URL first
-    const parsed = parseStorageUrl(blobUrl);
+    // Download the input image (previous output)
+    const parsed = parseStorageUrl(inputUrl);
     let blob: Blob;
     let contentType: string;
 
@@ -106,15 +132,13 @@ export async function POST(request: Request) {
         bucket: parsed.bucket as typeof BUCKET_INPUT_IMAGES,
         path: parsed.path,
       });
-
       contentType = blob.type;
     } else {
-      // Public URL or legacy Vercel Blob URL - use regular fetch
-      const blobResponse = await fetch(blobUrl);
+      // Public URL - use regular fetch
+      const blobResponse = await fetch(inputUrl);
       if (!blobResponse.ok) {
         throw new Error("Failed to fetch file from URL.");
       }
-
       contentType = blobResponse.headers.get("content-type") || "";
       const blobArrayBuffer = await blobResponse.arrayBuffer();
       blob = new Blob([blobArrayBuffer], { type: contentType });
@@ -167,13 +191,6 @@ export async function POST(request: Request) {
       );
     }
 
-    void updateThreadWithTitle(supabase, {
-      buffer: imageBuffer,
-      mediaType: contentType,
-      threadId,
-      userId,
-    }); // Update thread with title in background
-
     // Fetch reference images if provided
     const referenceImageBuffers: Array<{
       buffer: Buffer;
@@ -183,13 +200,11 @@ export async function POST(request: Request) {
     if (reference_image_urls && reference_image_urls.length > 0) {
       for (const refUrl of reference_image_urls) {
         try {
-          // Try to parse as Supabase Storage URL first
           const refParsed = parseStorageUrl(refUrl);
           let refBlob: Blob;
           let refContentType: string;
 
           if (refParsed) {
-            // Supabase Storage URL - use authenticated download
             refBlob = await downloadFile({
               supabase,
               bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
@@ -197,13 +212,11 @@ export async function POST(request: Request) {
             });
             refContentType = refBlob.type;
           } else {
-            // Public URL or legacy Vercel Blob URL - use regular fetch
             const refResponse = await fetch(refUrl);
             if (!refResponse.ok) {
               console.warn(`Failed to fetch reference image: ${refUrl}`);
               continue;
             }
-
             refContentType = refResponse.headers.get("content-type") || "";
             const refArrayBuffer = await refResponse.arrayBuffer();
             refBlob = new Blob([refArrayBuffer], { type: refContentType });
@@ -218,15 +231,14 @@ export async function POST(request: Request) {
           }
         } catch (error) {
           console.error(`Failed to fetch reference image ${refUrl}:`, error);
-          // Continue with other reference images
         }
       }
     }
 
     // Extract filename from URL
-    const filename = blobUrl.split("/").pop()?.split("?")[0];
+    const filename = inputUrl.split("/").pop()?.split("?")[0];
     if (!filename) {
-      throw new Error("");
+      throw new Error("Could not extract filename from URL");
     }
     const filenameParts = filename.split(".");
     const filenameWithoutExt = filenameParts.slice(0, -1).join(".");
@@ -234,7 +246,7 @@ export async function POST(request: Request) {
 
     const creditCost = determineCreditCostOfImageGeneration({ model });
 
-    const creditsAvailable = await getCreditsForUser(userId);
+    const creditsAvailable = await getCreditsForUser(user.id);
     if (creditsAvailable === null) {
       return NextResponse.json(
         { error: "Failed to fetch available credits" },
@@ -252,23 +264,31 @@ export async function POST(request: Request) {
       events: [
         {
           name: "image_generation_started",
-          externalCustomerId: userId,
+          externalCustomerId: user.id,
           metadata: {
             model,
             credit_count: creditCost,
+            is_iteration: true,
           },
         },
       ],
     });
     posthogNode.capture({
-      distinctId: userId,
+      distinctId: user.id,
       event: "image_generation_started",
       properties: {
         model,
         credit_count: creditCost,
+        is_iteration: true,
       },
     });
-    const result = await generateVisualizationImage({
+
+    // Choose which generation function to use based on use_base_prompt flag
+    const generateFn = use_base_prompt
+      ? generateVisualizationImage
+      : generateIterationImage;
+
+    const result = await generateFn({
       imageBuffer,
       mediaType: contentType,
       filename,
@@ -278,56 +298,41 @@ export async function POST(request: Request) {
       model,
       referenceImages: referenceImageBuffers,
       aspectRatio: aspect_ratio,
-      userId,
+      userId: user.id,
     });
-    const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
+
+    const outputFilename = `${filenameWithoutExt}-iter-${new Date().toISOString()}.${ext}`;
     const { url: outputUrl } = await uploadFile({
       supabase,
       bucket: BUCKET_OUTPUT_IMAGES,
       path: outputFilename,
       file: Buffer.from(result.uint8Array),
       contentType: result.mediaType,
-      userId,
+      userId: user.id,
     });
 
-    // Update generation record with output URL if available
-    if (userId && generationId) {
-      const { error: updateError } = await supabase
-        .from("generations")
-        .update({
-          output_url: outputUrl,
-        })
-        .eq("id", generationId);
+    // Update generation record with output URL
+    const { error: updateError } = await supabase
+      .from("generations")
+      .update({
+        output_url: outputUrl,
+      })
+      .eq("id", newGenerationId);
 
-      if (updateError) {
-        console.error("Failed to update generation:", updateError);
-      }
+    if (updateError) {
+      console.error("Failed to update generation:", updateError);
     }
 
     return NextResponse.json({
       outputImage: outputUrl,
+      generationId: newGenerationId,
       threadId,
-      generationId,
     });
   } catch (error) {
-    console.error("Generate endpoint error:", error);
+    console.error("Iterate endpoint error:", error);
     const message =
-      error instanceof Error ? error.message : "Failed to generate image.";
+      error instanceof Error ? error.message : "Failed to iterate on image.";
 
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
-
-/** Use Gemini Flash with "describe this image" prompt to generate title and update thread with it */
-async function updateThreadWithTitle(
-  supabase: SupabaseClient,
-  params: {
-    buffer: Buffer;
-    mediaType: string;
-    threadId: string;
-    userId: string;
-  },
-): Promise<void> {
-  const title = await titleVisualizationImage(params);
-  await supabase.from("threads").update({ title }).eq("id", params.threadId);
 }

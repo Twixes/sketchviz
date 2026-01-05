@@ -15,10 +15,12 @@ export interface ReferenceImage {
 interface UploadState {
   // Image sources
   inputSrc: string | null;
-  outputSrc: string | null;
   blobUrl: string | null;
   referenceImages: ReferenceImage[];
   inputImageDimensions: { width: number; height: number } | null;
+
+  // Thread state
+  tentativeThreadId: string | null;
 
   // UI state
   error: string | null;
@@ -35,8 +37,8 @@ interface UploadState {
 
   // Actions
   setInputSrc: (src: string | null) => void;
-  setOutputSrc: (src: string | null) => void;
   setBlobUrl: (url: string | null) => void;
+  setTentativeThreadId: (id: string | null) => void;
   setError: (error: string | null) => void;
   setOutdoorLight: (light: OutdoorLight) => void;
   setIndoorLight: (light: IndoorLight) => void;
@@ -57,10 +59,10 @@ interface UploadState {
 
 const initialState = {
   inputSrc: null,
-  outputSrc: null,
   blobUrl: null,
   referenceImages: [] as ReferenceImage[],
   inputImageDimensions: null,
+  tentativeThreadId: null,
   error: null,
   outdoorLight: null as OutdoorLight,
   indoorLight: null as IndoorLight,
@@ -88,8 +90,8 @@ export const useUploadStore = create<UploadState>()(
         }
       },
 
-      setOutputSrc: (src) => set({ outputSrc: src }),
       setBlobUrl: (url) => set({ blobUrl: url }),
+      setTentativeThreadId: (id) => set({ tentativeThreadId: id }),
       setError: (error) => set({ error }),
       setOutdoorLight: (light) => set({ outdoorLight: light }),
       setIndoorLight: (light) => set({ indoorLight: light }),

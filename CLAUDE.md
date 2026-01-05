@@ -113,6 +113,10 @@ pnpm format
 - `src/icons/`: SVG icons (imported as React components)
 - `src/test-data/`: Test data for SKIP_AI mode development
 
+### UI Components
+
+We should always use standard frontend components from `src/lib/components/ui/` when possible. In particular, raw `<button>` elements should never be used. Instead, `Button` should be adapted to the use case.
+
 ### Asset Handling
 - **SVG files**: imported as React components via `@svgr/webpack`
   - Example: `import GoogleIcon from "@/icons/google.svg"` → use as `<GoogleIcon />`

@@ -2,7 +2,7 @@ import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Button } from "@/lib/components/ui/Button";
 
 interface ThreadHeaderProps {
-  title: string;
+  title: string | null;
   createdAt: string;
   onBackClick: () => void;
 }

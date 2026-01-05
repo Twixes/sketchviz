@@ -32,6 +32,7 @@ export type IndoorLight = z.infer<typeof indoorLightSchema>;
 // Generate request schema with conditional aspect_ratio validation
 const generateRequestSchemaBase = z.object({
   blobUrl: z.string().min(1, "Missing blob URL."),
+  thread_id: z.string().uuid().optional(),
   outdoor_light: outdoorLightSchema.optional(),
   indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
@@ -62,3 +63,35 @@ export type GenerateRequest = z.infer<typeof generateRequestSchema>;
 
 // User params stored in database (excludes blobUrl which is ephemeral)
 export type UserParams = Omit<GenerateRequest, "blobUrl">;
+
+// Iterate request schema (for refining an existing generation)
+const iterateRequestSchemaBase = z.object({
+  outdoor_light: outdoorLightSchema.optional(),
+  indoor_light: indoorLightSchema.optional(),
+  edit_description: z.string().nullable().optional(),
+  model: modelSchema.optional(),
+  reference_image_urls: z.array(z.string().url()).max(3).optional(),
+  aspect_ratio: aspectRatioSchema.nullable().default(null).optional(),
+  // When true, uses the base "Turn this SketchUp render..." prompt instead of iteration prompt
+  use_base_prompt: z.boolean().optional().default(false),
+});
+
+export const iterateRequestSchema = iterateRequestSchemaBase.superRefine(
+  (data, ctx) => {
+    // If reference images are provided, aspect_ratio is required
+    if (
+      data.reference_image_urls &&
+      data.reference_image_urls.length > 0 &&
+      !data.aspect_ratio
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Aspect ratio is required when reference images are provided, due to Gemini limitations.",
+        path: ["aspect_ratio"],
+      });
+    }
+  },
+);
+
+export type IterateRequest = z.infer<typeof iterateRequestSchema>;
