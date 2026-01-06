@@ -10,7 +10,7 @@ import { parseStorageUrl } from "@/lib/supabase/storage";
  */
 export function useSignedUrl(
   url: string | null | undefined,
-  expiresIn = 3600,
+  expiresIn = 86400,
 ): string | null {
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const supabase = createClient();
