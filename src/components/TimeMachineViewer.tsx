@@ -256,31 +256,28 @@ export function TimeMachineViewer({
           className="flex justify-center min-[75rem]:hidden -mt-4 mb-12 z-1"
         />
       )}
-      <div className="relative w-full">
-        {/* Container with dynamic aspect ratio */}
-        <div
-          className="relative w-auto mx-auto max-h-[calc(80vh-8rem)] "
-          style={{ aspectRatio: cssAspectRatio }}
-        >
-          <AnimatePresence mode="popLayout">
-            {layers.map((layer) => {
-              const relativePosition = layer.index - activeLayerIndex;
-              return (
-                <LayerImage
-                  key={layer.id}
-                  layer={layer}
-                  isActive={layer.index === activeLayerIndex}
-                  relativePosition={relativePosition}
-                  onClick={() => onLayerClick?.(layer.index)}
-                  isGenerating={isGenerating}
-                  onVisualizeAgain={onVisualizeAgain}
-                  threadId={threadId}
-                />
-              );
-            })}
-          </AnimatePresence>
-        </div>
-
+      {/* Container with dynamic aspect ratio */}
+      <div
+        className="relative w-auto mx-auto max-h-[calc(90vh-8rem)] "
+        style={{ aspectRatio: cssAspectRatio }}
+      >
+        <AnimatePresence mode="popLayout">
+          {layers.map((layer) => {
+            const relativePosition = layer.index - activeLayerIndex;
+            return (
+              <LayerImage
+                key={layer.id}
+                layer={layer}
+                isActive={layer.index === activeLayerIndex}
+                relativePosition={relativePosition}
+                onClick={() => onLayerClick?.(layer.index)}
+                isGenerating={isGenerating}
+                onVisualizeAgain={onVisualizeAgain}
+                threadId={threadId}
+              />
+            );
+          })}
+        </AnimatePresence>
         {/* Layer navigation - vertical variant for wide viewports (> 75rem) */}
         {hasMultipleLayers && onNavigatePrevious && onNavigateNext && (
           <LayerNavigationControls
