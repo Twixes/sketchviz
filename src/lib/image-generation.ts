@@ -16,6 +16,18 @@ import {
   uploadFile,
 } from "./supabase/storage";
 
+export interface PreparedImageData {
+  imageBuffer: Buffer;
+  contentType: string;
+  filename: string;
+  filenameWithoutExt: string;
+  ext: string;
+  referenceImageBuffers: Array<{
+    buffer: Buffer;
+    mediaType: string;
+  }>;
+}
+
 interface ProcessImageGenerationParams {
   supabase: SupabaseClient;
   user: User;
@@ -26,7 +38,7 @@ interface ProcessImageGenerationParams {
   model: Model;
   aspectRatio: AspectRatio | null;
   referenceImageUrls: string[];
-  generationType: "iteration" | "regeneration";
+  generationType: "iteration" | "regeneration" | "initial";
   useBasePrompt?: boolean;
 }
 
@@ -36,23 +48,20 @@ interface ProcessImageGenerationResult {
 }
 
 /**
- * Shared logic for processing image generation (both iteration and regeneration).
- * Handles downloading input, validation, cropping, reference images, credits,
- * AI generation, and uploading the result.
+ * Prepares an image for generation by downloading, validating, cropping,
+ * and fetching reference images.
  */
-export async function processImageGeneration({
+export async function prepareImageForGeneration({
   supabase,
-  user,
   inputUrl,
-  outdoorLight,
-  indoorLight,
-  editDescription,
-  model,
   aspectRatio,
   referenceImageUrls,
-  generationType,
-  useBasePrompt = false,
-}: ProcessImageGenerationParams): Promise<ProcessImageGenerationResult> {
+}: {
+  supabase: SupabaseClient;
+  inputUrl: string;
+  aspectRatio: AspectRatio | null;
+  referenceImageUrls: string[];
+}): Promise<PreparedImageData> {
   // Download the input image
   const parsed = parseStorageUrl(inputUrl);
   let blob: Blob;
@@ -168,11 +177,48 @@ export async function processImageGeneration({
   }
   const filenameParts = filename.split(".");
   const filenameWithoutExt = filenameParts.slice(0, -1).join(".");
-  const ext = filenameParts.at(-1);
+  const ext = filenameParts.at(-1) || "";
 
+  return {
+    imageBuffer,
+    contentType,
+    filename,
+    filenameWithoutExt,
+    ext,
+    referenceImageBuffers,
+  };
+}
+
+/**
+ * Generates an image from prepared buffers, handles credits, analytics,
+ * AI generation, and uploading.
+ */
+export async function generateAndUploadImage({
+  supabase,
+  userId,
+  preparedImage,
+  outdoorLight,
+  indoorLight,
+  editDescription,
+  model,
+  aspectRatio,
+  generationType,
+  useBasePrompt = false,
+}: {
+  supabase: SupabaseClient;
+  userId: string;
+  preparedImage: PreparedImageData;
+  outdoorLight: OutdoorLight;
+  indoorLight: IndoorLight;
+  editDescription: string | null;
+  model: Model;
+  aspectRatio: AspectRatio | null;
+  generationType: "iteration" | "regeneration" | "initial";
+  useBasePrompt?: boolean;
+}): Promise<ProcessImageGenerationResult> {
   const creditCost = determineCreditCostOfImageGeneration({ model });
 
-  const creditsAvailable = await getCreditsForUser(user.id);
+  const creditsAvailable = await getCreditsForUser(userId);
   if (creditsAvailable === null) {
     throw new Error("Failed to fetch available credits");
   }
@@ -184,22 +230,21 @@ export async function processImageGeneration({
   const analyticsMetadata = {
     model,
     credit_count: creditCost,
-    ...(generationType === "iteration"
-      ? { is_iteration: true }
-      : { is_regeneration: true }),
+    ...(generationType === "iteration" && { is_iteration: true }),
+    ...(generationType === "regeneration" && { is_regeneration: true }),
   };
 
   await polar.events.ingest({
     events: [
       {
         name: "image_generation_started",
-        externalCustomerId: user.id,
+        externalCustomerId: userId,
         metadata: analyticsMetadata,
       },
     ],
   });
   posthogNode.capture({
-    distinctId: user.id,
+    distinctId: userId,
     event: "image_generation_started",
     properties: analyticsMetadata,
   });
@@ -211,31 +256,75 @@ export async function processImageGeneration({
   }
 
   const result = await generateFn({
-    imageBuffer,
-    mediaType: contentType,
-    filename,
+    imageBuffer: preparedImage.imageBuffer,
+    mediaType: preparedImage.contentType,
+    filename: preparedImage.filename,
     outdoorLight,
     indoorLight,
     editDescription,
     model,
-    referenceImages: referenceImageBuffers,
+    referenceImages: preparedImage.referenceImageBuffers,
     aspectRatio,
-    userId: user.id,
+    userId,
   });
 
-  const suffix = generationType === "iteration" ? "iter" : "regen";
-  const outputFilename = `${filenameWithoutExt}-${suffix}-${new Date().toISOString()}.${ext}`;
+  const suffixMap = {
+    iteration: "iter",
+    regeneration: "regen",
+    initial: "out",
+  };
+  const suffix = suffixMap[generationType];
+  const outputFilename = `${preparedImage.filenameWithoutExt}-${suffix}-${new Date().toISOString()}.${preparedImage.ext}`;
   const { url: outputUrl } = await uploadFile({
     supabase,
     bucket: BUCKET_OUTPUT_IMAGES,
     path: outputFilename,
     file: Buffer.from(result.uint8Array),
     contentType: result.mediaType,
-    userId: user.id,
+    userId,
   });
 
   return {
     outputUrl,
     creditCost,
   };
+}
+
+/**
+ * Convenience wrapper that prepares and generates an image in one call.
+ * For more control (e.g., parallel operations), use prepareImageForGeneration
+ * and generateAndUploadImage separately.
+ */
+export async function processImageGeneration({
+  supabase,
+  user,
+  inputUrl,
+  outdoorLight,
+  indoorLight,
+  editDescription,
+  model,
+  aspectRatio,
+  referenceImageUrls,
+  generationType,
+  useBasePrompt = false,
+}: ProcessImageGenerationParams): Promise<ProcessImageGenerationResult> {
+  const preparedImage = await prepareImageForGeneration({
+    supabase,
+    inputUrl,
+    aspectRatio,
+    referenceImageUrls,
+  });
+
+  return generateAndUploadImage({
+    supabase,
+    userId: user.id,
+    preparedImage,
+    outdoorLight,
+    indoorLight,
+    editDescription,
+    model,
+    aspectRatio,
+    generationType,
+    useBasePrompt,
+  });
 }

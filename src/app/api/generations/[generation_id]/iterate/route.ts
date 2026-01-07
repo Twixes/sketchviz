@@ -24,12 +24,12 @@ export async function POST(
   }
 
   const {
-    outdoor_light,
-    indoor_light,
-    edit_description,
+    outdoor_light = null,
+    indoor_light = null,
+    edit_description = null,
     model = `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
     reference_image_urls,
-    aspect_ratio,
+    aspect_ratio = null,
     use_base_prompt,
   } = validation.data;
 
