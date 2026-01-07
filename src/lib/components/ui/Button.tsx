@@ -28,7 +28,7 @@ export interface ButtonProps
   colorScheme?: "dark" | "light"; // default: 'dark'
 
   // Tooltip
-  tooltip?: string;
+  tooltip?: string | React.ReactNode;
 }
 
 const LoadingSpinner = ({ size }: { size: "sm" | "md" | "lg" }) => {

@@ -1,10 +1,10 @@
 "use client";
 
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { EyeOpenIcon, Half2Icon, ReloadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DownloadButton } from "@/components/DownloadButton";
 import { LayerNavigationControls } from "@/components/LayerNavigationControls";
 import { useSignedUrl } from "@/hooks/use-signed-url";
@@ -46,6 +46,8 @@ function LayerImage({
   isGenerating,
   onVisualizeAgain,
   threadId,
+  onCompareToPrevious,
+  isComparing,
 }: {
   layer: Layer;
   isActive: boolean;
@@ -54,6 +56,8 @@ function LayerImage({
   isGenerating?: boolean;
   onVisualizeAgain?: () => void;
   threadId?: string;
+  onCompareToPrevious?: () => void;
+  isComparing?: boolean;
 }) {
   const signedUrl = useSignedUrl(layer.imageUrl);
   const config = TIME_MACHINE_CONFIG;
@@ -85,7 +89,7 @@ function LayerImage({
         scale,
         y: -yOffset,
       }}
-      transition={TIME_MACHINE_LAYER_SPRING}
+      transition={isComparing ? { duration: 0 } : TIME_MACHINE_LAYER_SPRING}
       whileHover={!isActive ? { scale: scale * 1.01 } : undefined}
     >
       <div className="relative w-full h-full bg-black/5 rounded-2xl border border-black/20 overflow-hidden">
@@ -105,6 +109,28 @@ function LayerImage({
             </span>
           </div>
         )}
+
+        {/* Compare to previous button */}
+        {isActive &&
+          layer.index > 0 &&
+          onCompareToPrevious &&
+          !isGenerating && (
+            <div className="absolute top-3 left-3">
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<Half2Icon className="w-3 h-3" />}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onCompareToPrevious();
+                }}
+                tooltip="Hold to compare with previous layer"
+              >
+                Compare to previous
+              </Button>
+            </div>
+          )}
 
         {/* Layer label and actions */}
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
@@ -165,6 +191,35 @@ export function TimeMachineViewer({
   const [calculatedAspectRatio, setCalculatedAspectRatio] = useState<
     string | null
   >(null);
+
+  // Track compare mode state
+  const [isComparing, setIsComparing] = useState(false);
+  const originalIndexRef = useRef<number | null>(null);
+
+  // Handle mouseup anywhere to exit compare mode
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (isComparing && originalIndexRef.current !== null) {
+        setIsComparing(false);
+        onLayerClick?.(originalIndexRef.current);
+        originalIndexRef.current = null;
+      }
+    };
+
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isComparing, onLayerClick]);
+
+  // Handler for entering compare mode
+  const handleCompareToPrevious = () => {
+    if (activeLayerIndex > 0 && !isComparing) {
+      originalIndexRef.current = activeLayerIndex;
+      setIsComparing(true);
+      onLayerClick?.(activeLayerIndex - 1);
+    }
+  };
 
   // Build layers array: original input (index 0) + generation outputs (index 1+)
   const layers = useMemo<Layer[]>(() => {
@@ -274,6 +329,8 @@ export function TimeMachineViewer({
                 isGenerating={isGenerating}
                 onVisualizeAgain={onVisualizeAgain}
                 threadId={threadId}
+                onCompareToPrevious={handleCompareToPrevious}
+                isComparing={isComparing}
               />
             );
           })}

@@ -40,6 +40,11 @@ export function DownloadButton({ imageUrl, filename }: DownloadButtonProps) {
       size="sm"
       leftIcon={<DownloadIcon className="w-3 h-3" />}
       onClick={handleDownload}
+      tooltip={
+        <>
+          Download as: <strong>{filename}</strong>
+        </>
+      }
     >
       Download
     </Button>
