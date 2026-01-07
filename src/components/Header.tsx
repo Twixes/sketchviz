@@ -59,7 +59,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
                 leftIcon={<RocketIcon />}
                 className="cursor-pointer"
               >
-                Pricing
+                {creditsData?.planType === "pro" ? "Billing" : "Pricing"}
               </Button>
             </Link>
             <Link href="/threads">
