@@ -76,6 +76,20 @@ export async function POST(
   // This is stored in the current generation's input_url
   const inputUrl = decodeURI(currentGeneration.input_url);
 
+  // Determine if this is the first generation in the thread
+  // If it's the first generation, we should use the base prompt
+  // If it's a later iteration, we should NOT use the base prompt
+  const { data: allGenerations } = await supabase
+    .from("generations")
+    .select("id")
+    .eq("thread_id", threadId)
+    .order("created_at", { ascending: true });
+
+  const isFirstGeneration =
+    allGenerations && allGenerations.length > 0
+      ? allGenerations[0].id === generationId
+      : true; // Default to true if we can't determine
+
   try {
     const { outputUrl } = await processImageGeneration({
       supabase,
@@ -88,7 +102,7 @@ export async function POST(
       aspectRatio: aspect_ratio,
       referenceImageUrls: reference_image_urls || [],
       generationType: "regeneration",
-      useBasePrompt: true, // Regeneration always uses base prompt
+      useBasePrompt: isFirstGeneration,
     });
 
     // Update the current generation's output (not create a new one)
