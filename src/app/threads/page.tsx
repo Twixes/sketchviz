@@ -38,42 +38,47 @@ export default function ThreadsPage() {
     queryFn: async () => {
       if (!user) return [];
 
-      // Fetch threads
+      // Fetch threads with all their generations in a single query using JOIN
       const { data: threadsData, error: threadsError } = await supabase
         .from("threads")
-        .select("id, title, created_at")
-        .order("created_at", { ascending: false });
+        .select(
+          `
+          id,
+          title,
+          created_at,
+          generations (
+            output_url,
+            input_url,
+            created_at
+          )
+        `,
+        )
+        .order("created_at", { ascending: false })
+        .order("created_at", {
+          referencedTable: "generations",
+          ascending: false,
+        });
 
       if (threadsError) {
         console.error("Failed to fetch threads:", threadsError);
         throw threadsError;
       }
 
-      // For each thread, get generation count and latest generation
-      const threadsWithStats = await Promise.all(
-        threadsData.map(async (thread) => {
-          // Get generation count
-          const { count } = await supabase
-            .from("generations")
-            .select("*", { count: "exact", head: true })
-            .eq("thread_id", thread.id);
+      // Transform the joined data into the expected format
+      const threadsWithStats = threadsData.map((thread) => {
+        const generations = thread.generations || [];
+        const latest = generations[0] || null;
 
-          // Get latest generation for thumbnail
-          const { data: latestGeneration } = await supabase
-            .from("generations")
-            .select("output_url, input_url")
-            .eq("thread_id", thread.id)
-            .order("created_at", { ascending: false })
-            .limit(1)
-            .single();
-
-          return {
-            ...thread,
-            generation_count: count || 0,
-            latest_generation: latestGeneration,
-          };
-        }),
-      );
+        return {
+          id: thread.id,
+          title: thread.title,
+          created_at: thread.created_at,
+          generation_count: generations.length,
+          latest_generation: latest
+            ? { output_url: latest.output_url, input_url: latest.input_url }
+            : null,
+        };
+      });
 
       return threadsWithStats as Thread[];
     },
