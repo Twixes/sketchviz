@@ -1,6 +1,11 @@
 "use client";
 
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+} from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { motion } from "motion/react";
 import { useCallback, useEffect } from "react";
@@ -13,6 +18,8 @@ interface LayerNavigationControlsProps {
   onPrevious: () => void;
   onNext: () => void;
   disabled?: boolean;
+  className?: string;
+  orientation?: "vertical" | "horizontal";
 }
 
 export function LayerNavigationControls({
@@ -21,24 +28,39 @@ export function LayerNavigationControls({
   onPrevious,
   onNext,
   disabled = false,
+  className,
+  orientation = "vertical",
 }: LayerNavigationControlsProps) {
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < totalLayers - 1;
+
+  const isVertical = orientation === "vertical";
+  const isHorizontal = orientation === "horizontal";
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (disabled) return;
 
-      if (e.key === "ArrowUp" && canGoPrevious) {
-        e.preventDefault();
-        onPrevious();
-      } else if (e.key === "ArrowDown" && canGoNext) {
-        e.preventDefault();
-        onNext();
+      if (isVertical) {
+        if (e.key === "ArrowUp" && canGoPrevious) {
+          e.preventDefault();
+          onPrevious();
+        } else if (e.key === "ArrowDown" && canGoNext) {
+          e.preventDefault();
+          onNext();
+        }
+      } else {
+        if (e.key === "ArrowLeft" && canGoPrevious) {
+          e.preventDefault();
+          onPrevious();
+        } else if (e.key === "ArrowRight" && canGoNext) {
+          e.preventDefault();
+          onNext();
+        }
       }
     },
-    [disabled, canGoPrevious, canGoNext, onPrevious, onNext],
+    [disabled, canGoPrevious, canGoNext, onPrevious, onNext, isVertical],
   );
 
   useEffect(() => {
@@ -48,14 +70,21 @@ export function LayerNavigationControls({
 
   if (totalLayers <= 1) return null;
 
+  const PreviousIcon = isVertical ? ChevronUpIcon : ChevronLeftIcon;
+  const NextIcon = isVertical ? ChevronDownIcon : ChevronRightIcon;
+
   return (
     <motion.div
-      className="flex flex-col items-center gap-2"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
+      className={clsx(
+        "flex items-center gap-2",
+        isVertical ? "flex-col" : "flex-row",
+        className,
+      )}
+      initial={{ opacity: 0, [isVertical ? "x" : "y"]: isVertical ? 20 : 10 }}
+      animate={{ opacity: 1, [isVertical ? "x" : "y"]: 0 }}
       transition={TIME_MACHINE_SPRING}
     >
-      {/* Up arrow (to previous/older layer) */}
+      {/* Previous arrow */}
       <Button
         variant="icon"
         size="sm"
@@ -64,29 +93,50 @@ export function LayerNavigationControls({
         className={clsx(
           "transition-all",
           canGoPrevious && !disabled
-            ? "hover:scale-110"
+            ? isVertical
+              ? "hover:scale-110"
+              : "hover:scale-101"
             : "opacity-30 cursor-not-allowed",
+          !isVertical && "grow",
         )}
-        aria-label="Go to previous layer"
+        aria-label={`Go to previous layer${isHorizontal ? " (left)" : ""}`}
       >
-        <ChevronUpIcon className="w-5 h-5" />
+        <PreviousIcon className="w-5 h-5" />
       </Button>
 
       {/* Layer indicator */}
-      <div className="flex flex-col items-center py-2">
+      <div
+        className={clsx(
+          "flex items-center tabular-nums",
+          isVertical ? "flex-col py-2" : "flex-row px-2",
+        )}
+      >
         <motion.span
           key={currentIndex}
-          className="text-2xl font-semibold tabular-nums"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          className={clsx(
+            "font-semibold",
+            isVertical ? "text-2xl" : "text-base",
+          )}
+          initial={{
+            opacity: 0,
+            [isVertical ? "y" : "x"]: isVertical ? -10 : -5,
+          }}
+          animate={{ opacity: 1, [isVertical ? "y" : "x"]: 0 }}
           transition={{ duration: 0.2 }}
         >
           {currentIndex}
         </motion.span>
-        <span className="text-xs text-black/50">of {totalLayers - 1}</span>
+        <span
+          className={clsx(
+            "text-black/50",
+            isVertical ? "text-xs" : "text-base ml-1",
+          )}
+        >
+          of {totalLayers - 1}
+        </span>
       </div>
 
-      {/* Down arrow (to next/newer layer) */}
+      {/* Next arrow */}
       <Button
         variant="icon"
         size="sm"
@@ -95,12 +145,15 @@ export function LayerNavigationControls({
         className={clsx(
           "transition-all",
           canGoNext && !disabled
-            ? "hover:scale-110"
+            ? isVertical
+              ? "hover:scale-110"
+              : "hover:scale-101"
             : "opacity-30 cursor-not-allowed",
+          !isVertical && "grow",
         )}
-        aria-label="Go to next layer"
+        aria-label={`Go to next layer${isHorizontal ? " (right)" : ""}`}
       >
-        <ChevronDownIcon className="w-5 h-5" />
+        <NextIcon className="w-5 h-5" />
       </Button>
     </motion.div>
   );

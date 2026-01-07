@@ -8,7 +8,6 @@ import { ControlPanel } from "@/components/ControlPanel";
 import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { GenerateButton } from "@/components/GenerateButton";
 import { Header } from "@/components/Header";
-import { LayerNavigationControls } from "@/components/LayerNavigationControls";
 import { useSession } from "@/components/SessionProvider";
 import { TimeMachineViewer } from "@/components/TimeMachineViewer";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
@@ -18,6 +17,10 @@ import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutatio
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
+import {
+  DEFAULT_IMAGE_EDITING_MODEL,
+  DEFAULT_MODEL_PROVIDER,
+} from "@/lib/constants";
 import {
   type Generation,
   type Thread,
@@ -121,6 +124,53 @@ export default function ThreadDetailPage({
     }
   }, [fetchedThread, threadEditorStore.setThread]);
 
+  // Update control panel params when layer changes
+  useEffect(() => {
+    const thread = threadEditorStore.thread;
+    const generations = thread?.generations ?? [];
+
+    if (generations.length === 0) return;
+
+    const activeIndex = threadEditorStore.activeLayerIndex;
+    const subsequentGenIndex = activeIndex; // Layer N shows params from generation N
+
+    // If there's a subsequent generation, load its params
+    if (subsequentGenIndex >= 0 && subsequentGenIndex < generations.length) {
+      const subsequentGen = generations[subsequentGenIndex];
+      if (subsequentGen?.user_params) {
+        const params = subsequentGen.user_params;
+        threadEditorStore.setOutdoorLight(params.outdoor_light ?? null);
+        threadEditorStore.setIndoorLight(params.indoor_light ?? null);
+        threadEditorStore.setEditDescription(params.edit_description || "");
+        threadEditorStore.setModel(
+          params.model ??
+            `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
+        );
+        threadEditorStore.setAspectRatio(params.aspect_ratio ?? null);
+      }
+    } else {
+      // For the latest layer (no subsequent generation), use the previous generation's model
+      const previousGenIndex = activeIndex - 1;
+      if (previousGenIndex >= 0 && previousGenIndex < generations.length) {
+        const previousGen = generations[previousGenIndex];
+        if (previousGen?.user_params) {
+          threadEditorStore.setModel(
+            previousGen.user_params.model ??
+              `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
+          );
+        }
+      }
+    }
+  }, [
+    threadEditorStore.activeLayerIndex,
+    threadEditorStore.thread,
+    threadEditorStore.setOutdoorLight,
+    threadEditorStore.setIndoorLight,
+    threadEditorStore.setEditDescription,
+    threadEditorStore.setModel,
+    threadEditorStore.setAspectRatio,
+  ]);
+
   const handleBackToThreads = useCallback(() => {
     router.push("/threads");
   }, [router]);
@@ -172,6 +222,7 @@ export default function ThreadDetailPage({
               input_url: currentBlobUrl,
               output_url: result.outputImage,
               user_params: {
+                thread_id: result.threadId,
                 outdoor_light: uploadStore.outdoorLight,
                 indoor_light: uploadStore.indoorLight,
                 edit_description: uploadStore.editDescription,
@@ -223,6 +274,7 @@ export default function ThreadDetailPage({
         input_url: activeGen.output_url!,
         output_url: result.outputImage,
         user_params: {
+          thread_id: threadId,
           outdoor_light: threadEditorStore.outdoorLight,
           indoor_light: threadEditorStore.indoorLight,
           edit_description: threadEditorStore.editDescription,
@@ -259,6 +311,7 @@ export default function ThreadDetailPage({
         input_url: activeGen.output_url!,
         output_url: result.outputImage,
         user_params: {
+          thread_id: threadId,
           outdoor_light: threadEditorStore.outdoorLight,
           indoor_light: threadEditorStore.indoorLight,
           edit_description: threadEditorStore.editDescription,
@@ -340,7 +393,6 @@ export default function ThreadDetailPage({
   const hasGenerations = generations.length > 0;
   const activeGeneration = threadEditorStore.getActiveGeneration();
   const canIterate = hasGenerations && !!activeGeneration?.output_url;
-  const layerCount = threadEditorStore.getLayerCount();
 
   // Determine the appropriate generate handler
   const handleGenerate = hasGenerations ? handleIterate : handleInitialGenerate;
@@ -354,14 +406,9 @@ export default function ThreadDetailPage({
           className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
         >
           <Header user={user} onLogoClick={handleLogoClick} />
-          <motion.section className="space-y-6">
-            <div className="space-y-6">
-              <div className="h-[72px]" />
-              <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-                <p className="text-black/50">Loading thread...</p>
-              </div>
-            </div>
-          </motion.section>
+          <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+            <p className="text-black/50">Loading thread...</p>
+          </div>
         </motion.main>
       </FunkyBackgroundFuzz>
     );
@@ -396,20 +443,15 @@ export default function ThreadDetailPage({
         <Header user={user} onLogoClick={handleLogoClick} />
 
         <motion.section className="space-y-6">
-          <div className="space-y-6">
-            {/* ThreadHeader or placeholder */}
-            {thread ? (
+          <div className="space-y-8">
+            {thread && (
               <ThreadHeader
                 title={thread.title}
                 createdAt={thread.created_at}
                 onBackClick={handleBackToThreads}
               />
-            ) : (
-              <div className="h-[72px]" />
             )}
-
             <div className="relative space-y-6">
-              {/* TimeMachineViewer handles both new (inputSrc) and existing (generations) */}
               <TimeMachineViewer
                 inputSrc={uploadStore.inputSrc}
                 generations={generations}
@@ -418,6 +460,9 @@ export default function ThreadDetailPage({
                 isGenerating={isGenerating}
                 onVisualizeAgain={handleVisualizeAgain}
                 aspectRatio={aspectRatio}
+                threadId={threadId}
+                onNavigatePrevious={threadEditorStore.navigatePrevious}
+                onNavigateNext={threadEditorStore.navigateNext}
               />
 
               <ControlPanel
@@ -448,19 +493,6 @@ export default function ThreadDetailPage({
                 onGenerate={handleGenerate}
                 onSignIn={handleSignIn}
               />
-
-              {/* Layer navigation - only show when there are generations */}
-              {hasGenerations && (
-                <div className="absolute right-0 top-0 -mr-16">
-                  <LayerNavigationControls
-                    currentIndex={threadEditorStore.activeLayerIndex}
-                    totalLayers={layerCount}
-                    onPrevious={threadEditorStore.navigatePrevious}
-                    onNext={threadEditorStore.navigateNext}
-                    disabled={isGenerating}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </motion.section>

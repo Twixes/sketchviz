@@ -5,6 +5,8 @@ import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useMemo } from "react";
+import { DownloadButton } from "@/components/DownloadButton";
+import { LayerNavigationControls } from "@/components/LayerNavigationControls";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import {
   TIME_MACHINE_CONFIG,
@@ -30,6 +32,9 @@ interface TimeMachineViewerProps {
   isGenerating?: boolean;
   onVisualizeAgain?: () => void;
   aspectRatio?: AspectRatio | null;
+  threadId?: string;
+  onNavigatePrevious?: () => void;
+  onNavigateNext?: () => void;
 }
 
 function LayerImage({
@@ -39,6 +44,7 @@ function LayerImage({
   onClick,
   isGenerating,
   onVisualizeAgain,
+  threadId,
 }: {
   layer: Layer;
   isActive: boolean;
@@ -46,6 +52,7 @@ function LayerImage({
   onClick: () => void;
   isGenerating?: boolean;
   onVisualizeAgain?: () => void;
+  threadId?: string;
 }) {
   const signedUrl = useSignedUrl(layer.imageUrl);
   const config = TIME_MACHINE_CONFIG;
@@ -136,6 +143,19 @@ function LayerImage({
             </div>
           )}
         </div>
+        {signedUrl && layer.index > 0 && (
+          <div className="absolute bottom-3 right-3">
+            <DownloadButton
+              imageUrl={signedUrl}
+              filename={
+                threadId
+                  ? `${threadId}-${layer.label.toLowerCase().replace(/\s+/g, "-")}.png`
+                  : `${layer.label.toLowerCase().replace(/\s+/g, "-")}.png`
+              }
+              isActive={isActive}
+            />
+          </div>
+        )}
       </div>
       {isActive && isGenerating && <div className="loading-ring" aria-hidden />}
     </motion.button>
@@ -150,6 +170,9 @@ export function TimeMachineViewer({
   isGenerating = false,
   onVisualizeAgain,
   aspectRatio,
+  threadId,
+  onNavigatePrevious,
+  onNavigateNext,
 }: TimeMachineViewerProps) {
   // Convert aspect ratio from "16:9" format to "16/9" for CSS
   const cssAspectRatio = aspectRatio ? aspectRatio.replace(":", "/") : "3/2";
@@ -204,26 +227,60 @@ export function TimeMachineViewer({
     );
   }
 
+  const totalLayers = layers.length;
+  const hasMultipleLayers = totalLayers > 1;
+
   return (
-    <div className="relative w-full" style={{ perspective: "1000px" }}>
-      {/* Container with dynamic aspect ratio */}
-      <div className="relative w-full" style={{ aspectRatio: cssAspectRatio }}>
-        <AnimatePresence mode="popLayout">
-          {layers.map((layer) => {
-            const relativePosition = layer.index - activeLayerIndex;
-            return (
-              <LayerImage
-                key={layer.id}
-                layer={layer}
-                isActive={layer.index === activeLayerIndex}
-                relativePosition={relativePosition}
-                onClick={() => onLayerClick?.(layer.index)}
-                isGenerating={isGenerating}
-                onVisualizeAgain={onVisualizeAgain}
-              />
-            );
-          })}
-        </AnimatePresence>
+    <div>
+      {/* Layer navigation - horizontal variant for narrow viewports (<= 75rem) */}
+      {hasMultipleLayers && onNavigatePrevious && onNavigateNext && (
+        <LayerNavigationControls
+          orientation="horizontal"
+          currentIndex={activeLayerIndex}
+          totalLayers={totalLayers}
+          onPrevious={onNavigatePrevious}
+          onNext={onNavigateNext}
+          disabled={isGenerating}
+          className="flex justify-center min-[75rem]:hidden -mt-4 mb-12 z-1"
+        />
+      )}
+      <div className="relative w-full">
+        {/* Container with dynamic aspect ratio */}
+        <div
+          className="relative w-full"
+          style={{ aspectRatio: cssAspectRatio }}
+        >
+          <AnimatePresence mode="popLayout">
+            {layers.map((layer) => {
+              const relativePosition = layer.index - activeLayerIndex;
+              return (
+                <LayerImage
+                  key={layer.id}
+                  layer={layer}
+                  isActive={layer.index === activeLayerIndex}
+                  relativePosition={relativePosition}
+                  onClick={() => onLayerClick?.(layer.index)}
+                  isGenerating={isGenerating}
+                  onVisualizeAgain={onVisualizeAgain}
+                  threadId={threadId}
+                />
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        {/* Layer navigation - vertical variant for wide viewports (> 75rem) */}
+        {hasMultipleLayers && onNavigatePrevious && onNavigateNext && (
+          <LayerNavigationControls
+            orientation="vertical"
+            currentIndex={activeLayerIndex}
+            totalLayers={totalLayers}
+            onPrevious={onNavigatePrevious}
+            onNext={onNavigateNext}
+            disabled={isGenerating}
+            className="absolute -right-12 top-0 hidden min-[75rem]:flex"
+          />
+        )}
       </div>
     </div>
   );
