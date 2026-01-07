@@ -139,7 +139,7 @@ function LayerImage({
               )}
             >
               <ReloadIcon className="w-3 h-3" />
-              Visualize again
+              Regenerate
             </div>
           )}
         </div>

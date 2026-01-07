@@ -33,9 +33,7 @@ export function LayerNavigationControls({
 }: LayerNavigationControlsProps) {
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < totalLayers - 1;
-
   const isVertical = orientation === "vertical";
-  const isHorizontal = orientation === "horizontal";
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
@@ -70,9 +68,6 @@ export function LayerNavigationControls({
 
   if (totalLayers <= 1) return null;
 
-  const PreviousIcon = isVertical ? ChevronUpIcon : ChevronLeftIcon;
-  const NextIcon = isVertical ? ChevronDownIcon : ChevronRightIcon;
-
   return (
     <motion.div
       className={clsx(
@@ -99,9 +94,9 @@ export function LayerNavigationControls({
             : "opacity-30 cursor-not-allowed",
           !isVertical && "grow",
         )}
-        aria-label={`Go to previous layer${isHorizontal ? " (left)" : ""}`}
+        aria-label="Go to previous layer"
       >
-        <PreviousIcon className="w-5 h-5" />
+        <ChevronUpIcon className="w-5 h-5" />
       </Button>
 
       {/* Layer indicator */}
@@ -151,9 +146,9 @@ export function LayerNavigationControls({
             : "opacity-30 cursor-not-allowed",
           !isVertical && "grow",
         )}
-        aria-label={`Go to next layer${isHorizontal ? " (right)" : ""}`}
+        aria-label="Go to next layer"
       >
-        <NextIcon className="w-5 h-5" />
+        <ChevronDownIcon className="w-5 h-5" />
       </Button>
     </motion.div>
   );

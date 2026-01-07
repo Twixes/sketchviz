@@ -81,7 +81,7 @@ export function ControlPanel(props: ControlPanelProps) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {/* Light and Model Selectors */}
       <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap *:shrink">
         <LightSelector

@@ -30,7 +30,6 @@ export async function POST(
     model = `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
     reference_image_urls,
     aspect_ratio,
-    use_base_prompt,
   } = validation.data;
 
   // Get user session
@@ -46,8 +45,8 @@ export async function POST(
     );
   }
 
-  // Fetch the previous generation and verify ownership through RLS
-  const { data: previousGeneration, error: fetchError } = await supabase
+  // Fetch the current generation and verify ownership through RLS
+  const { data: currentGeneration, error: fetchError } = await supabase
     .from("generations")
     .select(
       `
@@ -64,46 +63,18 @@ export async function POST(
     .eq("id", generationId)
     .single();
 
-  if (fetchError || !previousGeneration) {
+  if (fetchError || !currentGeneration) {
     return NextResponse.json(
       { error: "Generation not found or access denied" },
       { status: 404 },
     );
   }
 
-  // Verify the generation has an output to iterate on
-  if (!previousGeneration.output_url) {
-    return NextResponse.json(
-      { error: "Cannot iterate on a generation that has no output" },
-      { status: 400 },
-    );
-  }
+  const threadId = currentGeneration.thread_id;
 
-  const threadId = previousGeneration.thread_id;
-  const inputUrl = decodeURI(previousGeneration.output_url); // Use previous output as new input
-
-  // Create a new generation record
-  const { data: newGeneration, error: generationError } = await supabase
-    .from("generations")
-    .insert({
-      thread_id: threadId,
-      input_url: inputUrl,
-      output_url: null,
-      user_params: {
-        outdoor_light,
-        indoor_light,
-        edit_description,
-        model,
-        aspect_ratio,
-      },
-    })
-    .select("id")
-    .single();
-
-  if (generationError) {
-    throw generationError;
-  }
-  const newGenerationId = newGeneration.id;
+  // For regeneration, we need to find the input that was originally used for this generation
+  // This is stored in the current generation's input_url
+  const inputUrl = decodeURI(currentGeneration.input_url);
 
   try {
     const { outputUrl } = await processImageGeneration({
@@ -116,31 +87,39 @@ export async function POST(
       model,
       aspectRatio: aspect_ratio,
       referenceImageUrls: reference_image_urls || [],
-      generationType: "iteration",
-      useBasePrompt: use_base_prompt,
+      generationType: "regeneration",
+      useBasePrompt: true, // Regeneration always uses base prompt
     });
 
-    // Update generation record with output URL
+    // Update the current generation's output (not create a new one)
     const { error: updateError } = await supabase
       .from("generations")
       .update({
         output_url: outputUrl,
+        user_params: {
+          outdoor_light,
+          indoor_light,
+          edit_description,
+          model,
+          aspect_ratio,
+        },
       })
-      .eq("id", newGenerationId);
+      .eq("id", generationId);
 
     if (updateError) {
       console.error("Failed to update generation:", updateError);
+      throw updateError;
     }
 
     return NextResponse.json({
       outputImage: outputUrl,
-      generationId: newGenerationId,
+      generationId,
       threadId,
     });
   } catch (error) {
-    console.error("Iterate endpoint error:", error);
+    console.error("Regenerate endpoint error:", error);
     const message =
-      error instanceof Error ? error.message : "Failed to iterate on image.";
+      error instanceof Error ? error.message : "Failed to regenerate image.";
 
     return NextResponse.json({ error: message }, { status: 500 });
   }

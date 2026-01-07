@@ -14,6 +14,7 @@ import { useGenerateMutation } from "@/hooks/use-generate-mutation";
 import { useIterateMutation } from "@/hooks/use-iterate-mutation";
 import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
+import { useRegenerateMutation } from "@/hooks/use-regenerate-mutation";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
@@ -56,6 +57,7 @@ export default function ThreadDetailPage({
 
   // Mutations
   const iterateMutation = useIterateMutation();
+  const regenerateMutation = useRegenerateMutation();
   const referenceUploadMutation = useReferenceUploadMutation();
 
   // Redirect to home if not logged in OR if new thread with no image
@@ -296,36 +298,21 @@ export default function ThreadDetailPage({
 
     threadEditorStore.setIsGenerating(true);
     try {
-      const result = await iterateMutation.mutateAsync({
+      await regenerateMutation.mutateAsync({
         generationId: activeGen.id,
         outdoorLight: threadEditorStore.outdoorLight,
         indoorLight: threadEditorStore.indoorLight,
         editDescription: threadEditorStore.editDescription,
         model: threadEditorStore.model,
         aspectRatio: threadEditorStore.aspectRatio,
-        useBasePrompt: true,
       });
 
-      const newGeneration: Generation = {
-        id: result.generationId,
-        input_url: activeGen.output_url!,
-        output_url: result.outputImage,
-        user_params: {
-          thread_id: threadId,
-          outdoor_light: threadEditorStore.outdoorLight,
-          indoor_light: threadEditorStore.indoorLight,
-          edit_description: threadEditorStore.editDescription,
-          model: threadEditorStore.model,
-          aspect_ratio: threadEditorStore.aspectRatio,
-        },
-        created_at: new Date().toISOString(),
-      };
-      threadEditorStore.addGeneration(newGeneration);
+      // The generation output is already updated by the mutation's onSuccess handler
       queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
     } finally {
       threadEditorStore.setIsGenerating(false);
     }
-  }, [threadEditorStore, iterateMutation, queryClient, threadId]);
+  }, [threadEditorStore, regenerateMutation, queryClient, threadId]);
 
   const handleReferenceImageDrop = async (file: File) => {
     const store = isNewThread ? uploadStore : threadEditorStore;
