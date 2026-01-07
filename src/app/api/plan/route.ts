@@ -46,7 +46,7 @@ export async function GET(
 
   const [credits, [planType]] = userId
     ? await Promise.all([getCreditsForUser(userId), getPlanForUser(userId)])
-    : ([null, ["free"]] as const);
+    : ([null, [null]] as const);
 
   const isVatApplicable =
     (!!geo.country && COUNTRIES_WITH_VAT.includes(geo.country)) ||

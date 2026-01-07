@@ -1,6 +1,5 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import type { PlanResponse } from "@/app/api/plan/types";
-import { useSession } from "@/components/SessionProvider";
 
 async function fetchPlan(): Promise<PlanResponse> {
   const response = await fetch("/api/plan");
