@@ -351,7 +351,7 @@ export default function ThreadDetailPage({
       <FunkyBackgroundFuzz>
         <motion.main
           transition={LAYOUT_TRANSITION}
-          className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
+          className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
         >
           <Header user={user} onLogoClick={handleLogoClick} />
           <motion.section className="space-y-6">
@@ -373,7 +373,7 @@ export default function ThreadDetailPage({
       <FunkyBackgroundFuzz>
         <motion.main
           transition={LAYOUT_TRANSITION}
-          className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
+          className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
         >
           <Header user={user} onLogoClick={handleLogoClick} />
           <motion.section className="space-y-6">
@@ -391,7 +391,7 @@ export default function ThreadDetailPage({
     <FunkyBackgroundFuzz>
       <motion.main
         transition={LAYOUT_TRANSITION}
-        className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
+        className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
       >
         <Header user={user} onLogoClick={handleLogoClick} />
 

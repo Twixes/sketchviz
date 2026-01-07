@@ -46,7 +46,7 @@ export default function Home() {
 
   return (
     <FunkyBackgroundFuzz>
-      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10">
+      <main className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10">
         <Header user={user} onLogoClick={handleReset} />
 
         <section className="grid gap-12 items-center lg:grid-cols-[1.05fr_0.95fr]">
