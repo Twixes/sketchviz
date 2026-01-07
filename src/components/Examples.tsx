@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { uuidv7 } from "uuidv7";
 import type { GenerateRequest } from "@/lib/schemas";
-import { useUploadStore } from "@/stores/upload-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 import { BeforeAfterComparison } from "./BeforeAfterComparison";
 
 const EXAMPLES: {
@@ -46,7 +46,7 @@ export function Examples() {
     setIndoorLight,
     setOutdoorLight,
     setTentativeThreadId,
-  } = useUploadStore();
+  } = useThreadEditorStore();
 
   const handleTryExample = async (
     beforeUrl: string,

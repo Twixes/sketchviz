@@ -11,7 +11,7 @@ import { ModelSelector } from "@/components/ModelSelector";
 import { ReferenceImageUpload } from "@/components/ReferenceImageUpload";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
-import type { ReferenceImage } from "@/stores/upload-store";
+import type { ReferenceImage } from "@/stores/thread-editor-store";
 
 interface ControlPanelProps {
   variant: "editor";

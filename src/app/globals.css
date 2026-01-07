@@ -123,7 +123,7 @@ strong {
 
 .loading-ring {
   --ring-size: 6px;
-  --ring-radius: 24px;
+  --ring-radius: 16px;
   position: absolute;
   border-radius: calc(var(--ring-radius) + var(--ring-size));
   padding: var(--ring-size);

@@ -10,6 +10,7 @@ import {
   type PreparedImageData,
   prepareImageForGeneration,
 } from "@/lib/image-generation";
+import { posthogNode } from "@/lib/posthog/server";
 import { generateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
     });
 
     // Run image generation and title generation in parallel
-    const [{ outputUrl }] = await Promise.all([
+    const [{ outputUrl, creditCost }] = await Promise.all([
       generateAndUploadImage({
         supabase,
         userId,
@@ -125,6 +126,23 @@ export async function POST(request: Request) {
       }
     }
 
+    // Track successful generation
+    posthogNode.capture({
+      distinctId: userId,
+      event: "generation_succeeded",
+      properties: {
+        thread_id: threadId,
+        generation_id: generationId,
+        model,
+        credit_cost: creditCost,
+        outdoor_light,
+        indoor_light,
+        has_edit_description: edit_description !== null,
+        aspect_ratio,
+        reference_image_count: reference_image_urls?.length || 0,
+      },
+    });
+
     return NextResponse.json({
       outputImage: outputUrl,
       threadId,
@@ -134,6 +152,23 @@ export async function POST(request: Request) {
     console.error("Generate endpoint error:", error);
     const message =
       error instanceof Error ? error.message : "Failed to generate image.";
+
+    // Track failed generation
+    posthogNode.capture({
+      distinctId: userId,
+      event: "generation_failed",
+      properties: {
+        thread_id: threadId,
+        generation_id: generationId,
+        model,
+        error: message,
+        outdoor_light,
+        indoor_light,
+        has_edit_description: edit_description !== null,
+        aspect_ratio,
+        reference_image_count: reference_image_urls?.length || 0,
+      },
+    });
 
     return NextResponse.json({ error: message }, { status: 500 });
   }

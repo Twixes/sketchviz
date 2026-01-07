@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
+import posthog from "posthog-js";
+import { useEffect } from "react";
 import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { FunkyBackgroundShapes2 } from "@/components/FunkyBackgroundShapes2";
 import { Header } from "@/components/Header";
@@ -34,7 +36,18 @@ export default function PricingPage() {
   const handleSignIn = useSignInCallback();
   const { data: planData } = usePlanQuery();
 
+  useEffect(() => {
+    posthog.capture("pricing_page_viewed", {
+      user_id: user?.id,
+      current_plan: planData?.planType,
+    });
+  }, [user?.id, planData?.planType]);
+
   const handleUpgradeToPro = async () => {
+    posthog.capture("upgrade_to_pro_clicked", {
+      user_id: user?.id,
+      current_plan: planData?.planType,
+    });
     if (!user) {
       user = await handleSignIn();
     }
@@ -43,6 +56,10 @@ export default function PricingPage() {
     }
   };
   const handleManagePlan = async () => {
+    posthog.capture("manage_plan_clicked", {
+      user_id: user?.id,
+      current_plan: planData?.planType,
+    });
     if (!user) {
       user = await handleSignIn();
     }

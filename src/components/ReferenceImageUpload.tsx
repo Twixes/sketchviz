@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
 import { Button } from "@/lib/components/ui/Button";
-import type { ReferenceImage } from "@/stores/upload-store";
-import { useUploadStore } from "@/stores/upload-store";
+import type { ReferenceImage } from "@/stores/thread-editor-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 interface ReferenceImageUploadBaseProps {
   disabled?: boolean;
@@ -13,7 +13,7 @@ interface ReferenceImageUploadBaseProps {
 
 interface ReferenceImageUploadInternalProps
   extends ReferenceImageUploadBaseProps {
-  // Uses internal useUploadStore
+  // Uses internal useThreadEditorStore
   referenceImages?: undefined;
   onFileDrop?: undefined;
   onRemove?: undefined;
@@ -36,7 +36,7 @@ export function ReferenceImageUpload(props: ReferenceImageUploadProps) {
   const isExternalMode = props.referenceImages !== undefined;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const uploadStore = useUploadStore();
+  const threadEditorStore = useThreadEditorStore();
   const uploadMutation = useReferenceUploadMutation();
   const [fullViewImage, setFullViewImage] = useState<ReferenceImage | null>(
     null,
@@ -45,7 +45,7 @@ export function ReferenceImageUpload(props: ReferenceImageUploadProps) {
   // Get reference images from props or store
   const referenceImages = isExternalMode
     ? props.referenceImages
-    : uploadStore.referenceImages;
+    : threadEditorStore.referenceImages;
 
   const handleFileSelect = async (file: File) => {
     if (referenceImages.length >= 3) {
@@ -56,17 +56,17 @@ export function ReferenceImageUpload(props: ReferenceImageUploadProps) {
       // External mode: use callback from props
       await props.onFileDrop(file);
     } else {
-      // Internal mode: use upload store
+      // Internal mode: use thread editor store
       const localSrc = URL.createObjectURL(file);
       const imageIndex = referenceImages.length;
-      uploadStore.addReferenceImage(localSrc, null);
+      threadEditorStore.addReferenceImage(localSrc, null);
 
       try {
         const blobUrl = await uploadMutation.mutateAsync({ file });
-        uploadStore.updateReferenceImageBlobUrl(imageIndex, blobUrl);
+        threadEditorStore.updateReferenceImageBlobUrl(imageIndex, blobUrl);
       } catch (error) {
         console.error("Failed to upload reference image:", error);
-        uploadStore.removeReferenceImage(imageIndex);
+        threadEditorStore.removeReferenceImage(imageIndex);
       }
     }
   };
@@ -75,7 +75,7 @@ export function ReferenceImageUpload(props: ReferenceImageUploadProps) {
     if (isExternalMode) {
       props.onRemove(index);
     } else {
-      uploadStore.removeReferenceImage(index);
+      threadEditorStore.removeReferenceImage(index);
     }
   };
 

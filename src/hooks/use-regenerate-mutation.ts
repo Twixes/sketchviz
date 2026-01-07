@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import posthog from "posthog-js";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
@@ -61,17 +62,61 @@ export function useRegenerateMutation() {
       return payload;
     },
 
-    onMutate: () => {
+    onMutate: ({
+      generationId,
+      outdoorLight,
+      indoorLight,
+      editDescription,
+      model,
+      aspectRatio,
+    }) => {
       setIsGenerating(true);
+      posthog.capture("regeneration_started", {
+        generation_id: generationId,
+        outdoor_light: outdoorLight,
+        indoor_light: indoorLight,
+        has_edit_description: editDescription !== null,
+        model,
+        aspect_ratio: aspectRatio,
+        reference_image_count: referenceImages.filter(
+          (img) => img.blobUrl !== null,
+        ).length,
+      });
     },
 
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       updateGenerationOutput(data.generationId, data.outputImage);
       setIsGenerating(false);
+      posthog.capture("regeneration_completed", {
+        thread_id: data.threadId,
+        generation_id: data.generationId,
+        outdoor_light: variables.outdoorLight,
+        indoor_light: variables.indoorLight,
+        has_edit_description: variables.editDescription !== null,
+        model: variables.model,
+        aspect_ratio: variables.aspectRatio,
+        reference_image_count: referenceImages.filter(
+          (img) => img.blobUrl !== null,
+        ).length,
+      });
     },
 
-    onError: () => {
+    onError: (error, variables) => {
       setIsGenerating(false);
+      const message =
+        error instanceof Error ? error.message : "Something went wrong.";
+      posthog.capture("regeneration_failed", {
+        error: message,
+        generation_id: variables.generationId,
+        outdoor_light: variables.outdoorLight,
+        indoor_light: variables.indoorLight,
+        has_edit_description: variables.editDescription !== null,
+        model: variables.model,
+        aspect_ratio: variables.aspectRatio,
+        reference_image_count: referenceImages.filter(
+          (img) => img.blobUrl !== null,
+        ).length,
+      });
     },
   });
 }

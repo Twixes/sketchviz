@@ -4,6 +4,7 @@ import {
   DEFAULT_MODEL_PROVIDER,
 } from "@/lib/constants";
 import { processImageGeneration } from "@/lib/image-generation";
+import { posthogNode } from "@/lib/posthog/server";
 import { iterateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
@@ -91,7 +92,7 @@ export async function POST(
       : true; // Default to true if we can't determine
 
   try {
-    const { outputUrl } = await processImageGeneration({
+    const { outputUrl, creditCost } = await processImageGeneration({
       supabase,
       user,
       inputUrl,
@@ -125,6 +126,24 @@ export async function POST(
       throw updateError;
     }
 
+    // Track successful regeneration
+    posthogNode.capture({
+      distinctId: user.id,
+      event: "regeneration_succeeded",
+      properties: {
+        thread_id: threadId,
+        generation_id: generationId,
+        model,
+        credit_cost: creditCost,
+        outdoor_light,
+        indoor_light,
+        has_edit_description: edit_description !== null,
+        aspect_ratio,
+        is_first_generation: isFirstGeneration,
+        reference_image_count: reference_image_urls?.length || 0,
+      },
+    });
+
     return NextResponse.json({
       outputImage: outputUrl,
       generationId,
@@ -134,6 +153,24 @@ export async function POST(
     console.error("Regenerate endpoint error:", error);
     const message =
       error instanceof Error ? error.message : "Failed to regenerate image.";
+
+    // Track failed regeneration
+    posthogNode.capture({
+      distinctId: user.id,
+      event: "regeneration_failed",
+      properties: {
+        thread_id: threadId,
+        generation_id: generationId,
+        model,
+        error: message,
+        outdoor_light,
+        indoor_light,
+        has_edit_description: edit_description !== null,
+        aspect_ratio,
+        is_first_generation: isFirstGeneration,
+        reference_image_count: reference_image_urls?.length || 0,
+      },
+    });
 
     return NextResponse.json({ error: message }, { status: 500 });
   }

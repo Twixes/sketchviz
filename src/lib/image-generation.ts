@@ -250,8 +250,11 @@ export async function generateAndUploadImage({
   });
 
   // Choose which generation function to use
+  // Use the iteration function (no base prompt) when:
+  // - It's an iteration AND useBasePrompt is false
+  // - It's a regeneration AND useBasePrompt is false (regenerating a non-first generation)
   let generateFn = generateVisualizationImage;
-  if (generationType === "iteration" && !useBasePrompt) {
+  if (!useBasePrompt && generationType !== "initial") {
     generateFn = generateIterationImage;
   }
 

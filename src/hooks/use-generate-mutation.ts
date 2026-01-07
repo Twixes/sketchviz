@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
+import posthog from "posthog-js";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
-import { useUploadStore } from "@/stores/upload-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 interface GenerateParams {
   blobUrl: string;
@@ -21,7 +22,7 @@ interface GenerateResponse {
 }
 
 export function useGenerateMutation() {
-  const { setError, setIsGenerating, referenceImages } = useUploadStore();
+  const { setError, setIsGenerating, referenceImages } = useThreadEditorStore();
 
   return useMutation({
     mutationFn: async ({
@@ -61,20 +62,59 @@ export function useGenerateMutation() {
       return payload;
     },
 
-    onMutate: () => {
+    onMutate: ({
+      outdoorLight,
+      indoorLight,
+      editDescription,
+      model,
+      aspectRatio,
+    }) => {
       setError(null);
       setIsGenerating(true);
+      posthog.capture("generation_started", {
+        outdoor_light: outdoorLight,
+        indoor_light: indoorLight,
+        has_edit_description: editDescription !== null,
+        model,
+        aspect_ratio: aspectRatio,
+        reference_image_count: referenceImages.filter(
+          (img) => img.blobUrl !== null,
+        ).length,
+      });
     },
 
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       setIsGenerating(false);
+      posthog.capture("generation_completed", {
+        thread_id: data.threadId,
+        generation_id: data.generationId,
+        outdoor_light: variables.outdoorLight,
+        indoor_light: variables.indoorLight,
+        has_edit_description: variables.editDescription !== null,
+        model: variables.model,
+        aspect_ratio: variables.aspectRatio,
+        reference_image_count: referenceImages.filter(
+          (img) => img.blobUrl !== null,
+        ).length,
+      });
     },
 
-    onError: (error) => {
+    onError: (error, variables) => {
       const message =
         error instanceof Error ? error.message : "Something went wrong.";
       setError(message);
       setIsGenerating(false);
+      posthog.capture("generation_failed", {
+        error: message,
+        outdoor_light: variables.outdoorLight,
+        indoor_light: variables.indoorLight,
+        has_edit_description: variables.editDescription !== null,
+        model: variables.model,
+        aspect_ratio: variables.aspectRatio,
+        reference_image_count: referenceImages.filter(
+          (img) => img.blobUrl !== null,
+        ).length,
+      });
     },
   });
 }

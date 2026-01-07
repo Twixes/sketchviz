@@ -1,4 +1,5 @@
 import { DownloadIcon } from "@radix-ui/react-icons";
+import posthog from "posthog-js";
 import { Button } from "@/lib/components/ui/Button";
 
 interface DownloadButtonProps {
@@ -20,8 +21,16 @@ export function DownloadButton({ imageUrl, filename }: DownloadButtonProps) {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
+      posthog.capture("image_downloaded", {
+        filename,
+        file_size: blob.size,
+      });
     } catch (error) {
       console.error("Failed to download image:", error);
+      posthog.capture("image_download_failed", {
+        filename,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   };
 

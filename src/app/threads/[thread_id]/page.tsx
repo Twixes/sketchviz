@@ -27,7 +27,6 @@ import {
   type Thread,
   useThreadEditorStore,
 } from "@/stores/thread-editor-store";
-import { useUploadStore } from "@/stores/upload-store";
 import { ThreadHeader } from "./ThreadHeader";
 
 export default function ThreadDetailPage({
@@ -36,7 +35,8 @@ export default function ThreadDetailPage({
   params: Usable<{ thread_id: string }>;
 }) {
   const { thread_id: threadId } = use(params);
-  const tentativeThreadId = useUploadStore((state) => state.tentativeThreadId);
+  const threadEditorStore = useThreadEditorStore();
+  const tentativeThreadId = threadEditorStore.tentativeThreadId;
   const isNewThread = threadId === tentativeThreadId;
 
   const router = useRouter();
@@ -44,13 +44,8 @@ export default function ThreadDetailPage({
   const { user, supabase } = useSession();
   const handleSignIn = useSignInCallback();
 
-  // Upload store (for new threads)
-  const uploadStore = useUploadStore();
   const uploadMutation = useUploadMutation();
   const generateMutation = useGenerateMutation();
-
-  // Thread editor store (for existing threads)
-  const threadEditorStore = useThreadEditorStore();
 
   // Fetch credits
   const { data: creditsData } = usePlanQuery();
@@ -66,13 +61,17 @@ export default function ThreadDetailPage({
       router.push("/");
       return;
     }
-    if (isNewThread && !uploadStore.inputSrc && !uploadMutation.isPending) {
+    if (
+      isNewThread &&
+      !threadEditorStore.inputSrc &&
+      !uploadMutation.isPending
+    ) {
       router.push("/");
     }
   }, [
     user,
     isNewThread,
-    uploadStore.inputSrc,
+    threadEditorStore.inputSrc,
     uploadMutation.isPending,
     router,
   ]);
@@ -180,18 +179,17 @@ export default function ThreadDetailPage({
   const handleLogoClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
-      uploadStore.reset();
       threadEditorStore.reset();
       router.push("/");
     },
-    [uploadStore, threadEditorStore, router],
+    [threadEditorStore, router],
   );
 
   // Handle initial generation (new thread)
   const handleInitialGenerate = useCallback(async () => {
-    uploadStore.setIsBusyForUser(true);
+    threadEditorStore.setIsBusyForUser(true);
     try {
-      let currentBlobUrl = uploadStore.blobUrl;
+      let currentBlobUrl = threadEditorStore.blobUrl;
 
       if (uploadMutation.isPending) {
         const uploadedUrl = await uploadMutation.mutateAsync(
@@ -205,11 +203,11 @@ export default function ThreadDetailPage({
       const result = await generateMutation.mutateAsync({
         blobUrl: currentBlobUrl,
         threadId, // Pass the tentative thread ID
-        outdoorLight: uploadStore.outdoorLight,
-        indoorLight: uploadStore.indoorLight,
-        editDescription: uploadStore.editDescription,
-        model: uploadStore.model,
-        aspectRatio: uploadStore.aspectRatio,
+        outdoorLight: threadEditorStore.outdoorLight,
+        indoorLight: threadEditorStore.indoorLight,
+        editDescription: threadEditorStore.editDescription,
+        model: threadEditorStore.model,
+        aspectRatio: threadEditorStore.aspectRatio,
       });
 
       if (result.threadId) {
@@ -225,11 +223,11 @@ export default function ThreadDetailPage({
               output_url: result.outputImage,
               user_params: {
                 thread_id: result.threadId,
-                outdoor_light: uploadStore.outdoorLight,
-                indoor_light: uploadStore.indoorLight,
-                edit_description: uploadStore.editDescription,
-                model: uploadStore.model,
-                aspect_ratio: uploadStore.aspectRatio,
+                outdoor_light: threadEditorStore.outdoorLight,
+                indoor_light: threadEditorStore.indoorLight,
+                edit_description: threadEditorStore.editDescription,
+                model: threadEditorStore.model,
+                aspect_ratio: threadEditorStore.aspectRatio,
               },
               created_at: new Date().toISOString(),
             },
@@ -240,19 +238,13 @@ export default function ThreadDetailPage({
         threadEditorStore.setThread(newThread);
         threadEditorStore.navigateToLayer(1); // Navigate to the new generation
 
-        // Clear tentative ID to switch from uploadStore to threadEditorStore
-        uploadStore.setTentativeThreadId(null);
+        // Clear tentative ID to signal we've transitioned to existing thread
+        threadEditorStore.setTentativeThreadId(null);
       }
     } finally {
-      uploadStore.setIsBusyForUser(false);
+      threadEditorStore.setIsBusyForUser(false);
     }
-  }, [
-    uploadStore,
-    uploadMutation,
-    generateMutation,
-    threadId,
-    threadEditorStore,
-  ]);
+  }, [threadEditorStore, uploadMutation, generateMutation, threadId]);
 
   // Handle iteration (existing thread)
   const handleIterate = useCallback(async () => {
@@ -315,19 +307,18 @@ export default function ThreadDetailPage({
   }, [threadEditorStore, regenerateMutation, queryClient, threadId]);
 
   const handleReferenceImageDrop = async (file: File) => {
-    const store = isNewThread ? uploadStore : threadEditorStore;
-    if (store.referenceImages.length >= 3) return;
+    if (threadEditorStore.referenceImages.length >= 3) return;
 
     const localSrc = URL.createObjectURL(file);
-    const imageIndex = store.referenceImages.length;
-    store.addReferenceImage(localSrc, null);
+    const imageIndex = threadEditorStore.referenceImages.length;
+    threadEditorStore.addReferenceImage(localSrc, null);
 
     try {
       const blobUrl = await referenceUploadMutation.mutateAsync({ file });
-      store.updateReferenceImageBlobUrl(imageIndex, blobUrl);
+      threadEditorStore.updateReferenceImageBlobUrl(imageIndex, blobUrl);
     } catch (error) {
       console.error("Failed to upload reference image:", error);
-      store.removeReferenceImage(imageIndex);
+      threadEditorStore.removeReferenceImage(imageIndex);
     }
   };
 
@@ -335,45 +326,23 @@ export default function ThreadDetailPage({
     return null;
   }
 
-  // Determine which state to use
+  // Use unified store for both new and existing threads
   const isGenerating = isNewThread
-    ? uploadStore.isBusyForUser
+    ? threadEditorStore.isBusyForUser
     : threadEditorStore.isGenerating;
-  const outdoorLight = isNewThread
-    ? uploadStore.outdoorLight
-    : threadEditorStore.outdoorLight;
-  const indoorLight = isNewThread
-    ? uploadStore.indoorLight
-    : threadEditorStore.indoorLight;
-  const editDescription = isNewThread
-    ? uploadStore.editDescription
-    : threadEditorStore.editDescription;
-  const model = isNewThread ? uploadStore.model : threadEditorStore.model;
-  const aspectRatio = isNewThread
-    ? uploadStore.aspectRatio
-    : threadEditorStore.aspectRatio;
-  const referenceImages = isNewThread
-    ? uploadStore.referenceImages
-    : threadEditorStore.referenceImages;
+  const outdoorLight = threadEditorStore.outdoorLight;
+  const indoorLight = threadEditorStore.indoorLight;
+  const editDescription = threadEditorStore.editDescription;
+  const model = threadEditorStore.model;
+  const aspectRatio = threadEditorStore.aspectRatio;
+  const referenceImages = threadEditorStore.referenceImages;
 
-  const setOutdoorLight = isNewThread
-    ? uploadStore.setOutdoorLight
-    : threadEditorStore.setOutdoorLight;
-  const setIndoorLight = isNewThread
-    ? uploadStore.setIndoorLight
-    : threadEditorStore.setIndoorLight;
-  const setEditDescription = isNewThread
-    ? uploadStore.setEditDescription
-    : threadEditorStore.setEditDescription;
-  const setModel = isNewThread
-    ? uploadStore.setModel
-    : threadEditorStore.setModel;
-  const setAspectRatio = isNewThread
-    ? uploadStore.setAspectRatio
-    : threadEditorStore.setAspectRatio;
-  const removeReferenceImage = isNewThread
-    ? uploadStore.removeReferenceImage
-    : threadEditorStore.removeReferenceImage;
+  const setOutdoorLight = threadEditorStore.setOutdoorLight;
+  const setIndoorLight = threadEditorStore.setIndoorLight;
+  const setEditDescription = threadEditorStore.setEditDescription;
+  const setModel = threadEditorStore.setModel;
+  const setAspectRatio = threadEditorStore.setAspectRatio;
+  const removeReferenceImage = threadEditorStore.removeReferenceImage;
 
   const thread = threadEditorStore.thread;
   const generations = thread?.generations ?? [];
@@ -440,7 +409,7 @@ export default function ThreadDetailPage({
             )}
             <div className="relative space-y-6">
               <TimeMachineViewer
-                inputSrc={uploadStore.inputSrc}
+                inputSrc={threadEditorStore.inputSrc}
                 generations={generations}
                 activeLayerIndex={threadEditorStore.activeLayerIndex}
                 onLayerClick={threadEditorStore.navigateToLayer}

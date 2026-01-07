@@ -7,7 +7,7 @@ import {
   MAX_UPLOAD_MB,
 } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
-import { useUploadStore } from "@/stores/upload-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 interface UploadFileParams {
   file: File;
@@ -15,7 +15,7 @@ interface UploadFileParams {
 
 export function useUploadMutation() {
   const { setInputSrc, setBlobUrl, setError, setIsUploading } =
-    useUploadStore();
+    useThreadEditorStore();
 
   return useMutation({
     mutationFn: async ({ file }: UploadFileParams): Promise<string> => {
@@ -82,6 +82,9 @@ export function useUploadMutation() {
     onSuccess: (blobUrl) => {
       setBlobUrl(blobUrl);
       setIsUploading(false);
+      posthog.capture("base_image_upload_completed", {
+        blob_url: blobUrl,
+      });
     },
 
     onError: (error) => {
@@ -89,6 +92,9 @@ export function useUploadMutation() {
         error instanceof Error ? error.message : "Something went wrong.";
       setError(message);
       setIsUploading(false);
+      posthog.capture("base_image_upload_failed", {
+        error: message,
+      });
     },
   });
 }

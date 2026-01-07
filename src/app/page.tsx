@@ -12,14 +12,14 @@ import { HeroFeatures } from "@/components/HeroFeatures";
 import { useSession } from "@/components/SessionProvider";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
-import { useUploadStore } from "@/stores/upload-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 export default function Home() {
   const router = useRouter();
   const { user } = useSession();
 
   // Zustand store - minimal usage, just for reset and upload
-  const { reset, setTentativeThreadId } = useUploadStore();
+  const { reset, setTentativeThreadId } = useThreadEditorStore();
 
   // TanStack Query mutations
   const uploadMutation = useUploadMutation();

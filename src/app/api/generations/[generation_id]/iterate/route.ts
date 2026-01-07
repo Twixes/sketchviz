@@ -4,6 +4,7 @@ import {
   DEFAULT_MODEL_PROVIDER,
 } from "@/lib/constants";
 import { processImageGeneration } from "@/lib/image-generation";
+import { posthogNode } from "@/lib/posthog/server";
 import { iterateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
 
@@ -106,7 +107,7 @@ export async function POST(
   const newGenerationId = newGeneration.id;
 
   try {
-    const { outputUrl } = await processImageGeneration({
+    const { outputUrl, creditCost } = await processImageGeneration({
       supabase,
       user,
       inputUrl,
@@ -132,6 +133,25 @@ export async function POST(
       console.error("Failed to update generation:", updateError);
     }
 
+    // Track successful iteration
+    posthogNode.capture({
+      distinctId: user.id,
+      event: "iteration_succeeded",
+      properties: {
+        thread_id: threadId,
+        generation_id: newGenerationId,
+        previous_generation_id: generationId,
+        model,
+        credit_cost: creditCost,
+        outdoor_light,
+        indoor_light,
+        has_edit_description: edit_description !== null,
+        aspect_ratio,
+        use_base_prompt,
+        reference_image_count: reference_image_urls?.length || 0,
+      },
+    });
+
     return NextResponse.json({
       outputImage: outputUrl,
       generationId: newGenerationId,
@@ -141,6 +161,24 @@ export async function POST(
     console.error("Iterate endpoint error:", error);
     const message =
       error instanceof Error ? error.message : "Failed to iterate on image.";
+
+    // Track failed iteration
+    posthogNode.capture({
+      distinctId: user.id,
+      event: "iteration_failed",
+      properties: {
+        thread_id: threadId,
+        previous_generation_id: generationId,
+        model,
+        error: message,
+        outdoor_light,
+        indoor_light,
+        has_edit_description: edit_description !== null,
+        aspect_ratio,
+        use_base_prompt,
+        reference_image_count: reference_image_urls?.length || 0,
+      },
+    });
 
     return NextResponse.json({ error: message }, { status: 500 });
   }

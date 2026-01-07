@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import { parseAspectRatio } from "@/lib/aspect-ratio";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
-import { useUploadStore } from "@/stores/upload-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 import { Hint } from "./Hint";
 
 type UploadDropzoneProps = {
@@ -29,7 +29,7 @@ export function UploadDropzone({
     inputSrc,
     setInputImageDimensions,
     aspectRatio: selectedAspectRatio,
-  } = useUploadStore();
+  } = useThreadEditorStore();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);

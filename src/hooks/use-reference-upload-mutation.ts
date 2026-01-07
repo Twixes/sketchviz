@@ -64,5 +64,17 @@ export function useReferenceUploadMutation() {
         file_type: file.type,
       });
     },
+    onSuccess: (publicUrl) => {
+      posthog.capture("reference_image_upload_completed", {
+        public_url: publicUrl,
+      });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error ? error.message : "Something went wrong.";
+      posthog.capture("reference_image_upload_failed", {
+        error: message,
+      });
+    },
   });
 }
