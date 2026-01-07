@@ -36,7 +36,7 @@ export function ThreadCard({ thread }: ThreadCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={() => router.push(`/threads/${thread.id}`)}
-      className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white/75 p-0 text-left shadow-sm transition-all hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
+      className="group relative overflow-hidden rounded-xl border border-black/10 bg-white/75 p-0 text-left shadow-sm transition-all hover:scale-[1.02] hover:shadow-md active:scale-[0.98]"
     >
       {/* Thumbnail */}
       {thread.latest_generation && signedUrl ? (
@@ -62,8 +62,9 @@ export function ThreadCard({ thread }: ThreadCardProps) {
         </h2>
         <div className="mt-2 flex items-center gap-3 text-xs text-black/50">
           <span>
-            {thread.generation_count}{" "}
-            {thread.generation_count === 1 ? "generation" : "generations"}
+            {thread.generation_count}
+            {" iteration"}
+            {thread.generation_count > 1 ? "s" : ""}
           </span>
           <span>•</span>
           <span>{new Date(thread.created_at).toLocaleDateString()}</span>
