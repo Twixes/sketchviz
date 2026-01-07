@@ -97,7 +97,7 @@ export default function Home() {
 
   return (
     <FunkyBackgroundFuzz>
-      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10">
+      <main className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10">
         <Header user={user} onLogoClick={handleReset} />
 
         <section

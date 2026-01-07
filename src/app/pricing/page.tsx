@@ -55,7 +55,7 @@ export default function PricingPage() {
     <FunkyBackgroundFuzz>
       <motion.main
         transition={LAYOUT_TRANSITION}
-        className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 pb-24 pt-10 lg:px-10"
+        className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-16 px-6 pb-24 pt-10 lg:px-10"
       >
         <Header user={user} />
 
