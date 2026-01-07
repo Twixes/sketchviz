@@ -4,7 +4,7 @@ import { ReloadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DownloadButton } from "@/components/DownloadButton";
 import { LayerNavigationControls } from "@/components/LayerNavigationControls";
 import { useSignedUrl } from "@/hooks/use-signed-url";
@@ -162,8 +162,10 @@ export function TimeMachineViewer({
   onNavigatePrevious,
   onNavigateNext,
 }: TimeMachineViewerProps) {
-  // Convert aspect ratio from "16:9" format to "16/9" for CSS
-  const cssAspectRatio = aspectRatio ? aspectRatio.replace(":", "/") : "3/2";
+  // Calculate actual aspect ratio from image if not provided
+  const [calculatedAspectRatio, setCalculatedAspectRatio] = useState<
+    string | null
+  >(null);
 
   // Build layers array: original input (index 0) + generation outputs (index 1+)
   const layers = useMemo<Layer[]>(() => {
@@ -204,6 +206,29 @@ export function TimeMachineViewer({
     return result;
   }, [inputSrc, generations]);
 
+  // Calculate aspect ratio from the first available image
+  useEffect(() => {
+    const imageUrl = layers[0]?.imageUrl;
+    if (!imageUrl || aspectRatio) {
+      setCalculatedAspectRatio(null);
+      return;
+    }
+
+    const img = document.createElement("img");
+    img.onload = () => {
+      setCalculatedAspectRatio(`${img.naturalWidth}/${img.naturalHeight}`);
+    };
+    img.onerror = () => {
+      setCalculatedAspectRatio(null);
+    };
+    img.src = imageUrl;
+  }, [layers, aspectRatio]);
+
+  // Convert aspect ratio from "16:9" format to "16/9" for CSS
+  const cssAspectRatio = aspectRatio
+    ? aspectRatio.replace(":", "/")
+    : calculatedAspectRatio || "3/2";
+
   if (layers.length === 0) {
     return (
       <div
@@ -235,7 +260,7 @@ export function TimeMachineViewer({
       <div className="relative w-full">
         {/* Container with dynamic aspect ratio */}
         <div
-          className="relative w-full"
+          className="relative w-auto mx-auto max-h-[calc(80vh-8rem)] "
           style={{ aspectRatio: cssAspectRatio }}
         >
           <AnimatePresence mode="popLayout">
