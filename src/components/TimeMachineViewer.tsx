@@ -76,7 +76,7 @@ function LayerImage({
       type="button"
       onClick={onClick}
       className={clsx(
-        "absolute inset-0 w-full rounded-3xl",
+        "absolute inset-0 w-full rounded-2xl",
         isActive ? "cursor-default" : "cursor-pointer",
       )}
       style={{ zIndex, filter: `brightness(${brightness})` }}
@@ -88,7 +88,7 @@ function LayerImage({
       transition={TIME_MACHINE_LAYER_SPRING}
       whileHover={!isActive ? { scale: scale * 1.01 } : undefined}
     >
-      <div className="relative w-full h-full bg-black/5 rounded-3xl border border-black/20 overflow-hidden">
+      <div className="relative w-full h-full bg-black/5 rounded-2xl border border-black/20 overflow-hidden">
         {signedUrl ? (
           <Image
             src={signedUrl}

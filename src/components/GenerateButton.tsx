@@ -4,6 +4,7 @@ import {
   DoubleArrowUpIcon,
   EnterIcon,
   ExclamationTriangleIcon,
+  EyeOpenIcon,
   UpdateIcon,
 } from "@radix-ui/react-icons";
 import type { User } from "@supabase/supabase-js";
@@ -94,7 +95,7 @@ export function GenerateButton({
       size="lg"
       onClick={onGenerate}
       disabled={isGenerating}
-      leftIcon={isIteration ? <UpdateIcon /> : undefined}
+      leftIcon={isIteration ? <UpdateIcon /> : <EyeOpenIcon />}
       className="relative w-full px-20"
     >
       {getLabel()}

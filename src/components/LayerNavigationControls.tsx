@@ -39,26 +39,16 @@ export function LayerNavigationControls({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (disabled) return;
-
-      if (isVertical) {
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
         if (e.key === "ArrowUp" && canGoPrevious) {
-          e.preventDefault();
           onPrevious();
         } else if (e.key === "ArrowDown" && canGoNext) {
-          e.preventDefault();
-          onNext();
-        }
-      } else {
-        if (e.key === "ArrowLeft" && canGoPrevious) {
-          e.preventDefault();
-          onPrevious();
-        } else if (e.key === "ArrowRight" && canGoNext) {
-          e.preventDefault();
           onNext();
         }
       }
     },
-    [disabled, canGoPrevious, canGoNext, onPrevious, onNext, isVertical],
+    [disabled, canGoPrevious, canGoNext, onPrevious, onNext],
   );
 
   useEffect(() => {
