@@ -1,10 +1,11 @@
 import { LightningBoltIcon, RocketIcon } from "@radix-ui/react-icons";
+import type React from "react";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
 
 export interface ModelOption extends SelectOption<Model> {
-  description: string;
+  description: React.ReactNode;
 }
 
 interface ModelSelectorProps {
@@ -18,32 +19,59 @@ export const MODEL_OPTIONS: ModelOption[] = [
     value: "google/gemini-3-pro-image-preview/4k",
     label: (
       <>
-        Nano Banana Pro{" "}
+        Pro{" "}
         <span className="bg-black rounded-md px-1 text-xs font-semibold border border-white text-white">
           4K
         </span>
       </>
     ),
-    description: "Highest quality in maximum resolution.",
+    description: (
+      <>
+        <strong>Highest quality in 4K resolution.</strong>
+        <br />
+        Powered by Google's Nano Banana Pro.
+      </>
+    ),
     icon: RocketIcon,
   },
   {
     value: "google/gemini-3-pro-image-preview",
     label: (
       <>
-        Nano Banana Pro{" "}
+        Pro{" "}
         <span className="bg-neutral-200 rounded-md px-1 text-xs font-semibold border border-white text-neutral-800">
           2K
         </span>
       </>
     ),
-    description: "Highest quality in standard resolution (recommended).",
+    description: (
+      <>
+        <strong>Highest quality in standard resolution (default).</strong>
+        <br />
+        Powered by Google's Nano Banana Pro.
+      </>
+    ),
     icon: RocketIcon,
   },
   {
     value: "google/gemini-2.5-flash-image-preview",
-    label: "Nano Banana",
-    description: "Fast and cheap, but less reliable.",
+    label: (
+      <>
+        Flash{" "}
+        <span className="bg-neutral-200 rounded-md px-1 text-xs font-semibold border border-white text-neutral-800">
+          1K
+        </span>
+      </>
+    ),
+    description: (
+      <>
+        <strong>
+          Faster and cheaper, but less reliable & lower resolution.
+        </strong>
+        <br />
+        Powered by Google's Nano Banana.
+      </>
+    ),
     icon: LightningBoltIcon,
   },
 ];
@@ -55,7 +83,7 @@ export function ModelSelector({
 }: ModelSelectorProps) {
   return (
     <Select
-      label="AI model"
+      label="Quality"
       value={value}
       options={MODEL_OPTIONS.map((option) => ({
         ...option,
