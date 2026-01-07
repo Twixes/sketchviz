@@ -6,7 +6,6 @@ import Link from "next/link";
 import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
-import GoogleIcon from "@/icons/google.svg";
 import { FADE_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 
@@ -94,10 +93,9 @@ export function Header({ user, onLogoClick }: HeaderProps) {
             <Button
               variant="secondary"
               onClick={handleSignIn}
-              leftIcon={<GoogleIcon />}
               className="cursor-pointer"
             >
-              Log in with Google
+              Sign in
             </Button>
           </>
         )}

@@ -15,18 +15,14 @@ export function useSignInCallback(): () => Promise<User | null> {
 
     const popup = window.open(
       "/auth/signin",
-      "Google Sign In",
+      "Sign In",
       `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`,
     );
 
     if (!popup) {
-      // Fallback if popup was blocked
-      await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
+      // Fallback if popup was blocked - redirect to signin page
+      window.location.href = "/auth/signin";
+      return null;
     } else {
       // Poll for popup closure - session will be updated automatically via auth state change listener
       const checkInterval = setInterval(() => {
