@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useState } from "react";
+import TextareaAutosize from "react-textarea-autosize";
 import { AspectRatioSelector } from "@/components/AspectRatioSelector";
 import {
   INDOOR_LIGHT_OPTIONS,
@@ -106,7 +107,7 @@ export function ControlPanel(props: ControlPanelProps) {
 
       {/* Edit Description Textarea */}
       <div className="flex relative">
-        <textarea
+        <TextareaAutosize
           id="edit-description"
           value={props.editDescription ?? ""}
           onChange={(e) =>
@@ -124,13 +125,13 @@ export function ControlPanel(props: ControlPanelProps) {
             }
           }}
           placeholder="Describe the changes you want (optional)"
-          rows={2}
+          minRows={1}
           disabled={props.isLoading}
           className={clsx([
             "w-full rounded-xl border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40",
             "focus:outline-none focus:ring-2 focus:ring-black/20 resize-none transition-colors",
             "disabled:opacity-50 disabled:cursor-not-allowed",
-            props.referenceImages.length > 0 ? "pb-16" : "pb-6",
+            props.referenceImages.length > 0 ? "pb-20" : "pb-10",
             isDraggingOver ? "border-black/60 bg-black/5" : "border-black/20",
           ])}
         />
