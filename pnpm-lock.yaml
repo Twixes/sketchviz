@@ -83,9 +83,6 @@ importers:
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
-      simplex-noise:
-        specifier: ^4.0.3
-        version: 4.0.3
       uuidv7:
         specifier: ^1.1.0
         version: 1.1.0
@@ -2921,9 +2918,6 @@ packages:
 
   simple-wcswidth@1.1.2:
     resolution: {integrity: sha512-j7piyCjAeTDSjzTSQ7DokZtMNwNlEAyxqSZeCS+CXH7fJ4jx3FuJ/mTW3mE+6JLs4VJBbcll0Kjn+KXI5t21Iw==}
-
-  simplex-noise@4.0.3:
-    resolution: {integrity: sha512-qSE2I4AngLQG7BXqoZj51jokT4WUXe8mOBrvfOXpci8+6Yu44+/dD5zqDpOx3Ux792eamTd2lLcI8jqFntk/lg==}
 
   snake-case@3.0.4:
     resolution: {integrity: sha512-LAOh4z89bGQvl9pFfNF8V146i7o7/CqFPbqzYgP+yYzDIDeS9HaNFtXABamRW+AQzEVODcvE79ljJ+8a9YSdMg==}
@@ -6225,8 +6219,6 @@ snapshots:
   signal-exit@4.1.0: {}
 
   simple-wcswidth@1.1.2: {}
-
-  simplex-noise@4.0.3: {}
 
   snake-case@3.0.4:
     dependencies:
