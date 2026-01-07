@@ -13,6 +13,7 @@ import {
   TIME_MACHINE_LAYER_SPRING,
 } from "@/lib/animation-constants";
 import type { AspectRatio } from "@/lib/aspect-ratio";
+import { Button } from "@/lib/components/ui/Button";
 import type { Generation } from "@/stores/thread-editor-store";
 
 interface Layer {
@@ -110,37 +111,24 @@ function LayerImage({
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
           <div
             className={clsx(
-              "px-2 py-1 rounded-lg text-xs font-medium backdrop-blur-sm transition-opacity",
+              "flex items-center h-6.5 px-2 rounded-lg text-xs font-medium backdrop-blur-sm transition-opacity",
               isActive ? "bg-black/70 text-white" : "bg-white/70 text-black/70",
             )}
           >
             {layer.label}
           </div>
           {isActive && layer.index > 0 && onVisualizeAgain && !isGenerating && (
-            // biome-ignore lint/a11y/useSemanticElements: this must be a div
-            <div
-              role="button"
-              tabIndex={0}
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<ReloadIcon className="w-3 h-3" />}
               onClick={(e) => {
                 e.stopPropagation();
                 onVisualizeAgain();
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onVisualizeAgain();
-                }
-              }}
-              className={clsx(
-                "flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium cursor-pointer",
-                "bg-white/80 text-black/70 backdrop-blur-sm",
-                "hover:bg-white hover:text-black transition-colors",
-              )}
             >
-              <ReloadIcon className="w-3 h-3" />
               Regenerate
-            </div>
+            </Button>
           )}
         </div>
         {signedUrl && layer.index > 0 && (
@@ -152,7 +140,6 @@ function LayerImage({
                   ? `${threadId}-${layer.label.toLowerCase().replace(/\s+/g, "-")}.png`
                   : `${layer.label.toLowerCase().replace(/\s+/g, "-")}.png`
               }
-              isActive={isActive}
             />
           </div>
         )}

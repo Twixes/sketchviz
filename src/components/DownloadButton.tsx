@@ -1,18 +1,14 @@
 import { DownloadIcon } from "@radix-ui/react-icons";
-import clsx from "clsx";
+import { Button } from "@/lib/components/ui/Button";
 
 interface DownloadButtonProps {
   imageUrl: string;
   filename: string;
-  isActive: boolean;
 }
 
-export function DownloadButton({
-  imageUrl,
-  filename,
-  isActive,
-}: DownloadButtonProps) {
-  const handleDownload = async () => {
+export function DownloadButton({ imageUrl, filename }: DownloadButtonProps) {
+  const handleDownload = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
@@ -30,31 +26,13 @@ export function DownloadButton({
   };
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: this must be a div
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={(e) => {
-        e.stopPropagation();
-        handleDownload();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          e.stopPropagation();
-          handleDownload();
-        }
-      }}
-      className={clsx(
-        "flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium cursor-pointer",
-        isActive
-          ? "bg-white/80 text-black/70 hover:bg-white hover:text-black"
-          : "bg-white/70 text-black/60 hover:bg-white/90 hover:text-black/70",
-        "backdrop-blur-sm transition-colors",
-      )}
+    <Button
+      variant="secondary"
+      size="sm"
+      leftIcon={<DownloadIcon className="w-3 h-3" />}
+      onClick={handleDownload}
     >
-      <DownloadIcon className="w-3 h-3" />
       Download
-    </div>
+    </Button>
   );
 }
