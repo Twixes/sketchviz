@@ -183,6 +183,7 @@ export const Button = ({
         sizeClasses,
         scaleClasses,
         interactionClasses,
+        link ? "cursor-pointer" : "",
         className,
       )}
       {...props}

@@ -6,7 +6,7 @@ export function Footer() {
 
   return (
     <footer className="text-black/50 mx-auto w-full max-w-6xl px-6 pb-6 lg:px-10">
-      {!pathname.startsWith("/threads") && (
+      {!pathname.startsWith("/threads") && !pathname.startsWith("/billing") && (
         <h4 className="mb-3 -mx-[0.05em] text-[min(calc(14.7vw-0.4rem),10.35rem)] tracking-tight leading-[0.8] font-bold whitespace-nowrap text-black/5 select-none">
           Render worlds.
         </h4>
