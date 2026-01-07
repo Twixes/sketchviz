@@ -73,8 +73,7 @@ function LayerImage({
   if (!isVisible) return null;
 
   return (
-    <motion.button
-      type="button"
+    <motion.div
       onClick={onClick}
       className={clsx(
         "absolute inset-0 w-full rounded-2xl",
@@ -146,7 +145,7 @@ function LayerImage({
         )}
       </div>
       {isActive && isGenerating && <div className="loading-ring" aria-hidden />}
-    </motion.button>
+    </motion.div>
   );
 }
 
