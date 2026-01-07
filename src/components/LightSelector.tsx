@@ -15,6 +15,7 @@ interface LightSelectorProps {
   options: LightOption[];
   customValuePlaceholder?: string;
   onChange: (value: string | null) => void;
+  disabled?: boolean;
 }
 
 export function LightSelector({
@@ -23,6 +24,7 @@ export function LightSelector({
   options,
   customValuePlaceholder = "…or specify it in text",
   onChange,
+  disabled,
 }: LightSelectorProps) {
   return (
     <Select
@@ -32,6 +34,7 @@ export function LightSelector({
       onChange={onChange}
       allowCustomInput={true}
       customInputPlaceholder={customValuePlaceholder}
+      disabled={disabled}
     />
   );
 }

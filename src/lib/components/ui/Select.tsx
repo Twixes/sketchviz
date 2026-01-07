@@ -19,6 +19,7 @@ interface SelectProps<T> {
   onChange: (value: T) => void;
   allowCustomInput?: boolean;
   customInputPlaceholder?: string;
+  disabled?: boolean;
 }
 
 export function Select<T extends string | null>({
@@ -28,6 +29,7 @@ export function Select<T extends string | null>({
   onChange,
   allowCustomInput = false,
   customInputPlaceholder = "…or specify it in text",
+  disabled = false,
 }: SelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -45,8 +47,11 @@ export function Select<T extends string | null>({
       <label htmlFor={label} className="text-sm font-semibold text-black">
         {label}:
       </label>
-      <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Popover.Trigger className="inline-flex items-center justify-between gap-2 flex-1 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-150 hover:bg-black/5 hover:border-black/30 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30">
+      <Popover.Root open={isOpen && !disabled} onOpenChange={setIsOpen}>
+        <Popover.Trigger
+          disabled={disabled}
+          className="inline-flex items-center justify-between gap-2 flex-1 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-150 hover:bg-black/5 hover:border-black/30 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-black/20"
+        >
           <span id={label} className="flex items-center gap-2 truncate">
             {currentOption ? (
               <>
@@ -149,7 +154,8 @@ export function Select<T extends string | null>({
                   value={customInputValue}
                   onChange={(e) => onChange((e.target.value || null) as T)}
                   placeholder={customInputPlaceholder}
-                  className="w-full rounded-lg border border-black/20 bg-white px-2 py-1.5 text-sm text-black placeholder:text-black/40 transition-transform duration-150 hover:border-black/30 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40"
+                  disabled={disabled}
+                  className="w-full rounded-lg border border-black/20 bg-white px-2 py-1.5 text-sm text-black placeholder:text-black/40 transition-transform duration-150 hover:border-black/30 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             )}

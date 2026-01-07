@@ -1,16 +1,14 @@
 "use client";
 
-import { DownloadIcon, Half2Icon, UploadIcon } from "@radix-ui/react-icons";
+import { UploadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { motion } from "motion/react";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createNoise2D } from "simplex-noise";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import { parseAspectRatio } from "@/lib/aspect-ratio";
-import { Button } from "@/lib/components/ui/Button";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
-import { useUploadStore } from "@/stores/upload-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 import { Hint } from "./Hint";
 
 type UploadDropzoneProps = {
@@ -29,21 +27,16 @@ export function UploadDropzone({
     isBusyForUser,
     error,
     inputSrc,
-    outputSrc,
     setInputImageDimensions,
     aspectRatio: selectedAspectRatio,
-  } = useUploadStore();
+  } = useThreadEditorStore();
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const outputRef = useRef<HTMLImageElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-  const [isComparing, setIsComparing] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
   const accept = useMemo(() => ACCEPTED_MIME_TYPES.join(","), []);
 
-  // Get signed URLs for authenticated storage access
+  // Get signed URL for authenticated storage access
   const inputSignedUrl = useSignedUrl(inputSrc);
-  const outputSignedUrl = useSignedUrl(outputSrc);
 
   const handleFile = useCallback(
     (file: File | null) => {
@@ -87,77 +80,6 @@ export function UploadDropzone({
     };
   }, [handleFile]);
 
-  useEffect(() => {
-    const outputEl = outputRef.current;
-    if (!outputEl || !outputSignedUrl) return;
-
-    let rafId = 0;
-    setIsReady(false);
-    const size = 180;
-    const durationMs = 800;
-    const noise2D = createNoise2D();
-    const noise = new Uint8Array(size * size);
-    const scale = 0.05; // Controls frequency of the noise pattern
-    for (let i = 0; i < noise.length; i += 1) {
-      const x = i % size;
-      const y = Math.floor(i / size);
-      // Simplex noise returns values in [-1, 1], normalize to [0, 255]
-      const value = noise2D(x * scale, y * scale);
-      noise[i] = Math.floor(((value + 1) / 2) * 256);
-    }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-    if (!ctx) {
-      outputEl.style.opacity = "1";
-      return;
-    }
-
-    outputEl.style.opacity = "1";
-
-    const start = performance.now();
-    const renderMask = (now: number) => {
-      const progress = Math.min((now - start) / durationMs, 1);
-      const threshold = Math.floor(progress * 256);
-      const imageData = ctx.createImageData(size, size);
-
-      for (let i = 0; i < noise.length; i += 1) {
-        const alpha = noise[i] < threshold ? 255 : 0;
-        const offset = i * 4;
-        imageData.data[offset] = 0;
-        imageData.data[offset + 1] = 0;
-        imageData.data[offset + 2] = 0;
-        imageData.data[offset + 3] = alpha;
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-      const maskUrl = canvas.toDataURL("image/png");
-      outputEl.style.maskImage = `url(${maskUrl})`;
-      outputEl.style.webkitMaskImage = `url(${maskUrl})`;
-      outputEl.style.maskRepeat = "no-repeat";
-      outputEl.style.webkitMaskRepeat = "no-repeat";
-      outputEl.style.maskSize = "100% 100%";
-      outputEl.style.webkitMaskSize = "100% 100%";
-
-      if (progress < 1) {
-        rafId = requestAnimationFrame(renderMask);
-      } else {
-        outputEl.style.maskImage = "none";
-        outputEl.style.webkitMaskImage = "none";
-        setIsReady(true);
-      }
-    };
-
-    rafId = requestAnimationFrame(renderMask);
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [outputSignedUrl]);
-
   const handleInputLoad = useCallback(
     (event: SyntheticEvent<HTMLImageElement>) => {
       const { naturalWidth, naturalHeight } = event.currentTarget;
@@ -170,51 +92,6 @@ export function UploadDropzone({
       }
     },
     [setInputImageDimensions],
-  );
-
-  const handleCompareStart = useCallback((event: React.PointerEvent) => {
-    event.stopPropagation();
-    setIsComparing(true);
-  }, []);
-
-  // Handle document-wide pointer release for compare mode
-  useEffect(() => {
-    if (!isComparing) return;
-
-    const handlePointerUp = () => {
-      setIsComparing(false);
-    };
-
-    document.addEventListener("pointerup", handlePointerUp);
-    document.addEventListener("pointercancel", handlePointerUp);
-
-    return () => {
-      document.removeEventListener("pointerup", handlePointerUp);
-      document.removeEventListener("pointercancel", handlePointerUp);
-    };
-  }, [isComparing]);
-
-  const handleDownload = useCallback(
-    async (event: React.MouseEvent) => {
-      event.stopPropagation();
-      if (!outputSignedUrl) return;
-
-      try {
-        const response = await fetch(outputSignedUrl);
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `sketchviz-${Date.now()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      } catch (error) {
-        console.error("Failed to download image:", error);
-      }
-    },
-    [outputSignedUrl],
   );
 
   // Calculate the display aspect ratio
@@ -265,49 +142,6 @@ export function UploadDropzone({
               className="absolute inset-0 h-full w-full bg-black object-cover rounded-3xl"
             />
             <Hint position="top-right">Click to replace image</Hint>
-            {outputSrc && outputSignedUrl && (
-              <>
-                <img
-                  ref={outputRef}
-                  src={outputSignedUrl}
-                  alt="Result"
-                  className="absolute inset-0 h-full w-full bg-white object-cover rounded-3xl opacity-0 transition-opacity duration-300"
-                  style={isComparing ? { visibility: "hidden" } : undefined}
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  leftIcon={<Half2Icon />}
-                  onPointerDown={handleCompareStart}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  title="Compare with original"
-                  aria-label="Compare with original"
-                  className={clsx(
-                    "absolute left-4 top-4 font-semibold backdrop-blur-sm shadow-sm touch-none",
-                    !isComparing
-                      ? "bg-black/80 text-white hover:bg-black/90"
-                      : "bg-white/80 text-black hover:bg-white/90",
-                  )}
-                >
-                  {isComparing ? "Original" : "Result"}
-                </Button>
-                {isReady && !isComparing ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    leftIcon={<DownloadIcon />}
-                    onClick={handleDownload}
-                    title="Download result"
-                    aria-label="Download result"
-                    className="absolute right-4 bottom-4 font-semibold backdrop-blur-sm shadow-sm bg-black/80 text-white hover:bg-black/90"
-                  >
-                    Download
-                  </Button>
-                ) : null}
-              </>
-            )}
           </>
         ) : (
           <>

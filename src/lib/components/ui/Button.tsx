@@ -1,3 +1,4 @@
+import * as Tooltip from "@radix-ui/react-tooltip";
 import clsx from "clsx";
 import Link from "next/link";
 import type React from "react";
@@ -25,6 +26,9 @@ export interface ButtonProps
 
   // Color scheme (icon variant only)
   colorScheme?: "dark" | "light"; // default: 'dark'
+
+  // Tooltip
+  tooltip?: string;
 }
 
 const LoadingSpinner = ({ size }: { size: "sm" | "md" | "lg" }) => {
@@ -71,6 +75,7 @@ export const Button = ({
   isSelected = false,
   scaleOnHover,
   colorScheme = "dark",
+  tooltip,
   className,
   children,
   disabled,
@@ -99,7 +104,7 @@ export const Button = ({
       "border border-black/20 bg-white/75 font-medium text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
-        : "hover:border-black/30 hover:bg-black/5",
+        : "hover:border-black/30 hover:bg-white/90",
     ]),
     ghost: clsx([
       "text-black",
@@ -193,11 +198,31 @@ export const Button = ({
       )}
     </button>
   );
-  return link ? (
-    <Link href={link} className="flex flex-col items-stretch">
-      {button}
-    </Link>
+
+  const buttonWithTooltip = tooltip ? (
+    <Tooltip.Provider>
+      <Tooltip.Root delayDuration={200}>
+        <Tooltip.Trigger asChild>{button}</Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            className="z-50 rounded-lg bg-black px-3 py-2 text-xs text-white shadow-lg max-w-xs"
+            sideOffset={5}
+          >
+            {tooltip}
+            <Tooltip.Arrow className="fill-black" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   ) : (
     button
+  );
+
+  return link ? (
+    <Link href={link} className="flex flex-col items-stretch">
+      {buttonWithTooltip}
+    </Link>
+  ) : (
+    buttonWithTooltip
   );
 };

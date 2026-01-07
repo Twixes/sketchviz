@@ -10,6 +10,7 @@ export interface ModelOption extends SelectOption<Model> {
 interface ModelSelectorProps {
   value: Model;
   onChange: (value: Model) => void;
+  disabled?: boolean;
 }
 
 export const MODEL_OPTIONS: ModelOption[] = [
@@ -47,7 +48,11 @@ export const MODEL_OPTIONS: ModelOption[] = [
   },
 ];
 
-export function ModelSelector({ value, onChange }: ModelSelectorProps) {
+export function ModelSelector({
+  value,
+  onChange,
+  disabled,
+}: ModelSelectorProps) {
   return (
     <Select
       label="AI model"
@@ -67,6 +72,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
         ),
       }))}
       onChange={onChange}
+      disabled={disabled}
     />
   );
 }

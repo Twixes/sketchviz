@@ -2,7 +2,7 @@ import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Button } from "@/lib/components/ui/Button";
 
 interface ThreadHeaderProps {
-  title: string;
+  title: string | null;
   createdAt: string;
   onBackClick: () => void;
 }
@@ -13,24 +13,20 @@ export function ThreadHeader({
   onBackClick,
 }: ThreadHeaderProps) {
   return (
-    <>
-      <div className="flex items-center gap-4">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={onBackClick}
-          leftIcon={<ArrowLeftIcon />}
-        >
-          Back to threads
-        </Button>
-      </div>
-
-      <div>
-        <h1 className="text-4xl font-semibold text-black">{title}</h1>
-        <p className="mt-2 text-lg text-black/70">
-          {new Date(createdAt).toLocaleString()}
-        </p>
-      </div>
-    </>
+    <div>
+      <h1 className="text-2xl min-lg:text-4xl font-semibold text-black">
+        {title}
+      </h1>
+      <p className="mt-2 text-lg text-black/70">
+        {new Date(createdAt).toLocaleString(undefined, {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        })}
+      </p>
+    </div>
   );
 }

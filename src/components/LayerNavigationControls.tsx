@@ -1,0 +1,153 @@
+"use client";
+
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
+} from "@radix-ui/react-icons";
+import clsx from "clsx";
+import { motion } from "motion/react";
+import { useCallback, useEffect, useRef } from "react";
+import { TIME_MACHINE_SPRING } from "@/lib/animation-constants";
+import { Button } from "@/lib/components/ui/Button";
+
+interface LayerNavigationControlsProps {
+  currentIndex: number;
+  totalLayers: number;
+  onPrevious: () => void;
+  onNext: () => void;
+  disabled?: boolean;
+  className?: string;
+  orientation?: "vertical" | "horizontal";
+}
+
+export function LayerNavigationControls({
+  currentIndex,
+  totalLayers,
+  onPrevious,
+  onNext,
+  disabled = false,
+  className,
+  orientation = "vertical",
+}: LayerNavigationControlsProps) {
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex < totalLayers - 1;
+  const isVertical = orientation === "vertical";
+
+  // Track previous index to determine animation direction
+  const prevIndexRef = useRef(currentIndex);
+  const direction = currentIndex > prevIndexRef.current ? 1 : -1; // 1 = next (from bottom), -1 = previous (from top)
+
+  useEffect(() => {
+    prevIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (disabled) return;
+      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        e.preventDefault();
+        if (e.key === "ArrowUp" && canGoPrevious) {
+          onPrevious();
+        } else if (e.key === "ArrowDown" && canGoNext) {
+          onNext();
+        }
+      }
+    },
+    [disabled, canGoPrevious, canGoNext, onPrevious, onNext],
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
+  if (totalLayers <= 1) return null;
+
+  return (
+    <motion.div
+      className={clsx(
+        "flex items-center gap-2",
+        isVertical ? "flex-col" : "flex-row",
+        className,
+      )}
+      initial={{ opacity: 0, [isVertical ? "x" : "y"]: isVertical ? 20 : 10 }}
+      animate={{ opacity: 1, [isVertical ? "x" : "y"]: 0 }}
+      transition={TIME_MACHINE_SPRING}
+    >
+      {/* Previous arrow */}
+      <Button
+        variant="icon"
+        size="sm"
+        onClick={onPrevious}
+        disabled={!canGoPrevious || disabled}
+        className={clsx(
+          "transition-all",
+          canGoPrevious && !disabled
+            ? isVertical
+              ? "hover:scale-110"
+              : "hover:scale-101"
+            : "opacity-30 cursor-not-allowed",
+          !isVertical && "grow",
+        )}
+        aria-label="Go to previous layer"
+      >
+        <ChevronUpIcon className="w-5 h-5" />
+      </Button>
+
+      {/* Layer indicator */}
+      <div
+        className={clsx(
+          "flex items-center tabular-nums",
+          isVertical ? "flex-col py-2" : "flex-row px-2",
+        )}
+      >
+        <motion.span
+          key={currentIndex}
+          className={clsx(
+            "font-semibold",
+            isVertical ? "text-2xl" : "text-base",
+          )}
+          initial={{
+            opacity: 0,
+            [isVertical ? "y" : "x"]: direction * (isVertical ? 10 : 5),
+          }}
+          animate={{ opacity: 1, [isVertical ? "y" : "x"]: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {currentIndex}
+        </motion.span>
+        <span
+          className={clsx(
+            "text-black/50",
+            isVertical ? "text-xs" : "text-base ml-1",
+          )}
+        >
+          of {totalLayers - 1}
+        </span>
+      </div>
+
+      {/* Next arrow */}
+      <Button
+        variant="icon"
+        size="sm"
+        onClick={onNext}
+        disabled={!canGoNext || disabled}
+        className={clsx(
+          "transition-all",
+          canGoNext && !disabled
+            ? isVertical
+              ? "hover:scale-110"
+              : "hover:scale-101"
+            : "opacity-30 cursor-not-allowed",
+          !isVertical && "grow",
+        )}
+        aria-label="Go to next layer"
+      >
+        <ChevronDownIcon className="w-5 h-5" />
+      </Button>
+    </motion.div>
+  );
+}

@@ -1,46 +1,28 @@
 "use client";
 
-import clsx from "clsx";
+import { useRouter } from "next/navigation";
 import { useCallback } from "react";
-import { ControlPanel } from "@/components/ControlPanel";
+import { uuidv7 } from "uuidv7";
 import { Examples } from "@/components/Examples";
 import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
+import { FunkyBackgroundShapes1 } from "@/components/FunkyBackgroundMini";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { HeroFeatures } from "@/components/HeroFeatures";
 import { useSession } from "@/components/SessionProvider";
-import { useGenerateMutation } from "@/hooks/use-generate-mutation";
+import { UploadDropzone } from "@/components/UploadDropzone";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
-import { useUploadStore } from "@/stores/upload-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 export default function Home() {
+  const router = useRouter();
   const { user } = useSession();
 
-  // Zustand store
-  const {
-    inputSrc,
-    blobUrl,
-    outdoorLight,
-    indoorLight,
-    editDescription,
-    model,
-    aspectRatio,
-    isBusyForUser,
-    setIsBusyForUser,
-    outputSrc,
-    setOutdoorLight,
-    setIndoorLight,
-    setEditDescription,
-    setModel,
-    setAspectRatio,
-    reset,
-  } = useUploadStore();
-
-  const focusUpload = Boolean(inputSrc);
+  // Zustand store - minimal usage, just for reset and upload
+  const { reset, setTentativeThreadId } = useThreadEditorStore();
 
   // TanStack Query mutations
   const uploadMutation = useUploadMutation();
-  const generateMutation = useGenerateMutation();
 
   const handleReset = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -51,95 +33,41 @@ export default function Home() {
   );
 
   const handleFileSelected = useCallback(
-    async (file: File) => {
-      await uploadMutation.mutateAsync({ file });
+    (file: File) => {
+      // Generate a tentative thread ID and navigate immediately
+      const threadId = uuidv7();
+      setTentativeThreadId(threadId);
+      // Start upload and navigate - upload continues on the thread page
+      uploadMutation.mutate({ file });
+      router.push(`/threads/${threadId}`);
     },
-    [uploadMutation],
+    [uploadMutation, router, setTentativeThreadId],
   );
-
-  const handleGenerate = useCallback(async () => {
-    setIsBusyForUser(true);
-    try {
-      // Wait for upload to finish if it's still in progress
-      let currentBlobUrl = blobUrl;
-
-      if (uploadMutation.isPending) {
-        const uploadedUrl = await uploadMutation.mutateAsync(
-          uploadMutation.variables,
-        );
-        currentBlobUrl = uploadedUrl;
-      }
-
-      if (!currentBlobUrl) return;
-
-      await generateMutation.mutateAsync({
-        blobUrl: currentBlobUrl,
-        outdoorLight,
-        indoorLight,
-        editDescription,
-        model,
-        aspectRatio,
-      });
-    } finally {
-      setIsBusyForUser(false);
-    }
-  }, [
-    blobUrl,
-    outdoorLight,
-    indoorLight,
-    editDescription,
-    model,
-    aspectRatio,
-    uploadMutation,
-    generateMutation,
-    setIsBusyForUser,
-  ]);
 
   return (
     <FunkyBackgroundFuzz>
       <main className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10">
         <Header user={user} onLogoClick={handleReset} />
 
-        <section
-          className={clsx([
-            "grid gap-12",
-            focusUpload
-              ? "min-h-[60vh] place-items-center"
-              : "items-center lg:grid-cols-[1.05fr_0.95fr]",
-          ])}
-        >
-          {!focusUpload ? (
-            <div className="contents lg:block lg:space-y-8">
-              <Hero />
-              <div className="order-2 lg:order-none">
-                <HeroFeatures />
-              </div>
+        <section className="grid gap-12 items-center lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="contents lg:block lg:space-y-8">
+            <Hero />
+            <div className="order-2 lg:order-none">
+              <HeroFeatures />
             </div>
-          ) : null}
+          </div>
 
-          <ControlPanel
-            className="order-1 lg:order-none"
-            user={user}
-            inputSrc={inputSrc}
-            outdoorLight={outdoorLight}
-            indoorLight={indoorLight}
-            editDescription={editDescription}
-            model={model}
-            aspectRatio={aspectRatio}
-            isBusyForUser={isBusyForUser}
-            outputSrc={outputSrc}
-            focusUpload={focusUpload}
-            onFileSelected={handleFileSelected}
-            onOutdoorLightChange={setOutdoorLight}
-            onIndoorLightChange={setIndoorLight}
-            onEditDescriptionChange={setEditDescription}
-            onModelChange={setModel}
-            onAspectRatioChange={setAspectRatio}
-            onGenerate={handleGenerate}
-          />
+          <div className="relative order-1 lg:order-none">
+            <FunkyBackgroundShapes1 />
+            <UploadDropzone
+              onFileSelected={handleFileSelected}
+              frame={true}
+              className="min-h-[320px] border border-dashed border-black/20 hover:border-black/60 cursor-pointer bg-white/85"
+            />
+          </div>
         </section>
 
-        {!focusUpload ? <Examples /> : null}
+        <Examples />
       </main>
     </FunkyBackgroundFuzz>
   );
