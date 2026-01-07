@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { uuidv7 } from "uuidv7";
 import type { GenerateRequest } from "@/lib/schemas";
 import { useUploadStore } from "@/stores/upload-store";
 import { BeforeAfterComparison } from "./BeforeAfterComparison";
@@ -36,12 +38,14 @@ const EXAMPLES: {
 ];
 
 export function Examples() {
+  const router = useRouter();
   const {
     setInputSrc,
     setBlobUrl,
     setEditDescription,
     setIndoorLight,
     setOutdoorLight,
+    setTentativeThreadId,
   } = useUploadStore();
 
   const handleTryExample = async (
@@ -52,21 +56,21 @@ export function Examples() {
       // Fetch the static image
       const response = await fetch(beforeUrl);
       if (!response.ok) throw new Error("Failed to fetch image");
-
       const blob = await response.blob();
       const objectUrl = URL.createObjectURL(blob);
-
       // Set the local blob URL for preview
       setInputSrc(objectUrl);
-
       // Set the full URL for the generate API to fetch from
       const fullUrl = new URL(beforeUrl, window.location.origin).href;
       setBlobUrl(fullUrl);
-
-      // Set edit description if available
+      // Set parameters if available
       setEditDescription(generateParams?.edit_description ?? null);
       setIndoorLight(generateParams?.indoor_light ?? null);
       setOutdoorLight(generateParams?.outdoor_light ?? null);
+      // Generate a tentative thread ID and navigate to the thread page
+      const threadId = uuidv7();
+      setTentativeThreadId(threadId);
+      router.push(`/threads/${threadId}`);
     } catch (error) {
       console.error("Failed to load example:", error);
     }
