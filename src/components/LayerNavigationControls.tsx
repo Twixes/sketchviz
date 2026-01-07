@@ -8,7 +8,7 @@ import {
 } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { motion } from "motion/react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { TIME_MACHINE_SPRING } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 
@@ -34,6 +34,14 @@ export function LayerNavigationControls({
   const canGoPrevious = currentIndex > 0;
   const canGoNext = currentIndex < totalLayers - 1;
   const isVertical = orientation === "vertical";
+
+  // Track previous index to determine animation direction
+  const prevIndexRef = useRef(currentIndex);
+  const direction = currentIndex > prevIndexRef.current ? 1 : -1; // 1 = next (from bottom), -1 = previous (from top)
+
+  useEffect(() => {
+    prevIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
@@ -104,7 +112,7 @@ export function LayerNavigationControls({
           )}
           initial={{
             opacity: 0,
-            [isVertical ? "y" : "x"]: isVertical ? -10 : -5,
+            [isVertical ? "y" : "x"]: direction * (isVertical ? 10 : 5),
           }}
           animate={{ opacity: 1, [isVertical ? "y" : "x"]: 0 }}
           transition={{ duration: 0.2 }}
