@@ -90,19 +90,26 @@ export function ControlPanel(props: ControlPanelProps) {
           value={props.outdoorLight}
           options={OUTDOOR_LIGHT_OPTIONS}
           onChange={props.onOutdoorLightChange}
+          disabled={props.isLoading}
         />
         <LightSelector
           label="Indoor lighting"
           value={props.indoorLight}
           options={INDOOR_LIGHT_OPTIONS}
           onChange={props.onIndoorLightChange}
+          disabled={props.isLoading}
         />
         <AspectRatioSelector
           value={props.aspectRatio}
           onChange={props.onAspectRatioChange}
           hasReferenceImages={props.referenceImages.length > 0}
+          disabled={props.isLoading}
         />
-        <ModelSelector value={props.model} onChange={props.onModelChange} />
+        <ModelSelector
+          value={props.model}
+          onChange={props.onModelChange}
+          disabled={props.isLoading}
+        />
       </div>
 
       {/* Edit Description Textarea */}

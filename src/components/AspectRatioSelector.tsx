@@ -20,6 +20,7 @@ interface AspectRatioSelectorProps {
   value: AspectRatio | null;
   onChange: (value: AspectRatio | null) => void;
   hasReferenceImages: boolean;
+  disabled?: boolean;
 }
 
 // Create icon component for different aspect ratio types
@@ -36,6 +37,7 @@ export function AspectRatioSelector({
   value,
   onChange,
   hasReferenceImages,
+  disabled,
 }: AspectRatioSelectorProps) {
   const preserveOption: AspectRatioOption = {
     value: null,
@@ -64,6 +66,7 @@ export function AspectRatioSelector({
       value={value}
       options={allOptions}
       onChange={onChange}
+      disabled={disabled}
     />
   );
 }
