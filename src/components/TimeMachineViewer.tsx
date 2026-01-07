@@ -110,7 +110,7 @@ function LayerImage({
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
           <div
             className={clsx(
-              "flex items-center h-6.5 px-2 rounded-lg text-xs font-medium backdrop-blur-sm transition-opacity",
+              "flex items-center h-6 px-2 rounded-lg text-xs font-medium backdrop-blur-sm transition-opacity",
               isActive ? "bg-black/70 text-white" : "bg-white/70 text-black/70",
             )}
           >

@@ -140,12 +140,12 @@ export const Button = ({
       lg: "px-6 py-3 text-sm gap-2 rounded-xl",
     },
     secondary: {
-      sm: "px-2 py-1 text-xs gap-1.5 rounded-lg",
+      sm: "px-2 py-0.75 text-xs gap-1.5 rounded-lg",
       md: "px-4 py-2 text-sm gap-2 rounded-xl",
       lg: "px-6 py-3 text-sm gap-2 rounded-xl",
     },
     ghost: {
-      sm: "px-2 py-1 text-xs gap-1.5 rounded-lg",
+      sm: "px-2 py-0.75 text-xs gap-1.5 rounded-lg",
       md: "px-3 py-2 text-sm gap-2 rounded-xl",
       lg: "px-4 py-3 text-sm gap-2 rounded-xl",
     },
@@ -155,7 +155,7 @@ export const Button = ({
       lg: "p-3 rounded-xl",
     },
     "list-item": {
-      sm: "px-2 py-1.5 text-xs gap-2 rounded-lg",
+      sm: "px-2 py-0.75 text-xs gap-2 rounded-lg",
       md: "px-3 py-2 text-sm gap-2 rounded-lg",
       lg: "px-4 py-3 text-sm gap-2 rounded-lg",
     },

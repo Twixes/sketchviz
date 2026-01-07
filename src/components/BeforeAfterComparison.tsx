@@ -122,14 +122,12 @@ export function BeforeAfterComparison({
         >
           <ArrowLeftIcon /> Drag <ArrowRightIcon />
         </div>
-
-        {/* Try this out button */}
         <Button
           variant="secondary"
           size="sm"
           onClick={handleTryExample}
-          rightIcon={<Pencil1Icon className="size-3.5" />}
-          className="absolute left-3 bottom-3 bg-white/80 hover:bg-white text-black/70 hover:text-black backdrop-blur-sm shadow-sm border-0 z-10"
+          leftIcon={<Pencil1Icon className="w-3 h-3" />}
+          className="absolute left-3 bottom-3"
         >
           Try this out
         </Button>
