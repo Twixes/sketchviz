@@ -127,6 +127,7 @@ strong {
   position: absolute;
   border-radius: calc(var(--ring-radius) + var(--ring-size));
   padding: var(--ring-size);
+  inset: calc(var(--ring-size) * -1);
   background: conic-gradient(
     from -90deg,
     #000 0deg,
