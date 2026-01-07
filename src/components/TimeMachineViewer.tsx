@@ -126,6 +126,7 @@ function LayerImage({
                 e.stopPropagation();
                 onVisualizeAgain();
               }}
+              tooltip="This layer will be regenerated from the previous layer, with current parameters applied"
             >
               Regenerate
             </Button>
