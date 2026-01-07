@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
   const {
     input_url: blobUrl,
-    thread_id,
+    thread_id: threadId,
     outdoor_light,
     indoor_light,
     edit_description,
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
   // Create a new thread (use client-provided ID if available)
   const { error: threadError } = await supabase.from("threads").insert({
-    id: thread_id,
+    id: threadId,
     user_id: userId,
     title: "",
   });
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
   const { data: generation, error: generationError } = await supabase
     .from("generations")
     .insert({
-      thread_id: thread_id,
+      thread_id: threadId,
       input_url: blobUrl,
       output_url: null,
       user_params: {
