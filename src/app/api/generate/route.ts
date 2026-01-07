@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
   const {
     input_url: blobUrl,
-    thread_id: clientThreadId,
+    thread_id,
     outdoor_light,
     indoor_light,
     edit_description,
@@ -51,30 +51,28 @@ export async function POST(request: Request) {
 
   const userId = data?.claims?.sub;
   if (!userId) {
-    throw new Error("Cannot use this endpoint unauthenticated"); // TODO: Raise 401 specifically
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 },
+    );
   }
 
   // Create a new thread (use client-provided ID if available)
-  const { data: thread, error: threadError } = await supabase
-    .from("threads")
-    .insert({
-      ...(clientThreadId ? { id: clientThreadId } : {}),
-      user_id: userId,
-      title: "",
-    })
-    .select("id")
-    .single();
+  const { error: threadError } = await supabase.from("threads").insert({
+    id: thread_id,
+    user_id: userId,
+    title: "",
+  });
 
   if (threadError) {
     throw threadError;
   }
-  const threadId = thread.id;
 
   // Create a new generation record
   const { data: generation, error: generationError } = await supabase
     .from("generations")
     .insert({
-      thread_id: threadId,
+      thread_id: thread_id,
       input_url: blobUrl,
       output_url: null,
       user_params: {
@@ -106,7 +104,6 @@ export async function POST(request: Request) {
         bucket: parsed.bucket as typeof BUCKET_INPUT_IMAGES,
         path: parsed.path,
       });
-
       contentType = blob.type;
     } else {
       // Public URL or legacy Vercel Blob URL - use regular fetch
@@ -114,10 +111,8 @@ export async function POST(request: Request) {
       if (!blobResponse.ok) {
         throw new Error("Failed to fetch file from URL.");
       }
-
       contentType = blobResponse.headers.get("content-type") || "";
-      const blobArrayBuffer = await blobResponse.arrayBuffer();
-      blob = new Blob([blobArrayBuffer], { type: contentType });
+      blob = await blobResponse.blob();
     }
 
     if (!contentType || !ACCEPTED_MIME_TYPES.includes(contentType)) {
@@ -137,34 +132,28 @@ export async function POST(request: Request) {
       );
     }
 
-    const arrayBuffer = await blob.arrayBuffer();
-    let imageBuffer: Buffer = Buffer.from(arrayBuffer);
+    let imageBuffer: Buffer = Buffer.from(await blob.arrayBuffer());
 
     // Crop image if aspect ratio is specified
     if (aspect_ratio) {
       const sharpImage = sharp(imageBuffer);
       const metadata = await sharpImage.metadata();
-
       if (!metadata.width || !metadata.height) {
         throw new Error("Unable to read image dimensions.");
       }
-
       const cropDimensions = calculateCropDimensions({
         imageWidth: metadata.width,
         imageHeight: metadata.height,
         targetRatio: aspect_ratio,
       });
-
-      imageBuffer = Buffer.from(
-        await sharpImage
-          .extract({
-            left: cropDimensions.left,
-            top: cropDimensions.top,
-            width: cropDimensions.width,
-            height: cropDimensions.height,
-          })
-          .toBuffer(),
-      );
+      imageBuffer = await sharpImage
+        .extract({
+          left: cropDimensions.left,
+          top: cropDimensions.top,
+          width: cropDimensions.width,
+          height: cropDimensions.height,
+        })
+        .toBuffer();
     }
 
     // Fetch reference images if provided
@@ -198,8 +187,7 @@ export async function POST(request: Request) {
             }
 
             refContentType = refResponse.headers.get("content-type") || "";
-            const refArrayBuffer = await refResponse.arrayBuffer();
-            refBlob = new Blob([refArrayBuffer], { type: refContentType });
+            refBlob = await refResponse.blob();
           }
 
           if (refContentType && ACCEPTED_MIME_TYPES.includes(refContentType)) {

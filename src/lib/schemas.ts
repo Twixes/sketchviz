@@ -54,7 +54,7 @@ function validateAspectRatioWithReferences<
 // Generate request schema with conditional aspect_ratio validation
 const generateRequestSchemaBase = z.object({
   input_url: z.string().min(1, "Missing input URL."),
-  thread_id: z.string().uuid().optional(),
+  thread_id: z.string().uuid(),
   outdoor_light: outdoorLightSchema.optional(),
   indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
