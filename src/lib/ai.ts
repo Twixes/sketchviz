@@ -8,8 +8,16 @@ import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 
 const googleClient = createGoogleGenerativeAI();
 
-const IMAGE_DESCRIPTION_PROMPT =
-  "Describe this SketchUp render in a brief title. Refer to a matching historical or contemporary style of design if relevant (but you must highlight which elements reflect this style). Output plain text";
+const IMAGE_DESCRIPTION_PROMPT = `
+Describe this SketchUp render in a brief plain-text title.
+Follow the APA style of titles. No period at the end. Up to 12 words.
+Start with what the render presents, then more specific details.
+Refer to a matching historical or contemporary style of design if relevant (but you must highlight which elements reflect this style).
+
+<example>
+Kitchen: Wood Grain, Red Stone, Japenese-Inspired Panels
+</example>
+`.trim();
 
 type GeneratedImage = {
   base64: string;

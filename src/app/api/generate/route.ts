@@ -167,13 +167,6 @@ export async function POST(request: Request) {
       );
     }
 
-    void updateThreadWithTitle(supabase, {
-      buffer: imageBuffer,
-      mediaType: contentType,
-      threadId,
-      userId,
-    }); // Update thread with title in background
-
     // Fetch reference images if provided
     const referenceImageBuffers: Array<{
       buffer: Buffer;
@@ -268,18 +261,26 @@ export async function POST(request: Request) {
         credit_count: creditCost,
       },
     });
-    const result = await generateVisualizationImage({
-      imageBuffer,
-      mediaType: contentType,
-      filename,
-      outdoorLight: outdoor_light,
-      indoorLight: indoor_light,
-      editDescription: edit_description,
-      model,
-      referenceImages: referenceImageBuffers,
-      aspectRatio: aspect_ratio,
-      userId,
-    });
+    const [result] = await Promise.all([
+      generateVisualizationImage({
+        imageBuffer,
+        mediaType: contentType,
+        filename,
+        outdoorLight: outdoor_light,
+        indoorLight: indoor_light,
+        editDescription: edit_description,
+        model,
+        referenceImages: referenceImageBuffers,
+        aspectRatio: aspect_ratio,
+        userId,
+      }),
+      updateThreadWithTitle(supabase, {
+        buffer: imageBuffer,
+        mediaType: contentType,
+        threadId,
+        userId,
+      }),
+    ]);
     const outputFilename = `${filenameWithoutExt}-out-${new Date().toISOString()}.${ext}`;
     const { url: outputUrl } = await uploadFile({
       supabase,
@@ -327,7 +328,8 @@ async function updateThreadWithTitle(
     threadId: string;
     userId: string;
   },
-): Promise<void> {
+): Promise<string> {
   const title = await titleVisualizationImage(params);
   await supabase.from("threads").update({ title }).eq("id", params.threadId);
+  return title;
 }
