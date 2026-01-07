@@ -20,7 +20,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     label: (
       <>
         Pro{" "}
-        <span className="bg-black rounded-md px-1 text-xs font-semibold border border-white text-white">
+        <span className="bg-black rounded-md px-1 ml-1 text-xs font-semibold border border-white text-white">
           4K
         </span>
       </>
@@ -39,7 +39,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     label: (
       <>
         Pro{" "}
-        <span className="bg-neutral-200 rounded-md px-1 text-xs font-semibold border border-white text-neutral-800">
+        <span className="bg-neutral-200 rounded-md px-1 ml-1 text-xs font-semibold border border-white text-neutral-800">
           2K
         </span>
       </>
@@ -58,7 +58,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     label: (
       <>
         Flash{" "}
-        <span className="bg-neutral-200 rounded-md px-1 text-xs font-semibold border border-white text-neutral-800">
+        <span className="bg-neutral-200 rounded-md px-1 ml-1 text-xs font-semibold border border-white text-neutral-800">
           1K
         </span>
       </>
