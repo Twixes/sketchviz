@@ -29,9 +29,31 @@ export const indoorLightSchema = z
 
 export type IndoorLight = z.infer<typeof indoorLightSchema>;
 
+// Shared validation: aspect_ratio is required when reference images are provided
+function validateAspectRatioWithReferences<
+  T extends {
+    reference_image_urls?: string[] | null;
+    aspect_ratio?: AspectRatioType | null;
+  },
+>(data: T, ctx: z.RefinementCtx) {
+  // If reference images are provided, aspect_ratio is required
+  if (
+    data.reference_image_urls &&
+    data.reference_image_urls.length > 0 &&
+    !data.aspect_ratio
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Aspect ratio is required when reference images are provided, due to Gemini limitations.",
+      path: ["aspect_ratio"],
+    });
+  }
+}
+
 // Generate request schema with conditional aspect_ratio validation
 const generateRequestSchemaBase = z.object({
-  blobUrl: z.string().min(1, "Missing blob URL."),
+  input_url: z.string().min(1, "Missing input URL."),
   thread_id: z.string().uuid().optional(),
   outdoor_light: outdoorLightSchema.optional(),
   indoor_light: indoorLightSchema.optional(),
@@ -42,27 +64,13 @@ const generateRequestSchemaBase = z.object({
 });
 
 export const generateRequestSchema = generateRequestSchemaBase.superRefine(
-  (data, ctx) => {
-    // If reference images are provided, aspect_ratio is required
-    if (
-      data.reference_image_urls &&
-      data.reference_image_urls.length > 0 &&
-      !data.aspect_ratio
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Aspect ratio is required when reference images are provided, due to Gemini limitations.",
-        path: ["aspect_ratio"],
-      });
-    }
-  },
+  validateAspectRatioWithReferences,
 );
 
 export type GenerateRequest = z.infer<typeof generateRequestSchema>;
 
-// User params stored in database (excludes blobUrl which is ephemeral)
-export type UserParams = Omit<GenerateRequest, "blobUrl">;
+// User params stored in database (excludes input_url which is ephemeral)
+export type UserParams = Omit<GenerateRequest, "input_url">;
 
 // Iterate request schema (for refining an existing generation)
 const iterateRequestSchemaBase = z.object({
@@ -77,21 +85,7 @@ const iterateRequestSchemaBase = z.object({
 });
 
 export const iterateRequestSchema = iterateRequestSchemaBase.superRefine(
-  (data, ctx) => {
-    // If reference images are provided, aspect_ratio is required
-    if (
-      data.reference_image_urls &&
-      data.reference_image_urls.length > 0 &&
-      !data.aspect_ratio
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message:
-          "Aspect ratio is required when reference images are provided, due to Gemini limitations.",
-        path: ["aspect_ratio"],
-      });
-    }
-  },
+  validateAspectRatioWithReferences,
 );
 
 export type IterateRequest = z.infer<typeof iterateRequestSchema>;

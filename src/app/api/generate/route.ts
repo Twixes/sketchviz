@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   const {
-    blobUrl,
+    input_url: blobUrl,
     thread_id: clientThreadId,
     outdoor_light,
     indoor_light,

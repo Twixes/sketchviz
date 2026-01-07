@@ -39,7 +39,7 @@ export function useGenerateMutation() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          blobUrl,
+          input_url: blobUrl,
           thread_id: threadId,
           outdoor_light: outdoorLight,
           indoor_light: indoorLight,
