@@ -4,6 +4,7 @@ import { EyeOpenIcon, Half2Icon, ReloadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import type { SyntheticEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DownloadButton } from "@/components/DownloadButton";
 import { LayerNavigationControls } from "@/components/LayerNavigationControls";
@@ -15,6 +16,7 @@ import {
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import { Button } from "@/lib/components/ui/Button";
 import type { Generation } from "@/stores/thread-editor-store";
+import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 interface Layer {
   id: string;
@@ -61,6 +63,20 @@ function LayerImage({
 }) {
   const signedUrl = useSignedUrl(layer.imageUrl);
   const config = TIME_MACHINE_CONFIG;
+  const setInputImageDimensions = useThreadEditorStore(
+    (state) => state.setInputImageDimensions,
+  );
+
+  const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    if (!isActive) return;
+    const { naturalWidth, naturalHeight } = event.currentTarget;
+    if (naturalWidth && naturalHeight) {
+      setInputImageDimensions({
+        width: naturalWidth,
+        height: naturalHeight,
+      });
+    }
+  };
 
   // Calculate visual properties based on position relative to active layer
   const depth = Math.log2(Math.abs(relativePosition) + 1);
@@ -101,6 +117,7 @@ function LayerImage({
             className="object-cover"
             unoptimized
             priority={isActive}
+            onLoad={handleImageLoad}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-black/5">
