@@ -34,7 +34,7 @@ export function PricingCard({
   const { data: planData } = usePlanQuery();
 
   const isPro = tier === "pro";
-  const featureBaseDelay = isPro ? 0.5 : 0.4;
+  const isCurrentPlan = tier === planData?.planType;
 
   return (
     <motion.div
@@ -44,7 +44,60 @@ export function PricingCard({
       className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-sm"
     >
       <div className="relative flex-1">
-        <h2 className="text-3xl font-bold text-black leading-none">{title}</h2>
+        <div className="flex items-center gap-1">
+          <h2 className="text-3xl font-bold text-black leading-none">
+            {title}
+          </h2>
+          {isCurrentPlan &&
+            (isPro ? (
+              <svg
+                className="size-6"
+                viewBox="0 0 15 15"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>Current plan</title>
+                <defs>
+                  <linearGradient
+                    id="checkmark-gradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="var(--accent-cobalt)" />
+                    <stop offset="100%" stopColor="var(--accent-coral)" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M11.467 3.727c.289.189.37.576.181.865l-4.25 6.5a.75.75 0 01-1.194.145l-2.75-2.5a.75.75 0 111.002-1.114l2.207 2.007 3.849-5.886a.75.75 0 01.955-.017z"
+                  fill="url(#checkmark-gradient)"
+                  strokeWidth="2"
+                  stroke="url(#checkmark-gradient)"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="size-6"
+                viewBox="0 0 15 15"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>Current plan</title>
+                <path
+                  d="M11.467 3.727c.289.189.37.576.181.865l-4.25 6.5a.75.75 0 01-1.194.145l-2.75-2.5a.75.75 0 111.002-1.114l2.207 2.007 3.849-5.886a.75.75 0 01.955-.017z"
+                  fill="currentColor"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-black"
+                />
+              </svg>
+            ))}
+        </div>
         <div className="mt-3 flex items-end gap-2">
           <span
             className={`text-6xl font-bold tracking-tight ${
@@ -69,7 +122,7 @@ export function PricingCard({
               key={feature}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: featureBaseDelay + index * 0.05 }}
+              transition={{ delay: 0.4 + index * 0.05 }}
               className="flex items-start gap-3"
             >
               <div
