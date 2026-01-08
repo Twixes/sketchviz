@@ -24,7 +24,9 @@ export function Hero() {
         transition={{ ...FAST_TRANSITION, delay: 0.1 }}
         className="max-w-xl text-lg text-black/70"
       >
-        You don't need to be a 3D artist for realistic visualizations anymore.
+        <strong>
+          You don't need to be a 3D artist for great visualizations anymore.
+        </strong>
         <br />
         Upload a raw render and get polished, photorealistic output with refined
         lighting, realistic materials, and professional depth.
