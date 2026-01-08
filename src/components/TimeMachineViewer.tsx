@@ -108,7 +108,7 @@ function LayerImage({
       transition={isComparing ? { duration: 0 } : TIME_MACHINE_LAYER_SPRING}
       whileHover={!isActive ? { scale: scale * 1.01 } : undefined}
     >
-      <div className="relative w-full h-full bg-black/5 rounded-2xl border border-black/20 overflow-hidden">
+      <div className="relative w-full h-full bg-white rounded-2xl border border-black/40 overflow-hidden">
         {signedUrl ? (
           <Image
             src={signedUrl}
