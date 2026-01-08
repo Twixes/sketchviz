@@ -55,12 +55,8 @@ export default function ThreadDetailPage({
   const regenerateMutation = useRegenerateMutation();
   const referenceUploadMutation = useReferenceUploadMutation();
 
-  // Redirect to home if not logged in OR if new thread with no image
+  // Redirect to home if new thread with no image (nothing to show)
   useEffect(() => {
-    if (!user) {
-      router.push("/");
-      return;
-    }
     if (
       isNewThread &&
       !threadEditorStore.inputSrc &&
@@ -69,7 +65,6 @@ export default function ThreadDetailPage({
       router.push("/");
     }
   }, [
-    user,
     isNewThread,
     threadEditorStore.inputSrc,
     uploadMutation.isPending,
@@ -322,10 +317,6 @@ export default function ThreadDetailPage({
     }
   };
 
-  if (!user) {
-    return null;
-  }
-
   // Use unified store for both new and existing threads
   const isGenerating = isNewThread
     ? threadEditorStore.isBusyForUser
@@ -354,7 +345,7 @@ export default function ThreadDetailPage({
   const handleGenerate = hasGenerations ? handleIterate : handleInitialGenerate;
 
   // Loading state for existing threads
-  if (!isNewThread && isLoading) {
+  if (!isNewThread && user && isLoading) {
     return (
       <FunkyBackgroundFuzz>
         <motion.main
@@ -371,7 +362,7 @@ export default function ThreadDetailPage({
   }
 
   // Thread not found (only for existing threads that failed to load)
-  if (!isNewThread && !thread) {
+  if (!isNewThread && user && !thread) {
     return (
       <FunkyBackgroundFuzz>
         <motion.main
