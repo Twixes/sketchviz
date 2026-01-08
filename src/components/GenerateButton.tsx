@@ -65,7 +65,7 @@ export function GenerateButton({
         leftIcon={<EnterIcon />}
         className="relative w-full px-20"
       >
-        Log in with Google to continue
+        Sign in with Google to continue
         <CreditBadge creditCost={creditCost} />
       </Button>
     );

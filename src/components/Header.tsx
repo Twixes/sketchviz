@@ -97,7 +97,7 @@ export function Header({ user, onLogoClick }: HeaderProps) {
               leftIcon={<GoogleIcon />}
               className="cursor-pointer"
             >
-              Log in with Google
+              Sign in with Google
             </Button>
           </>
         )}
