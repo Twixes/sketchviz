@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  DoubleArrowUpIcon,
   EnterIcon,
   ExclamationTriangleIcon,
+  ExternalLinkIcon,
   EyeOpenIcon,
   UpdateIcon,
 } from "@radix-ui/react-icons";
@@ -73,19 +73,7 @@ export function GenerateButton({
 
   // Insufficient credits - show upgrade button
   if (hasInsufficientCredits) {
-    return (
-      <Button
-        variant="primary"
-        size="lg"
-        link="/billing/upgrade"
-        disabled={isGenerating}
-        rightIcon={<DoubleArrowUpIcon />}
-        className="relative w-full px-20"
-      >
-        You're out of credits – upgrade to Pro
-        <CreditBadge creditCost={creditCost} hasWarning />
-      </Button>
-    );
+    return <UpgradeButton isGenerating={isGenerating} />;
   }
 
   // Normal action button
@@ -116,5 +104,20 @@ function CreditBadge({
       {hasWarning && <ExclamationTriangleIcon className="mr-0.5" />}
       {creditCost} credits
     </div>
+  );
+}
+
+export function UpgradeButton({ isGenerating }: { isGenerating: boolean }) {
+  return (
+    <Button
+      variant="primary"
+      size="lg"
+      link="/billing/upgrade"
+      disabled={isGenerating}
+      rightIcon={<ExternalLinkIcon />}
+      className="relative w-full px-20"
+    >
+      You're out of free credits – upgrade now from the Pricing page
+    </Button>
   );
 }
