@@ -7,7 +7,7 @@ const FEATURES = [
   {
     label: "Quality",
     value: "Reliable & beautiful",
-    detail: "World-class rendering powered by Google's latest generative AI",
+    detail: "World-class rendering powered by cutting-edge visual AI models",
   },
   {
     label: "Speed",
