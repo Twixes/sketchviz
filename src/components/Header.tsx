@@ -12,10 +12,9 @@ import { Button } from "@/lib/components/ui/Button";
 
 interface HeaderProps {
   user: User | null;
-  onLogoClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
-export function Header({ user, onLogoClick }: HeaderProps) {
+export function Header({ user }: HeaderProps) {
   const handleSignIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
   const { data: creditsData, isLoading: isLoadingCredits } = usePlanQuery();
@@ -28,7 +27,6 @@ export function Header({ user, onLogoClick }: HeaderProps) {
     >
       <a
         href="/"
-        onClick={onLogoClick}
         className="flex items-center gap-3 cursor-pointer whitespace-nowrap"
       >
         <Image

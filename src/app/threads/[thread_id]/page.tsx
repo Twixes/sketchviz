@@ -5,9 +5,8 @@ import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { type Usable, use, useCallback, useEffect } from "react";
 import { ControlPanel } from "@/components/ControlPanel";
-import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
 import { GenerateButton } from "@/components/GenerateButton";
-import { Header } from "@/components/Header";
+import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
 import { TimeMachineViewer } from "@/components/TimeMachineViewer";
 import { useGenerateMutation } from "@/hooks/use-generate-mutation";
@@ -17,7 +16,6 @@ import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutatio
 import { useRegenerateMutation } from "@/hooks/use-regenerate-mutation";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
-import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
@@ -27,7 +25,6 @@ import {
   type Thread,
   useThreadEditorStore,
 } from "@/stores/thread-editor-store";
-import { ThreadHeader } from "./ThreadHeader";
 
 export default function ThreadDetailPage({
   params,
@@ -166,19 +163,6 @@ export default function ThreadDetailPage({
     threadEditorStore.setModel,
     threadEditorStore.setAspectRatio,
   ]);
-
-  const handleBackToThreads = useCallback(() => {
-    router.push("/threads");
-  }, [router]);
-
-  const handleLogoClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
-      e.preventDefault();
-      threadEditorStore.reset();
-      router.push("/");
-    },
-    [threadEditorStore, router],
-  );
 
   // Handle initial generation (new thread)
   const handleInitialGenerate = useCallback(async () => {
@@ -347,103 +331,92 @@ export default function ThreadDetailPage({
   // Loading state for existing threads
   if (!isNewThread && user && isLoading) {
     return (
-      <FunkyBackgroundFuzz>
-        <motion.main
-          transition={LAYOUT_TRANSITION}
-          className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
-        >
-          <Header user={user} onLogoClick={handleLogoClick} />
-          <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-            <p className="text-black/50">Loading thread...</p>
-          </div>
-        </motion.main>
-      </FunkyBackgroundFuzz>
+      <PageWrapper user={user} gap="small">
+        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+          <p className="text-black/50">Loading thread...</p>
+        </div>
+      </PageWrapper>
     );
   }
 
   // Thread not found (only for existing threads that failed to load)
   if (!isNewThread && user && !thread) {
     return (
-      <FunkyBackgroundFuzz>
-        <motion.main
-          transition={LAYOUT_TRANSITION}
-          className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
-        >
-          <Header user={user} onLogoClick={handleLogoClick} />
-          <motion.section className="space-y-6">
-            <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-              <p className="text-black/50">Thread not found</p>
-            </div>
-          </motion.section>
-        </motion.main>
-      </FunkyBackgroundFuzz>
+      <PageWrapper user={user} gap="small">
+        <motion.section className="space-y-6">
+          <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+            <p className="text-black/50">Thread not found</p>
+          </div>
+        </motion.section>
+      </PageWrapper>
     );
   }
 
+  // Format date for description
+  const formattedDate = thread
+    ? new Date(thread.created_at).toLocaleString(undefined, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      })
+    : undefined;
+
   // Unified view for both new and existing threads
   return (
-    <FunkyBackgroundFuzz>
-      <motion.main
-        transition={LAYOUT_TRANSITION}
-        className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-8 px-6 pb-24 pt-10 lg:px-10"
-      >
-        <Header user={user} onLogoClick={handleLogoClick} />
+    <PageWrapper
+      user={user}
+      gap="small"
+      title={thread?.title}
+      description={formattedDate}
+    >
+      <motion.section className="space-y-6">
+        <div className="relative space-y-6">
+          <TimeMachineViewer
+            inputSrc={threadEditorStore.inputSrc}
+            generations={generations}
+            activeLayerIndex={threadEditorStore.activeLayerIndex}
+            onLayerClick={threadEditorStore.navigateToLayer}
+            isGenerating={isGenerating}
+            onVisualizeAgain={handleVisualizeAgain}
+            aspectRatio={aspectRatio}
+            threadId={threadId}
+            onNavigatePrevious={threadEditorStore.navigatePrevious}
+            onNavigateNext={threadEditorStore.navigateNext}
+          />
 
-        <motion.section className="space-y-6">
-          <div className="space-y-8">
-            {thread && (
-              <ThreadHeader
-                title={thread.title}
-                createdAt={thread.created_at}
-                onBackClick={handleBackToThreads}
-              />
-            )}
-            <div className="relative space-y-6">
-              <TimeMachineViewer
-                inputSrc={threadEditorStore.inputSrc}
-                generations={generations}
-                activeLayerIndex={threadEditorStore.activeLayerIndex}
-                onLayerClick={threadEditorStore.navigateToLayer}
-                isGenerating={isGenerating}
-                onVisualizeAgain={handleVisualizeAgain}
-                aspectRatio={aspectRatio}
-                threadId={threadId}
-                onNavigatePrevious={threadEditorStore.navigatePrevious}
-                onNavigateNext={threadEditorStore.navigateNext}
-              />
+          <ControlPanel
+            variant="editor"
+            outdoorLight={outdoorLight}
+            indoorLight={indoorLight}
+            editDescription={editDescription}
+            model={model}
+            aspectRatio={aspectRatio}
+            referenceImages={referenceImages}
+            isLoading={isGenerating}
+            onOutdoorLightChange={setOutdoorLight}
+            onIndoorLightChange={setIndoorLight}
+            onEditDescriptionChange={setEditDescription}
+            onModelChange={setModel}
+            onAspectRatioChange={setAspectRatio}
+            onReferenceImageDrop={handleReferenceImageDrop}
+            onReferenceImageRemove={removeReferenceImage}
+            onGenerate={handleGenerate}
+          />
 
-              <ControlPanel
-                variant="editor"
-                outdoorLight={outdoorLight}
-                indoorLight={indoorLight}
-                editDescription={editDescription}
-                model={model}
-                aspectRatio={aspectRatio}
-                referenceImages={referenceImages}
-                isLoading={isGenerating}
-                onOutdoorLightChange={setOutdoorLight}
-                onIndoorLightChange={setIndoorLight}
-                onEditDescriptionChange={setEditDescription}
-                onModelChange={setModel}
-                onAspectRatioChange={setAspectRatio}
-                onReferenceImageDrop={handleReferenceImageDrop}
-                onReferenceImageRemove={removeReferenceImage}
-                onGenerate={handleGenerate}
-              />
-
-              <GenerateButton
-                user={user}
-                model={model}
-                credits={creditsData?.credits}
-                isGenerating={isGenerating}
-                isIteration={canIterate}
-                onGenerate={handleGenerate}
-                onSignIn={handleSignIn}
-              />
-            </div>
-          </div>
-        </motion.section>
-      </motion.main>
-    </FunkyBackgroundFuzz>
+          <GenerateButton
+            user={user}
+            model={model}
+            credits={creditsData?.credits}
+            isGenerating={isGenerating}
+            isIteration={canIterate}
+            onGenerate={handleGenerate}
+            onSignIn={handleSignIn}
+          />
+        </div>
+      </motion.section>
+    </PageWrapper>
   );
 }

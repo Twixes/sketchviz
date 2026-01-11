@@ -4,10 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
-import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
-import { Header } from "@/components/Header";
+import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
-import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 import { ThreadCard } from "./ThreadCard";
 
@@ -94,49 +92,39 @@ export default function ThreadsPage() {
   }
 
   return (
-    <FunkyBackgroundFuzz>
-      <motion.main
-        transition={LAYOUT_TRANSITION}
-        className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-12 px-6 pb-24 pt-10 lg:px-10"
-      >
-        <Header user={user} />
-
-        <motion.section className="space-y-8">
-          <div>
-            <h1 className="text-4xl font-semibold text-black">Past threads</h1>
-            <p className="mt-2 text-lg text-black/70">
-              Your visualization history
-            </p>
+    <PageWrapper
+      user={user}
+      title="Past threads"
+      description="Your visualization history"
+    >
+      <motion.section className="space-y-8">
+        {isLoading ? (
+          <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+            <p className="text-black/50">Loading threads...</p>
           </div>
-
-          {isLoading ? (
-            <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-              <p className="text-black/50">Loading threads...</p>
-            </div>
-          ) : threads && threads.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {threads.map((thread) => (
-                <ThreadCard key={thread.id} thread={thread} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
-              <p className="text-lg text-black/50">No threads yet</p>
-              <p className="mt-2 text-sm text-black/40">
-                Start by creating your first visualization
-              </p>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleBackHome}
-                className="mt-6"
-              >
-                Create visualization
-              </Button>
-            </div>
-          )}
-        </motion.section>
-      </motion.main>
-    </FunkyBackgroundFuzz>
+        ) : threads && threads.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {threads.map((thread) => (
+              <ThreadCard key={thread.id} thread={thread} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
+            <p className="text-lg text-black/50">No threads yet</p>
+            <p className="mt-2 text-sm text-black/40">
+              Start by creating your first visualization
+            </p>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleBackHome}
+              className="mt-6"
+            >
+              Create visualization
+            </Button>
+          </div>
+        )}
+      </motion.section>
+    </PageWrapper>
   );
 }

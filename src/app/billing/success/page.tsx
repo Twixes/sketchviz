@@ -1,11 +1,8 @@
 "use client";
 
 import { motion } from "motion/react";
-import posthog from "posthog-js";
-import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import { FunkyBackgroundFuzz } from "@/components/FunkyBackgroundFuzz";
-import { Header } from "@/components/Header";
+import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
 import { FADE_TRANSITION, fadeInUp } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
@@ -14,14 +11,12 @@ export default function BillingSuccessPage() {
   const { user } = useSession();
 
   return (
-    <FunkyBackgroundFuzz>
-      {window !== undefined && (
+    <>
+      {typeof window !== "undefined" && (
         <Confetti recycle={false} numberOfPieces={500} gravity={0.3} />
       )}
 
-      <motion.main className="relative z-10 mx-auto flex grow w-full max-w-6xl flex-col gap-16 px-6 pb-24 pt-10 lg:px-10">
-        <Header user={user} />
-
+      <PageWrapper user={user} gap="large">
         <motion.section
           {...fadeInUp}
           transition={FADE_TRANSITION}
@@ -77,7 +72,7 @@ export default function BillingSuccessPage() {
             </Button>
           </motion.div>
         </motion.section>
-      </motion.main>
-    </FunkyBackgroundFuzz>
+      </PageWrapper>
+    </>
   );
 }

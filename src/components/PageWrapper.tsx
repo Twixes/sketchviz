@@ -1,0 +1,74 @@
+"use client";
+
+import type { User } from "@supabase/supabase-js";
+import { motion } from "motion/react";
+import type { ReactNode } from "react";
+import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
+import { FunkyBackgroundFuzz } from "./FunkyBackgroundFuzz";
+import { Header } from "./Header";
+
+interface PageWrapperProps {
+  user: User | null;
+  children: ReactNode;
+  /** Gap between content items (title, children). Defaults to 'normal' (gap-12). */
+  gap?: "small" | "normal" | "large";
+  /** Maximum width of the content area. Defaults to 'normal' (max-w-6xl). */
+  maxWidth?: "normal" | "narrow";
+  /** Page title displayed as h1. */
+  title?: ReactNode;
+  /** Page description displayed below the title. */
+  description?: ReactNode;
+}
+
+const gapClasses = {
+  small: "gap-8",
+  normal: "gap-12",
+  large: "gap-16",
+} as const;
+
+const maxWidthClasses = {
+  normal: "max-w-6xl",
+  narrow: "max-w-5xl",
+} as const;
+
+export function PageWrapper({
+  user,
+  children,
+  gap = "normal",
+  maxWidth = "normal",
+  title,
+  description,
+}: PageWrapperProps) {
+  // Outer main always uses gap-12 (consistent Header-to-content spacing)
+  // The gap prop controls spacing within the content section
+  const className = `relative z-10 mx-auto flex grow w-full ${maxWidthClasses[maxWidth]} flex-col gap-12 px-6 pb-24 pt-10 lg:px-10`;
+
+  const content = (
+    <>
+      <Header user={user} />
+      <section className={`flex grow flex-col ${gapClasses[gap]}`}>
+        {(title || description) && (
+          <div>
+            {title && (
+              <h1 className="text-2xl lg:text-3xl font-semibold text-black">
+                {title}
+              </h1>
+            )}
+            {description && (
+              <p className="mt-2 text-lg text-black/70">{description}</p>
+            )}
+          </div>
+        )}
+        {children}
+      </section>
+    </>
+  );
+
+  return (
+    <FunkyBackgroundFuzz>
+      <motion.main transition={LAYOUT_TRANSITION} className={className}>
+        {content}
+      </motion.main>
+    </FunkyBackgroundFuzz>
+  );
+}
