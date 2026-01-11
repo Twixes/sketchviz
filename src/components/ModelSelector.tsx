@@ -57,7 +57,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     value: "google/gemini-2.5-flash-image-preview",
     label: (
       <>
-        Flash{" "}
+        Lite{" "}
         <span className="bg-neutral-200 rounded-md px-1 ml-1 text-xs font-semibold border border-white text-neutral-800">
           1K
         </span>
