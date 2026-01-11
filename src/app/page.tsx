@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { uuidv7 } from "uuidv7";
 import { Examples } from "@/components/Examples";
-import { FunkyBackgroundShapes1 } from "@/components/FunkyBackgroundMini";
 import { Hero } from "@/components/Hero";
 import { HeroFeatures } from "@/components/HeroFeatures";
+import { NeonShapesHero } from "@/components/NeonShapesHero";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
 import { UploadDropzone } from "@/components/UploadDropzone";
@@ -46,10 +46,9 @@ export default function Home() {
         </div>
 
         <div className="relative order-1 lg:order-none">
-          <FunkyBackgroundShapes1 />
+          <NeonShapesHero />
           <UploadDropzone
             onFileSelected={handleFileSelected}
-            frame={true}
             className="min-h-[320px] border border-dashed border-black/20 hover:border-black/60 cursor-pointer bg-white/85"
           />
         </div>

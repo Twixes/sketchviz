@@ -9,6 +9,21 @@
   --accent-mint: #16c79a;
   --accent-sun: #ffd166;
   --accent-ink: #121212;
+
+  /* Neon colors */
+  --neon-pink: #ff6b9d;
+  --neon-coral: #ff8a65;
+  --neon-turquoise: #4dd0e1;
+  --neon-white: #fff5e6;
+  --neon-violet: #b388ff;
+  --neon-amber: #ffab40;
+
+  /* Neon glow variants for layered effects */
+  --neon-pink-glow: rgba(255, 107, 157, 0.6);
+  --neon-coral-glow: rgba(255, 138, 101, 0.5);
+  --neon-turquoise-glow: rgba(77, 208, 225, 0.5);
+  --neon-violet-glow: rgba(179, 136, 255, 0.5);
+  --neon-amber-glow: rgba(255, 171, 64, 0.5);
 }
 
 @theme inline {
@@ -53,12 +68,12 @@ strong {
   font-weight: 600;
 }
 
-.memphis-shell {
+.neon-shell {
   position: relative;
   overflow: hidden;
 }
 
-.memphis-shell::before {
+.neon-shell::before {
   content: "";
   position: absolute;
   inset: -14rem;
@@ -87,7 +102,7 @@ strong {
   z-index: 0;
 }
 
-.memphis-shell > * {
+.neon-shell > * {
   position: relative;
   z-index: 1;
 }

@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { NeonShape } from "@/components/NeonShape";
 import { FADE_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 
@@ -12,26 +13,22 @@ export function PricingContactCTA({ animationDelay }: PricingContactCTAProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: animationDelay, ...FADE_TRANSITION }}
-      className="relative overflow-hidden rounded-3xl border-2 border-black/10 bg-gradient-to-r from-white/80 to-white/60 p-10 text-center backdrop-blur-sm"
+      className="relative overflow-hidden rounded-3xl border-2 border-black/10 bg-gradient-to-r from-white/80 to-white/60 p-10 text-center"
     >
-      {/* Decorative shapes inside */}
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{
-          duration: 20,
-          repeat: Number.POSITIVE_INFINITY,
-          ease: "linear",
-        }}
-        className="absolute -right-8 -top-8 size-32 rounded-full bg-[color:var(--accent-sun)] opacity-10"
+      {/* Neon decorative shapes */}
+      <NeonShape
+        shape="zigzag"
+        color="amber"
+        size="lg"
+        animation="drift"
+        className="absolute -right-6 -top-6 opacity-30"
       />
-      <motion.div
-        animate={{ rotate: -360, scale: [1, 1.1, 1] }}
-        transition={{
-          duration: 15,
-          repeat: Number.POSITIVE_INFINITY,
-          ease: "linear",
-        }}
-        className="absolute -bottom-6 -left-6 size-24 bg-[color:var(--accent-mint)] opacity-10"
+      <NeonShape
+        shape="spiral"
+        color="turquoise"
+        size="md"
+        animation="breathing"
+        className="absolute -bottom-4 -left-4 opacity-25"
       />
 
       <h3 className="relative text-2xl font-bold text-black lg:text-3xl">

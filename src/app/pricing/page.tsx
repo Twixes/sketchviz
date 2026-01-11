@@ -3,7 +3,7 @@
 import { motion } from "motion/react";
 import posthog from "posthog-js";
 import { useEffect } from "react";
-import { FunkyBackgroundShapes2 } from "@/components/FunkyBackgroundShapes2";
+import { NeonShapesPricing } from "@/components/NeonShapesPricing";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
 import { usePlanQuery } from "@/hooks/use-plan-query";
@@ -77,7 +77,7 @@ export default function PricingPage() {
       >
         <PricingHeader />
 
-        <FunkyBackgroundShapes2>
+        <NeonShapesPricing>
           <div className="grid gap-8 md:grid-cols-2 lg:gap-10">
             <PricingCard
               tier="free"
@@ -125,7 +125,7 @@ export default function PricingPage() {
               animationDelay={0.4}
             />
           </div>
-        </FunkyBackgroundShapes2>
+        </NeonShapesPricing>
 
         <PricingContactCTA animationDelay={0.6} />
       </motion.section>

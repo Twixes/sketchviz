@@ -117,6 +117,53 @@ pnpm format
 
 We should always use standard frontend components from `src/lib/components/ui/` when possible. In particular, raw `<button>` elements should never be used. Instead, `Button` should be adapted to the use case.
 
+### Design Philosophy: MDM Neon Aesthetic
+
+The visual identity is inspired by **Marszałkowska Dzielnica Mieszkaniowa (MDM)** – Warsaw's iconic socialist realist district known for its stylish neon signage from the 1950s-60s. This influence creates a warm, retro-futuristic aesthetic that celebrates the real world through structured, geometric forms.
+
+**Core Principles:**
+- **Structured, not random**: Geometric patterns (grids, defined lines) over blurry blotches
+- **Mature and sophisticated**: No childish shapes – use diamonds, arrows, spirals, crescents, zigzags
+- **Warm neon glow**: Soft colors with multi-layer drop-shadow effects simulating neon tubes
+- **Social realist influence**: Shapes that feel intentional, architectural, and purposeful
+
+**Color Palette** (`globals.css`):
+- `--neon-pink`: #ff6b9d (warm rose)
+- `--neon-coral`: #ff8a65 (warm orange)
+- `--neon-turquoise`: #4dd0e1 (cool accent)
+- `--neon-violet`: #b388ff (soft purple)
+- `--neon-amber`: #ffab40 (warm gold)
+- Each color has a `-glow` variant for layered effects
+
+**Neon Shapes** (`src/icons/neon/`):
+- `arrow.svg` – Directional, purposeful (MDM signage style)
+- `diamond.svg` – Geometric rhombus (classic neon motif)
+- `zigzag.svg` – Energy/progress waveform
+- `spiral.svg` – Elegant flourish
+- `crescent.svg` – Curved arc (cafe/bar neon style)
+
+**Background System** (`.neon-shell` in `globals.css`):
+- Small dot grid (22px) for subtle texture
+- Large geometric grid (280px) with neon-tinted lines
+- Corner accent gradients – linear and defined, not blurry radial blobs
+
+**Animation Philosophy** (`src/lib/neon-animations.ts`):
+- Smooth only – no flicker effects
+- `NEON_BREATHING`: Gentle opacity pulse (3s cycle)
+- `NEON_DRIFT`: Slow positional float (20s cycle)
+- Respects `prefers-reduced-motion`
+
+**Component Usage:**
+```tsx
+<NeonShape
+  shape="diamond"
+  color="pink"
+  size="lg"
+  animation="breathing"
+  className="absolute -left-10 -top-8"
+/>
+```
+
 ### Asset Handling
 - **SVG files**: imported as React components via `@svgr/webpack`
   - Example: `import GoogleIcon from "@/icons/google.svg"` → use as `<GoogleIcon />`

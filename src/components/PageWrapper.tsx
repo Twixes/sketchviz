@@ -4,8 +4,8 @@ import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
-import { FunkyBackgroundFuzz } from "./FunkyBackgroundFuzz";
 import { Header } from "./Header";
+import { NeonBackground } from "./NeonBackground";
 
 interface PageWrapperProps {
   user: User | null;
@@ -65,10 +65,10 @@ export function PageWrapper({
   );
 
   return (
-    <FunkyBackgroundFuzz>
+    <NeonBackground>
       <motion.main transition={LAYOUT_TRANSITION} className={className}>
         {content}
       </motion.main>
-    </FunkyBackgroundFuzz>
+    </NeonBackground>
   );
 }

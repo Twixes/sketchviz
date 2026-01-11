@@ -2,7 +2,7 @@
 
 import { UploadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
-import { motion } from "motion/react";
+import { frame, motion } from "motion/react";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSignedUrl } from "@/hooks/use-signed-url";
@@ -13,13 +13,11 @@ import { Hint } from "./Hint";
 
 type UploadDropzoneProps = {
   onFileSelected: (file: File) => void;
-  frame?: boolean;
   className?: string;
 };
 
 export function UploadDropzone({
   onFileSelected,
-  frame = true,
   className,
 }: UploadDropzoneProps) {
   // Get state from Zustand store
@@ -105,14 +103,10 @@ export function UploadDropzone({
       <div
         className={clsx([
           "group relative flex cursor-pointer flex-col items-center justify-center gap-4 max-h-[75vh] max-w-full mx-auto text-center transition",
-          frame
-            ? "rounded-3xl bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]"
-            : "rounded-3xl px-6 py-12",
+          "rounded-3xl bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]",
           isDragging
             ? "border-pink-400 bg-pink-50/80"
-            : frame
-              ? "hover:border-black/30"
-              : "",
+            : "hover:border-black/30",
           className,
         ])}
         style={
