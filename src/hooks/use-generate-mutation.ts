@@ -18,6 +18,8 @@ interface GenerateResponse {
   outputImage: string;
   threadId: string;
   generationId: string;
+  width: number;
+  height: number;
   error?: string;
 }
 

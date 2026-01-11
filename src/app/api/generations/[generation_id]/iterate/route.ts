@@ -107,25 +107,28 @@ export async function POST(
   const newGenerationId = newGeneration.id;
 
   try {
-    const { outputUrl, creditCost } = await processImageGeneration({
-      supabase,
-      user,
-      inputUrl,
-      outdoorLight: outdoor_light,
-      indoorLight: indoor_light,
-      editDescription: edit_description,
-      model,
-      aspectRatio: aspect_ratio,
-      referenceImageUrls: reference_image_urls || [],
-      generationType: "iteration",
-      useBasePrompt: use_base_prompt,
-    });
+    const { outputUrl, creditCost, width, height } =
+      await processImageGeneration({
+        supabase,
+        user,
+        inputUrl,
+        outdoorLight: outdoor_light,
+        indoorLight: indoor_light,
+        editDescription: edit_description,
+        model,
+        aspectRatio: aspect_ratio,
+        referenceImageUrls: reference_image_urls || [],
+        generationType: "iteration",
+        useBasePrompt: use_base_prompt,
+      });
 
-    // Update generation record with output URL
+    // Update generation record with output URL and dimensions
     const { error: updateError } = await supabase
       .from("generations")
       .update({
         output_url: outputUrl,
+        width,
+        height,
       })
       .eq("id", newGenerationId);
 
@@ -156,6 +159,8 @@ export async function POST(
       outputImage: outputUrl,
       generationId: newGenerationId,
       threadId,
+      width,
+      height,
     });
   } catch (error) {
     console.error("Iterate endpoint error:", error);

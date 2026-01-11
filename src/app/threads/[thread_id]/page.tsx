@@ -86,7 +86,9 @@ export default function ThreadDetailPage({
             input_url,
             output_url,
             user_params,
-            created_at
+            created_at,
+            width,
+            height
           )
         `,
         )
@@ -127,7 +129,7 @@ export default function ThreadDetailPage({
     const activeIndex = threadEditorStore.activeLayerIndex;
     const subsequentGenIndex = activeIndex; // Layer N shows params from generation N
 
-    // If there's a subsequent generation, load its params
+    // If there's a subsequent generation, load its params (except aspectRatio)
     if (subsequentGenIndex >= 0 && subsequentGenIndex < generations.length) {
       const subsequentGen = generations[subsequentGenIndex];
       if (subsequentGen?.user_params) {
@@ -139,7 +141,9 @@ export default function ThreadDetailPage({
           params.model ??
             `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
         );
-        threadEditorStore.setAspectRatio(params.aspect_ratio ?? null);
+        // Don't load historical aspectRatio - it would override the viewer's
+        // actual dimensions. Only user selection should set aspectRatio.
+        threadEditorStore.setAspectRatio(null);
       }
     } else {
       // For the latest layer (no subsequent generation), use the previous generation's model
@@ -209,6 +213,8 @@ export default function ThreadDetailPage({
                 aspect_ratio: threadEditorStore.aspectRatio,
               },
               created_at: new Date().toISOString(),
+              width: result.width,
+              height: result.height,
             },
           ],
         };
@@ -255,6 +261,8 @@ export default function ThreadDetailPage({
           aspect_ratio: threadEditorStore.aspectRatio,
         },
         created_at: new Date().toISOString(),
+        width: result.width,
+        height: result.height,
       };
       threadEditorStore.addGeneration(newGeneration);
       queryClient.invalidateQueries({ queryKey: ["thread", threadId] });

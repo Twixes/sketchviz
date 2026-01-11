@@ -18,6 +18,8 @@ interface IterateResponse {
   outputImage: string;
   generationId: string;
   threadId: string;
+  width: number;
+  height: number;
   error?: string;
 }
 
@@ -88,7 +90,12 @@ export function useIterateMutation() {
 
     onSuccess: (data, variables) => {
       // The generation was already added optimistically or we need to update it
-      updateGenerationOutput(data.generationId, data.outputImage);
+      updateGenerationOutput(
+        data.generationId,
+        data.outputImage,
+        data.width,
+        data.height,
+      );
       setIsGenerating(false);
       posthog.capture("iteration_completed", {
         thread_id: data.threadId,

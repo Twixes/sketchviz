@@ -92,25 +92,28 @@ export async function POST(
       : true; // Default to true if we can't determine
 
   try {
-    const { outputUrl, creditCost } = await processImageGeneration({
-      supabase,
-      user,
-      inputUrl,
-      outdoorLight: outdoor_light,
-      indoorLight: indoor_light,
-      editDescription: edit_description,
-      model,
-      aspectRatio: aspect_ratio,
-      referenceImageUrls: reference_image_urls || [],
-      generationType: "regeneration",
-      useBasePrompt: isFirstGeneration,
-    });
+    const { outputUrl, creditCost, width, height } =
+      await processImageGeneration({
+        supabase,
+        user,
+        inputUrl,
+        outdoorLight: outdoor_light,
+        indoorLight: indoor_light,
+        editDescription: edit_description,
+        model,
+        aspectRatio: aspect_ratio,
+        referenceImageUrls: reference_image_urls || [],
+        generationType: "regeneration",
+        useBasePrompt: isFirstGeneration,
+      });
 
-    // Update the current generation's output (not create a new one)
+    // Update the current generation's output and dimensions (not create a new one)
     const { error: updateError } = await supabase
       .from("generations")
       .update({
         output_url: outputUrl,
+        width,
+        height,
         user_params: {
           outdoor_light,
           indoor_light,
@@ -148,6 +151,8 @@ export async function POST(
       outputImage: outputUrl,
       generationId,
       threadId,
+      width,
+      height,
     });
   } catch (error) {
     console.error("Regenerate endpoint error:", error);

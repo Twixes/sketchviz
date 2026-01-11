@@ -67,14 +67,32 @@ function LayerImage({
     (state) => state.setInputImageDimensions,
   );
 
+  // Store Original layer dimensions when image loads (regardless of active state)
+  const originalDimensionsRef = useRef<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  // Update store when Original layer becomes active and we have dimensions
+  useEffect(() => {
+    if (isActive && layer.index === 0 && originalDimensionsRef.current) {
+      setInputImageDimensions(originalDimensionsRef.current);
+    }
+  }, [isActive, layer.index, setInputImageDimensions]);
+
   const handleImageLoad = (event: SyntheticEvent<HTMLImageElement>) => {
-    if (!isActive) return;
     const { naturalWidth, naturalHeight } = event.currentTarget;
-    if (naturalWidth && naturalHeight) {
-      setInputImageDimensions({
+    if (!naturalWidth || !naturalHeight) return;
+
+    // For Original layer, store dimensions in ref and update store if active
+    if (layer.index === 0) {
+      originalDimensionsRef.current = {
         width: naturalWidth,
         height: naturalHeight,
-      });
+      };
+      if (isActive) {
+        setInputImageDimensions({ width: naturalWidth, height: naturalHeight });
+      }
     }
   };
 
@@ -204,10 +222,10 @@ export function TimeMachineViewer({
   onNavigatePrevious,
   onNavigateNext,
 }: TimeMachineViewerProps) {
-  // Calculate actual aspect ratio from image if not provided
-  const [calculatedAspectRatio, setCalculatedAspectRatio] = useState<
-    string | null
-  >(null);
+  // Get input image dimensions from store (for Original layer)
+  const inputImageDimensions = useThreadEditorStore(
+    (state) => state.inputImageDimensions,
+  );
 
   // Track compare mode state
   const [isComparing, setIsComparing] = useState(false);
@@ -277,28 +295,30 @@ export function TimeMachineViewer({
     return result;
   }, [inputSrc, generations]);
 
-  // Calculate aspect ratio from the first available image
-  useEffect(() => {
-    const imageUrl = layers[0]?.imageUrl;
-    if (!imageUrl || aspectRatio) {
-      setCalculatedAspectRatio(null);
-      return;
+  // Calculate CSS aspect ratio for the viewer
+  const cssAspectRatio = useMemo(() => {
+    // If user has set an aspect ratio in the editor, respect it (shows crop preview)
+    if (aspectRatio) {
+      return aspectRatio.replace(":", "/");
     }
 
-    const img = document.createElement("img");
-    img.onload = () => {
-      setCalculatedAspectRatio(`${img.naturalWidth}/${img.naturalHeight}`);
-    };
-    img.onerror = () => {
-      setCalculatedAspectRatio(null);
-    };
-    img.src = imageUrl;
-  }, [layers, aspectRatio]);
+    // Layer N (N > 0) = generation at index N-1, use stored output dimensions
+    if (activeLayerIndex > 0) {
+      const activeGen = generations[activeLayerIndex - 1];
+      if (activeGen?.width && activeGen?.height) {
+        return `${activeGen.width}/${activeGen.height}`;
+      }
+    }
 
-  // Convert aspect ratio from "16:9" format to "16/9" for CSS
-  const cssAspectRatio = aspectRatio
-    ? aspectRatio.replace(":", "/")
-    : calculatedAspectRatio || "3/2";
+    // Use inputImageDimensions from store (set by handleImageLoad when active layer loads)
+    // This covers: Layer 0 (original), and old generations without stored dimensions
+    if (inputImageDimensions) {
+      return `${inputImageDimensions.width}/${inputImageDimensions.height}`;
+    }
+
+    // Final fallback
+    return "3/2";
+  }, [aspectRatio, activeLayerIndex, inputImageDimensions, generations]);
 
   if (layers.length === 0) {
     return (
@@ -330,7 +350,7 @@ export function TimeMachineViewer({
       )}
       {/* Container with dynamic aspect ratio */}
       <div
-        className="relative w-auto mx-auto max-h-[calc(90vh-8rem)] "
+        className="relative w-auto mx-auto max-h-[calc(90vh-8rem)] z-10"
         style={{ aspectRatio: cssAspectRatio }}
       >
         <AnimatePresence mode="popLayout">

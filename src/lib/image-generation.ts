@@ -45,6 +45,8 @@ interface ProcessImageGenerationParams {
 interface ProcessImageGenerationResult {
   outputUrl: string;
   creditCost: number;
+  width: number;
+  height: number;
 }
 
 /**
@@ -271,6 +273,13 @@ export async function generateAndUploadImage({
     userId,
   });
 
+  // Extract dimensions from generated image
+  const outputBuffer = Buffer.from(result.uint8Array);
+  const outputMetadata = await sharp(outputBuffer).metadata();
+  if (!outputMetadata.width || !outputMetadata.height) {
+    throw new Error("Unable to read generated image dimensions.");
+  }
+
   const suffixMap = {
     iteration: "iter",
     regeneration: "regen",
@@ -282,7 +291,7 @@ export async function generateAndUploadImage({
     supabase,
     bucket: BUCKET_OUTPUT_IMAGES,
     path: outputFilename,
-    file: Buffer.from(result.uint8Array),
+    file: outputBuffer,
     contentType: result.mediaType,
     userId,
   });
@@ -290,6 +299,8 @@ export async function generateAndUploadImage({
   return {
     outputUrl,
     creditCost,
+    width: outputMetadata.width,
+    height: outputMetadata.height,
   };
 }
 

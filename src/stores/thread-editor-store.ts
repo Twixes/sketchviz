@@ -23,6 +23,8 @@ export interface Generation {
   output_url: string | null;
   user_params: UserParams;
   created_at: string;
+  width: number | null;
+  height: number | null;
 }
 
 export interface Thread {
@@ -71,7 +73,12 @@ interface ThreadEditorState {
   // Actions
   setThread: (thread: Thread) => void;
   addGeneration: (generation: Generation) => void;
-  updateGenerationOutput: (generationId: string, outputUrl: string) => void;
+  updateGenerationOutput: (
+    generationId: string,
+    outputUrl: string,
+    width: number,
+    height: number,
+  ) => void;
   navigateToLayer: (index: number) => void;
   navigatePrevious: () => void;
   navigateNext: () => void;
@@ -174,6 +181,7 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
           editDescription: null,
           model: `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
           aspectRatio: null,
+          inputImageDimensions: null, // Clear stale dimensions from previous thread
         });
       },
 
@@ -197,12 +205,14 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
         });
       },
 
-      updateGenerationOutput: (generationId, outputUrl) => {
+      updateGenerationOutput: (generationId, outputUrl, width, height) => {
         const { thread } = get();
         if (!thread) return;
 
         const updatedGenerations = thread.generations.map((gen) =>
-          gen.id === generationId ? { ...gen, output_url: outputUrl } : gen,
+          gen.id === generationId
+            ? { ...gen, output_url: outputUrl, width, height }
+            : gen,
         );
         set({ thread: { ...thread, generations: updatedGenerations } });
       },

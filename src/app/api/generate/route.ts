@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     });
 
     // Run image generation and title generation in parallel
-    const [{ outputUrl, creditCost }] = await Promise.all([
+    const [{ outputUrl, creditCost, width, height }] = await Promise.all([
       generateAndUploadImage({
         supabase,
         userId,
@@ -112,12 +112,14 @@ export async function POST(request: Request) {
       }),
     ]);
 
-    // Update generation record with output URL if available
+    // Update generation record with output URL and dimensions
     if (userId && generationId) {
       const { error: updateError } = await supabase
         .from("generations")
         .update({
           output_url: outputUrl,
+          width,
+          height,
         })
         .eq("id", generationId);
 
@@ -147,6 +149,8 @@ export async function POST(request: Request) {
       outputImage: outputUrl,
       threadId,
       generationId,
+      width,
+      height,
     });
   } catch (error) {
     console.error("Generate endpoint error:", error);

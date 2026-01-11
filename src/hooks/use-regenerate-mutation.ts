@@ -17,6 +17,8 @@ interface RegenerateResponse {
   outputImage: string;
   generationId: string;
   threadId: string;
+  width: number;
+  height: number;
   error?: string;
 }
 
@@ -85,7 +87,12 @@ export function useRegenerateMutation() {
     },
 
     onSuccess: (data, variables) => {
-      updateGenerationOutput(data.generationId, data.outputImage);
+      updateGenerationOutput(
+        data.generationId,
+        data.outputImage,
+        data.width,
+        data.height,
+      );
       setIsGenerating(false);
       posthog.capture("regeneration_completed", {
         thread_id: data.threadId,
