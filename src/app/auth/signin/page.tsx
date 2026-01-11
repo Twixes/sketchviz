@@ -1,19 +1,42 @@
 "use client";
 
-import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * Validates redirect path is safe (same-origin, no open redirect).
+ */
+function isValidRedirectPath(path: string | null): path is string {
+  if (!path) return false;
+  if (!path.startsWith("/") || path.startsWith("//")) return false;
+  if (path.includes("..")) return false;
+  return true;
+}
+
 export default function SignInPage() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
+  const validatedRedirect = useMemo(
+    () => (isValidRedirectPath(redirectTo) ? redirectTo : null),
+    [redirectTo],
+  );
+
   useEffect(() => {
     const supabase = createClient();
+    // Build callback URL with optional redirect param
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    if (validatedRedirect) {
+      callbackUrl.searchParams.set("redirect", validatedRedirect);
+    }
     // Automatically trigger Google sign-in when this page loads
     supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
       },
     });
-  }, []);
+  }, [validatedRedirect]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white">

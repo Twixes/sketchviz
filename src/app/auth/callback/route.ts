@@ -49,5 +49,22 @@ export async function GET(request: Request) {
   }
 
   // URL to redirect to after sign in process completes
+  // If a redirect param was passed, go there; otherwise go to /auth/success (for popup flow)
+  const redirectPath = requestUrl.searchParams.get("redirect");
+  if (isValidRedirectPath(redirectPath)) {
+    return NextResponse.redirect(`${origin}${redirectPath}`);
+  }
   return NextResponse.redirect(`${origin}/auth/success`);
+}
+
+/**
+ * Validates that a redirect path is safe (same-origin, no open redirect).
+ */
+function isValidRedirectPath(path: string | null): path is string {
+  if (!path) return false;
+  // Must start with exactly one slash (prevents protocol-relative URLs like //evil.com)
+  if (!path.startsWith("/") || path.startsWith("//")) return false;
+  // Block path traversal
+  if (path.includes("..")) return false;
+  return true;
 }

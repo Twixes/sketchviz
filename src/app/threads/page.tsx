@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
 import { Button } from "@/lib/components/ui/Button";
@@ -23,13 +23,6 @@ interface Thread {
 export default function ThreadsPage() {
   const router = useRouter();
   const { user, supabase } = useSession();
-
-  // Redirect to home if not logged in
-  useEffect(() => {
-    if (!user) {
-      router.push("/");
-    }
-  }, [user, router]);
 
   const { data: threads, isLoading } = useQuery({
     queryKey: ["threads", user?.id],

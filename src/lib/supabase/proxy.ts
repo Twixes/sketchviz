@@ -39,12 +39,13 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // You can add protection for specific routes here
-  // if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/auth/signin'
-  //   return NextResponse.redirect(url)
-  // }
+  // Protect /threads routes - redirect to signin with return URL
+  if (!user && request.nextUrl.pathname.startsWith("/threads")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/signin";
+    url.searchParams.set("redirect", request.nextUrl.pathname);
+    return NextResponse.redirect(url);
+  }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
   // If you're creating a new response object with NextResponse.next() make sure to:
