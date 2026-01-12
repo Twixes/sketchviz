@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { frame, motion } from "motion/react";
 import type { DragEvent, SyntheticEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import { parseAspectRatio } from "@/lib/aspect-ratio";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
@@ -28,6 +29,7 @@ export function UploadDropzone({
     setInputImageDimensions,
     aspectRatio: selectedAspectRatio,
   } = useThreadEditorStore();
+  const { data: planData } = usePlanQuery();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
@@ -154,7 +156,11 @@ export function UploadDropzone({
               <span className="rounded-full bg-black px-4 py-2 text-sm font-semibold text-white">
                 {isBusyForUser ? "Generating..." : "Choose file"}
               </span>
-              <span className="text-xs text-black/40">Try for free now</span>
+              <span className="text-xs text-black/40">
+                {planData?.planType === "pro"
+                  ? "Let's get right into it"
+                  : "Try for free now"}
+              </span>
             </div>
           </>
         )}
