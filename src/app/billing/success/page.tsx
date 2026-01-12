@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import Link from "next/link";
 import Confetti from "react-confetti";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
@@ -52,9 +53,17 @@ export default function BillingSuccessPage() {
               transition={{ ...FADE_TRANSITION, delay: 0.4 }}
               className="text-lg md:text-xl text-muted-foreground max-w-3xl"
             >
-              Thank you for subscribing! You now have access to 1,000 credits
-              each&nbsp;month, unlimited&nbsp;paid&nbsp;usage,
-              and&nbsp;priority&nbsp;support.
+              Thank you for subscribing! You now have 1,000 credits included
+              each&nbsp;month, unlimited&nbsp;
+              <span className="whitespace-nowrap">pay-as-you-go</span> usage
+              beyond&nbsp;that – and&nbsp;priority&nbsp;support via&nbsp;
+              <Link
+                href="mailto:support@sketchviz.app"
+                className="underline decoration-dashed"
+              >
+                support@sketchviz.app
+              </Link>
+              .
             </motion.p>
           </div>
 
