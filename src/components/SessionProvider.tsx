@@ -2,6 +2,7 @@
 
 import { sendGAEvent, sendGTMEvent } from "@next/third-parties/google";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import posthog from "posthog-js";
 import {
@@ -31,6 +32,7 @@ export function SessionProvider({
   const [supabase] = useState(() => createClient());
   const [user, setUser] = useState<User | null>(initialUser);
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: we want this to run on every page change
   useEffect(() => {
@@ -49,6 +51,8 @@ export function SessionProvider({
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      // Invalidate plan query to refetch with new auth state
+      queryClient.invalidateQueries({ queryKey: ["plan"] });
       if (session?.user) {
         posthog.identify(session?.user?.id, {
           email: session?.user?.email,
@@ -67,7 +71,7 @@ export function SessionProvider({
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, queryClient]);
 
   return (
     <SessionContext.Provider value={{ user, supabase }}>
