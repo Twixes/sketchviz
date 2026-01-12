@@ -42,9 +42,7 @@ export function PricingContactCTA({ animationDelay }: PricingContactCTAProps) {
         variant="secondary"
         size="lg"
         className="relative mt-4"
-        onClick={() => {
-          window.location.href = "mailto:support@sketchviz.com";
-        }}
+        link="mailto:hello@sketchviz.app"
       >
         Get in touch
       </Button>
