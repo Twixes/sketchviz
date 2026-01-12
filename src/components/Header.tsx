@@ -55,7 +55,7 @@ export function Header({ user }: HeaderProps) {
         </a>
         {user && <CreditsButton />}
       </div>
-      <div className="flex flex-wrap justify-start items-center gap-3 whitespace-nowrap">
+      <div className="flex flex-wrap justify-end items-center gap-3 whitespace-nowrap">
         {user ? (
           <>
             <NewRenderButton />
