@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import type { SyntheticEvent } from "react";
 import { useEffect, useMemo, useRef } from "react";
-import { DownloadButton } from "@/components/DownloadButton";
+import { ExportButton } from "@/components/ExportButton";
 import { LayerNavigationControls } from "@/components/LayerNavigationControls";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import {
@@ -17,6 +17,15 @@ import type { AspectRatio } from "@/lib/aspect-ratio";
 import { Button } from "@/lib/components/ui/Button";
 import type { Generation } from "@/stores/thread-editor-store";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
+
+function toKebabCase(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "") // Remove punctuation
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Collapse multiple hyphens
+    .replace(/^-|-$/g, ""); // Trim leading/trailing hyphens
+}
 
 interface Layer {
   id: string;
@@ -36,6 +45,7 @@ interface TimeMachineViewerProps {
   onVisualizeAgain?: () => void;
   aspectRatio?: AspectRatio | null;
   threadId?: string;
+  threadTitle?: string | null;
   onNavigatePrevious?: () => void;
   onNavigateNext?: () => void;
 }
@@ -47,7 +57,7 @@ function LayerImage({
   onClick,
   isGenerating,
   onVisualizeAgain,
-  threadId,
+  threadTitle,
   isComparing,
 }: {
   layer: Layer;
@@ -56,7 +66,7 @@ function LayerImage({
   onClick: () => void;
   isGenerating?: boolean;
   onVisualizeAgain?: () => void;
-  threadId?: string;
+  threadTitle?: string | null;
   isComparing?: boolean;
 }) {
   const signedUrl = useSignedUrl(layer.imageUrl);
@@ -170,12 +180,14 @@ function LayerImage({
         </div>
         {signedUrl && layer.index > 0 && (
           <div className="absolute bottom-3 right-3">
-            <DownloadButton
+            <ExportButton
               imageUrl={signedUrl}
               filename={
-                threadId
-                  ? `${threadId}-${layer.label.toLowerCase().replace(/\s+/g, "-")}.png`
-                  : `${layer.label.toLowerCase().replace(/\s+/g, "-")}.png`
+                threadTitle
+                  ? layer.index > 1
+                    ? `${toKebabCase(threadTitle)}-${layer.index}.jpeg`
+                    : `${toKebabCase(threadTitle)}.jpeg`
+                  : `${toKebabCase(layer.label)}.jpeg`
               }
             />
           </div>
@@ -194,7 +206,7 @@ export function TimeMachineViewer({
   isGenerating = false,
   onVisualizeAgain,
   aspectRatio,
-  threadId,
+  threadTitle,
   onNavigatePrevious,
   onNavigateNext,
 }: TimeMachineViewerProps) {
@@ -313,7 +325,7 @@ export function TimeMachineViewer({
                 onClick={() => onLayerClick?.(layer.index)}
                 isGenerating={isGenerating}
                 onVisualizeAgain={onVisualizeAgain}
-                threadId={threadId}
+                threadTitle={threadTitle}
                 isComparing={isComparing}
               />
             );

@@ -398,7 +398,7 @@ export default function ThreadDetailPage({
             isGenerating={isGenerating}
             onVisualizeAgain={handleVisualizeAgain}
             aspectRatio={aspectRatio}
-            threadId={threadId}
+            threadTitle={thread?.title}
             onNavigatePrevious={threadEditorStore.navigatePrevious}
             onNavigateNext={threadEditorStore.navigateNext}
           />
