@@ -1,8 +1,10 @@
 import {
   ClockIcon,
   ExitIcon,
+  InfoCircledIcon,
   PlusIcon,
   RocketIcon,
+  UploadIcon,
 } from "@radix-ui/react-icons";
 import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
@@ -117,6 +119,7 @@ function CreditsButton(): JSX.Element {
       size="md"
       link="/billing/portal"
       className="border-dashed bg-transparent hover:border-black/40 hover:bg-black/5 gap-1.5"
+      rightIcon={<InfoCircledIcon />}
       tooltip={
         <>
           {!isLoadingCredits &&
@@ -174,7 +177,7 @@ function NewRenderButton(): JSX.Element {
     <>
       <Button
         variant="primary"
-        leftIcon={<PlusIcon />}
+        leftIcon={<UploadIcon />}
         className="cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
         tooltip="Select a raw SketchUp render to visualize"
