@@ -116,7 +116,7 @@ export function UpgradeButton({ isGenerating }: { isGenerating: boolean }) {
     <Button
       variant="primary"
       size="lg"
-      link="/billing/upgrade"
+      link="/pricing"
       disabled={isGenerating}
       rightIcon={<ExternalLinkIcon />}
       className="relative w-full px-20"
