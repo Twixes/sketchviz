@@ -87,8 +87,8 @@ export default function ThreadsPage() {
   return (
     <PageWrapper
       user={user}
-      title="Past threads"
-      description="Your visualization history"
+      title="History"
+      description="Your past visualizations"
     >
       <motion.section className="space-y-8">
         {isLoading ? (
