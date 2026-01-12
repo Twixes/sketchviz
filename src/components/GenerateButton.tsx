@@ -69,7 +69,7 @@ export function GenerateButton({
         leftIcon={<EnterIcon />}
         className="relative w-full px-20"
       >
-        Sign in with Google to continue
+        Sign up with Google to try for free
         <CreditBadge creditCost={creditCost} />
       </Button>
     );
