@@ -125,9 +125,9 @@ function CreditsButton(): JSX.Element {
           {!isLoadingCredits &&
             (creditsData?.planType === "pro" ? (
               <>
-                This is your included allowance.
+                This is your monthly Pro allowance.
                 <br />
-                Usage beyond the allowance is $0.015/credit.
+                Pro usage beyond the allowance is $0.015/credit.
               </>
             ) : (
               "This is your free allowance. Upgrade for more usage."
