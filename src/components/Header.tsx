@@ -130,7 +130,7 @@ function CreditsButton(): JSX.Element {
                 Pro usage beyond the allowance is $0.015/credit.
               </>
             ) : (
-              "This is your free allowance. Upgrade for more usage."
+              "This is your free allowance. Upgrade to render more."
             ))}
           <br />
           Click to manage your plan
