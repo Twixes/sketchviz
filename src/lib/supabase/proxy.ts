@@ -39,8 +39,11 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect /threads routes - redirect to signin with return URL
-  if (!user && request.nextUrl.pathname.startsWith("/threads")) {
+  // Protect /threads list page - redirect to signin with return URL
+  // Note: /threads/[thread_id] is intentionally NOT protected here to allow
+  // the "Try this out" preview flow for unauthenticated users. The thread page
+  // handles redirecting unauthenticated users who try to access existing threads.
+  if (!user && request.nextUrl.pathname === "/threads") {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/signin";
     url.searchParams.set("redirect", request.nextUrl.pathname);

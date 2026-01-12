@@ -68,6 +68,14 @@ export default function ThreadDetailPage({
     router,
   ]);
 
+  // Redirect to signin for unauthenticated users trying to access existing threads
+  // (new threads are allowed for the preview flow)
+  useEffect(() => {
+    if (!user && !isNewThread) {
+      router.push(`/auth/signin?redirect=/threads/${threadId}`);
+    }
+  }, [user, isNewThread, router, threadId]);
+
   // Fetch thread data (only for existing threads)
   const { data: fetchedThread, isLoading } = useQuery({
     queryKey: ["thread", threadId],
