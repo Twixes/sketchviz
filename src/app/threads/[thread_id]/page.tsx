@@ -426,6 +426,7 @@ export default function ThreadDetailPage({
             user={user}
             model={model}
             credits={creditsData?.credits}
+            planType={creditsData?.planType}
             isGenerating={isGenerating}
             isIteration={canIterate}
             onGenerate={handleGenerate}

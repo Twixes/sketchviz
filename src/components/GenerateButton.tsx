@@ -16,6 +16,7 @@ interface GenerateButtonProps {
   user: User | null;
   model: Model;
   credits: number | null | undefined;
+  planType: "free" | "pro" | null | undefined;
   isGenerating: boolean;
   /**
    * Whether this is an iteration on an existing generation.
@@ -30,14 +31,17 @@ export function GenerateButton({
   user,
   model,
   credits,
+  planType,
   isGenerating,
   isIteration = false,
   onGenerate,
   onSignIn,
 }: GenerateButtonProps) {
   const creditCost = determineCreditCostOfImageGeneration({ model });
+  // Only show insufficient credits for free users - Pro users are billed for overages
   const hasInsufficientCredits = !!(
     user &&
+    planType === "free" &&
     credits !== null &&
     credits !== undefined &&
     credits < creditCost

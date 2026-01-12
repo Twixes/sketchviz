@@ -5,7 +5,7 @@ import type { AspectRatio } from "./aspect-ratio";
 import { calculateCropDimensions } from "./aspect-ratio";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "./constants";
 import { determineCreditCostOfImageGeneration } from "./credits";
-import { getCreditsForUser, polar } from "./polar";
+import { getCreditsForUser, getPlanForUser, polar } from "./polar";
 import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 import {
@@ -220,11 +220,15 @@ export async function generateAndUploadImage({
 }): Promise<ProcessImageGenerationResult> {
   const creditCost = determineCreditCostOfImageGeneration({ model });
 
-  const creditsAvailable = await getCreditsForUser(userId);
+  const [creditsAvailable, [planType]] = await Promise.all([
+    getCreditsForUser(userId),
+    getPlanForUser(userId),
+  ]);
   if (creditsAvailable === null) {
     throw new Error("Failed to fetch available credits");
   }
-  if (creditsAvailable < creditCost) {
+  // Only block free users - Pro users are billed for overages
+  if (planType === "free" && creditsAvailable < creditCost) {
     throw new Error("Insufficient credits");
   }
 
