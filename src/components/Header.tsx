@@ -44,31 +44,46 @@ export function Header({ user }: HeaderProps) {
         {user ? (
           <>
             {!!user && (
-              <div className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black">
-                <span className="text-black/50">Credits:</span>
-                <span>
-                  {isLoadingCredits ? "..." : (creditsData?.credits ?? "none")}
-                </span>
-              </div>
+              <Link
+                href="/billing/portal"
+                className="flex items-center gap-1.5 rounded-xl border border-dashed border-black/20 px-4 py-2 text-sm font-medium text-black hover:border-black/40 hover:bg-black/5 transition-colors"
+              >
+                {isLoadingCredits ? (
+                  <span>...</span>
+                ) : creditsData?.planType === "pro" &&
+                  creditsData.credits !== null &&
+                  creditsData.credits <= 0 ? (
+                  <>
+                    <span className="text-black/50">Credits left:</span>
+                    <span>0</span>
+                    <span className="text-black/40 font-normal">
+                      (pay-as-you-go: {Math.abs(creditsData.credits)})
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-black/50">Credits left:</span>
+                    <span>{creditsData?.credits ?? "none"}</span>
+                  </>
+                )}
+              </Link>
             )}
-            <Link href="/pricing">
-              <Button
-                variant="secondary"
-                leftIcon={<RocketIcon />}
-                className="cursor-pointer"
-              >
-                {creditsData?.planType === "pro" ? "Billing" : "Pricing"}
-              </Button>
-            </Link>
-            <Link href="/threads">
-              <Button
-                variant="secondary"
-                leftIcon={<ClockIcon />}
-                className="cursor-pointer"
-              >
-                Past threads
-              </Button>
-            </Link>
+            <Button
+              variant="secondary"
+              leftIcon={<ClockIcon />}
+              className="cursor-pointer"
+              link="/threads"
+            >
+              Past threads
+            </Button>
+            <Button
+              variant="secondary"
+              leftIcon={<RocketIcon />}
+              className="cursor-pointer"
+              link="/pricing"
+            >
+              Pricing
+            </Button>
             <Button
               variant="secondary"
               onClick={handleSignOut}
@@ -80,15 +95,14 @@ export function Header({ user }: HeaderProps) {
           </>
         ) : (
           <>
-            <Link href="/pricing">
-              <Button
-                variant="secondary"
-                leftIcon={<RocketIcon />}
-                className="cursor-pointer"
-              >
-                Pricing
-              </Button>
-            </Link>
+            <Button
+              variant="secondary"
+              leftIcon={<RocketIcon />}
+              className="cursor-pointer"
+              link="/pricing"
+            >
+              Pricing
+            </Button>
             <Button
               variant="secondary"
               onClick={handleSignIn}
