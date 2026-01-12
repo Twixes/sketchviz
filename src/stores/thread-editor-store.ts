@@ -57,6 +57,7 @@ interface ThreadEditorState {
 
   // UI state
   error: string | null;
+  isComparing: boolean;
 
   // Loading states
   isUploading: boolean;
@@ -101,6 +102,7 @@ interface ThreadEditorState {
   setIsUploading: (isUploading: boolean) => void;
   setIsGenerating: (isGenerating: boolean) => void;
   setIsBusyForUser: (isBusy: boolean) => void;
+  setIsComparing: (isComparing: boolean) => void;
   reset: () => void;
 }
 
@@ -118,6 +120,7 @@ const initialState = {
   aspectRatio: null as AspectRatio | null,
   referenceImages: [] as ReferenceImage[],
   error: null as string | null,
+  isComparing: false,
   isUploading: false,
   isGenerating: false,
   isBusyForUser: false,
@@ -352,6 +355,7 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
       },
 
       setIsGenerating: (isGenerating) => set({ isGenerating }),
+      setIsComparing: (isComparing) => set({ isComparing }),
 
       reset: () => {
         const { inputSrc, referenceImages, model } = get();

@@ -2,13 +2,13 @@
 
 import {
   ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   ChevronUpIcon,
+  Half2Icon,
 } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { motion } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
+import { useCompareToPrevious } from "@/hooks/use-compare-to-previous";
 import { TIME_MACHINE_SPRING } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 
@@ -32,6 +32,7 @@ export function LayerNavigationControls({
   orientation = "vertical",
 }: LayerNavigationControlsProps) {
   const canGoPrevious = currentIndex > 0;
+  const canCompare = currentIndex > 0 && !disabled;
   const canGoNext = currentIndex < totalLayers - 1;
   const isVertical = orientation === "vertical";
 
@@ -42,6 +43,12 @@ export function LayerNavigationControls({
   useEffect(() => {
     prevIndexRef.current = currentIndex;
   }, [currentIndex]);
+
+  // Compare to previous layer functionality
+  const {
+    handlePointerDown: handleComparePointerDown,
+    handlePointerUp: handleComparePointerUp,
+  } = useCompareToPrevious();
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
@@ -77,6 +84,26 @@ export function LayerNavigationControls({
       animate={{ opacity: 1, [isVertical ? "x" : "y"]: 0 }}
       transition={TIME_MACHINE_SPRING}
     >
+      {/* Compare to previous */}
+      <Button
+        variant="icon"
+        size="sm"
+        onPointerDown={handleComparePointerDown}
+        onPointerUp={handleComparePointerUp}
+        disabled={!canCompare}
+        className={clsx(
+          "transition-all",
+          canCompare
+            ? isVertical
+              ? "hover:scale-110"
+              : "hover:scale-101"
+            : "opacity-30 cursor-not-allowed",
+        )}
+        tooltip="Hold to compare with previous layer"
+      >
+        <Half2Icon className="w-5 h-5" />
+      </Button>
+
       {/* Previous arrow */}
       <Button
         variant="icon"
