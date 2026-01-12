@@ -95,8 +95,8 @@ strong {
     );
   background-size:
     22px 22px,
-    50vmax 50vmax,
-    45vmax 45vmax;
+    65vmax 65vmax,
+    55vmax 55vmax;
   opacity: 0.8;
   pointer-events: none;
   z-index: 0;
