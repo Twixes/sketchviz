@@ -2,6 +2,7 @@ import { CheckIcon } from "@radix-ui/react-icons";
 import * as Popover from "@radix-ui/react-popover";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { useState } from "react";
+import { cn } from "@/lib/cn";
 import { Button } from "./Button";
 
 export interface SelectOption<T> {
@@ -69,9 +70,10 @@ export function Select<T extends string | null>({
             )}
           </span>
           <span
-            className={`text-black/60 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={cn(
+              "text-black/60 transition-transform duration-200",
+              isOpen && "rotate-180",
+            )}
           >
             ▼
           </span>
@@ -101,19 +103,21 @@ export function Select<T extends string | null>({
                   className="group relative w-full pr-8"
                 >
                   <option.icon
-                    className={`size-4 shrink-0 transition-transform duration-150 ${
-                      isSelected || isDisabled ? "" : "group-hover:scale-110"
-                    }`}
+                    className={cn(
+                      "size-4 shrink-0 transition-transform duration-150",
+                      !isSelected && !isDisabled && "group-hover:scale-110",
+                    )}
                   />
                   <div className="flex flex-col items-start flex-1">
-                    <span className={option.description ? "font-medium" : ""}>
+                    <span className={cn(option.description && "font-medium")}>
                       {option.label}
                     </span>
                     {option.description && (
                       <span
-                        className={`text-xs ${
-                          isSelected ? "text-white/70" : "text-black/50"
-                        }`}
+                        className={cn(
+                          "text-xs",
+                          isSelected ? "text-white/70" : "text-black/50",
+                        )}
                       >
                         {option.description}
                       </span>

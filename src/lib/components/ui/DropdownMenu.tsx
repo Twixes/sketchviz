@@ -2,8 +2,8 @@
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import clsx from "clsx";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/cn";
 
 interface DropdownMenuProps {
   children: ReactNode;
@@ -27,7 +27,7 @@ export function DropdownMenu({ children, trigger }: DropdownMenuProps) {
       </DropdownMenuPrimitive.Trigger>
       <DropdownMenuPrimitive.Portal>
         <DropdownMenuPrimitive.Content
-          className={clsx(
+          className={cn(
             "z-50 min-w-[180px] overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-lg",
             "animate-in fade-in-0 zoom-in-95",
           )}
@@ -56,7 +56,7 @@ export function DropdownMenuItem({
 }: DropdownMenuItemProps) {
   return (
     <DropdownMenuPrimitive.Item
-      className={clsx(
+      className={cn(
         "flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none transition-colors",
         disabled && "opacity-50 cursor-not-allowed",
         destructive

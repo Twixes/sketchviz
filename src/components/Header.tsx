@@ -134,23 +134,20 @@ function CreditsButton(): JSX.Element {
         </>
       }
     >
+      <span className="text-black/50">Credits left:</span>
       {isLoadingCredits ? (
         <span>...</span>
       ) : creditsData?.planType === "pro" &&
         creditsData.credits !== null &&
         creditsData.credits <= 0 ? (
         <>
-          <span className="text-black/50">Credits left:</span>
           <span>0</span>
           <span className="text-black/40 font-normal">
             (pay-as-you-go: {Math.abs(creditsData.credits)})
           </span>
         </>
       ) : (
-        <>
-          <span className="text-black/50">Credits left:</span>
-          <span>{creditsData?.credits ?? "none"}</span>
-        </>
+        <span>{creditsData?.credits ?? "none"}</span>
       )}
     </Button>
   );

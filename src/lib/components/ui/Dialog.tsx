@@ -2,8 +2,8 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import clsx from "clsx";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/cn";
 import { Button } from "./Button";
 
 interface DialogProps {
@@ -28,7 +28,7 @@ export function Dialog({
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in-0" />
         <DialogPrimitive.Content
-          className={clsx(
+          className={cn(
             "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2",
             "rounded-2xl border border-black/10 bg-white p-6 shadow-xl",
             "animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%]",

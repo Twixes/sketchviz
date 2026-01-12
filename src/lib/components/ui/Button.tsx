@@ -1,7 +1,7 @@
 import * as Tooltip from "@radix-ui/react-tooltip";
-import clsx from "clsx";
 import Link from "next/link";
 import type React from "react";
+import { cn } from "@/lib/cn";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -40,7 +40,7 @@ const LoadingSpinner = ({ size }: { size: "sm" | "md" | "lg" }) => {
 
   return (
     <svg
-      className={clsx(sizeClass, "animate-spin")}
+      className={cn(sizeClass, "animate-spin")}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -94,25 +94,25 @@ export const Button = ({
 
   // Variant-specific classes
   const variantClasses = {
-    primary: clsx([
+    primary: cn([
       "font-semibold",
       loading || disabled
         ? "cursor-not-allowed bg-black/20 text-black/40"
         : "bg-black text-white hover:bg-black/90",
     ]),
-    secondary: clsx([
+    secondary: cn([
       "border border-black/20 bg-white/75 font-medium text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
         : "hover:border-black/30 hover:bg-white/90",
     ]),
-    ghost: clsx([
+    ghost: cn([
       "text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
         : "hover:bg-black/5",
     ]),
-    icon: clsx([
+    icon: cn([
       colorScheme === "dark"
         ? "bg-black/80 text-white"
         : "bg-white/80 text-black",
@@ -122,7 +122,7 @@ export const Button = ({
           ? "hover:bg-black/90"
           : "hover:bg-white/90",
     ]),
-    "list-item": clsx([
+    "list-item": cn([
       "text-left",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
@@ -177,7 +177,7 @@ export const Button = ({
     <button
       type={type}
       disabled={loading || disabled}
-      className={clsx(
+      className={cn(
         baseClasses,
         variantClasses,
         sizeClasses,
