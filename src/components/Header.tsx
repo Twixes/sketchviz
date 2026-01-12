@@ -109,7 +109,7 @@ export function Header({ user }: HeaderProps) {
               leftIcon={<GoogleIcon />}
               className="cursor-pointer"
             >
-              Sign up with Google
+              Sign in with Google
             </Button>
           </>
         )}
