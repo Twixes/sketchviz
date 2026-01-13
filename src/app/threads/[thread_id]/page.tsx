@@ -377,7 +377,7 @@ export default function ThreadDetailPage({
 
   // Format date for description
   const formattedDate = thread
-    ? new Date(thread.created_at).toLocaleString(undefined, {
+    ? new Date(thread.created_at).toLocaleString("en-US", {
         day: "numeric",
         month: "long",
         year: "numeric",
