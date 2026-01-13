@@ -1,6 +1,5 @@
 "use client";
 
-import { sendGAEvent, sendGTMEvent } from "@next/third-parties/google";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
@@ -36,15 +35,26 @@ export function SessionProvider({
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: we want this to run on every page change
   useEffect(() => {
-    sendGTMEvent({
-      event: "conversion",
-      value: {
-        send_to: "AW-971292206/UqMnCMns6ekZEK78ks8D",
-        value: 1.0,
-        currency: "PLN",
-      },
+    window.gtag?.("event", "conversion", {
+      send_to: "AW-971292206/UqMnCMns6ekZEK78ks8D",
+      value: 1.0,
+      currency: "PLN",
     });
   }, [pathname]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("signup") === "true") {
+      window.gtag?.("event", "conversion", {
+        send_to: "AW-971292206/OnR4CMWIxdsbEK78ks8D",
+      });
+      // Remove signup param from URL without creating a history entry
+      params.delete("signup");
+      const newSearch = params.toString();
+      const newUrl = `${window.location.pathname}${newSearch ? `?${newSearch}` : ""}`;
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, []);
 
   useEffect(() => {
     const {
@@ -58,10 +68,6 @@ export function SessionProvider({
           email: session?.user?.email,
           name: session?.user?.user_metadata.full_name,
           first_name: extractFirstName(session?.user?.user_metadata.full_name),
-        });
-        sendGTMEvent({
-          event: "conversion",
-          value: { send_to: "AW-971292206/OnR4CMWIxdsbEK78ks8D" },
         });
       } else {
         posthog.reset();

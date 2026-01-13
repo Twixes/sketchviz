@@ -9,6 +9,7 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const origin = requestUrl.origin;
+  let isSignup = false;
 
   if (code) {
     const supabase = await createClient();
@@ -41,6 +42,7 @@ export async function GET(request: Request) {
               },
             },
           });
+          isSignup = true;
         } else {
           throw error;
         }
@@ -48,13 +50,18 @@ export async function GET(request: Request) {
     }
   }
 
-  // URL to redirect to after sign in process completes
+  // URL to redirect to after auth completes
   // If a redirect param was passed, go there; otherwise go to /auth/success (for popup flow)
   const redirectPath = requestUrl.searchParams.get("redirect");
-  if (isValidRedirectPath(redirectPath)) {
-    return NextResponse.redirect(`${origin}${redirectPath}`);
+  const redirectUrl = new URL(
+    isValidRedirectPath(redirectPath)
+      ? `${origin}${redirectPath}`
+      : `${origin}/auth/success`,
+  );
+  if (isSignup) {
+    redirectUrl.searchParams.set("signup", "true");
   }
-  return NextResponse.redirect(`${origin}/auth/success`);
+  return NextResponse.redirect(redirectUrl);
 }
 
 /**

@@ -1,5 +1,4 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
-import { randomUUID } from "crypto";
 import sharp from "sharp";
 import {
   cleanUpEditDescription,

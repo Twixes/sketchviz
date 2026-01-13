@@ -2,8 +2,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import { GoogleTagManager } from "@next/third-parties/google";
 import Head from "next/head";
+import Script from "next/script";
 import { QueryProvider } from "@/components/QueryProvider";
 import { SessionProvider } from "@/components/SessionProvider";
 import { createClient } from "@/lib/supabase/server";
@@ -49,7 +49,19 @@ export default async function RootLayout({
         />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <GoogleTagManager gtmScriptUrl="https://www.googletagmanager.com/gtag/js?id=AW-971292206" />
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=AW-971292206"
+        strategy="afterInteractive"
+      />
+      <Script id="gtag-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'AW-971292206');
+        `}
+      </Script>
       <body
         className={`${outfit.variable} antialiased`}
         style={
