@@ -46,7 +46,7 @@ export function SessionProvider({
     const params = new URLSearchParams(window.location.search);
     if (params.get("signup") === "true") {
       window.gtag?.("event", "conversion", {
-        send_to: "AW-971292206/OnR4CMWIxdsbEK78ks8D",
+        send_to: "AW-971292206/BcHUCIuLyuIbEK78ks8D",
       });
       // Remove signup param from URL without creating a history entry
       params.delete("signup");
