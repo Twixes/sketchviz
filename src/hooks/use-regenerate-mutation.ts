@@ -23,8 +23,12 @@ interface RegenerateResponse {
 }
 
 export function useRegenerateMutation() {
-  const { referenceImages, setIsGenerating, updateGenerationOutput } =
-    useThreadEditorStore();
+  const {
+    referenceImages,
+    setIsGenerating,
+    updateGenerationOutput,
+    navigateNext,
+  } = useThreadEditorStore();
 
   return useMutation({
     mutationFn: async ({
@@ -94,6 +98,7 @@ export function useRegenerateMutation() {
         data.height,
       );
       setIsGenerating(false);
+      navigateNext();
       posthog.capture("regeneration_completed", {
         thread_id: data.threadId,
         generation_id: data.generationId,

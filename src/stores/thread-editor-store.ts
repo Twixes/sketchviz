@@ -173,12 +173,12 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
 
       // Actions
       setThread: (thread) => {
-        const { thread: currentThread, activeLayerIndex } = get();
+        const { thread: currentThread } = get();
         const isSameThread = currentThread?.id === thread.id;
 
         if (isSameThread) {
           // Updating existing thread: preserve current layer and params
-          set({ thread, activeLayerIndex: activeLayerIndex + 1 });
+          set({ thread });
         } else {
           // New thread: Navigate to the latest layer when setting thread
           // Latest layer gets fresh/default params (ready for next generation)
