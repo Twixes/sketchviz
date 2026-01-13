@@ -19,7 +19,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     value: "google/gemini-3-pro-image-preview/4k",
     label: (
       <>
-        Pro{" "}
+        High{" "}
         <span className="bg-black rounded-md px-1 ml-1 text-xs font-semibold border border-white text-white">
           4K
         </span>
@@ -38,7 +38,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     value: "google/gemini-3-pro-image-preview",
     label: (
       <>
-        Pro{" "}
+        High{" "}
         <span className="bg-neutral-200 rounded-md px-1 ml-1 text-xs font-semibold border border-white text-neutral-800">
           2K
         </span>
@@ -57,7 +57,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     value: "google/gemini-2.5-flash-image-preview",
     label: (
       <>
-        Lite{" "}
+        Low{" "}
         <span className="bg-neutral-200 rounded-md px-1 ml-1 text-xs font-semibold border border-white text-neutral-800">
           1K
         </span>
