@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
@@ -23,6 +23,7 @@ interface RegenerateResponse {
 }
 
 export function useRegenerateMutation() {
+  const queryClient = useQueryClient();
   const {
     referenceImages,
     setIsGenerating,
@@ -98,6 +99,7 @@ export function useRegenerateMutation() {
         data.height,
       );
       setIsGenerating(false);
+      queryClient.invalidateQueries({ queryKey: ["plan"] });
       navigateNext();
       posthog.capture("regeneration_completed", {
         thread_id: data.threadId,
