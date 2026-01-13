@@ -27,7 +27,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     ),
     description: (
       <>
-        <strong>Highest quality in 4K resolution.</strong>
+        <strong>Best quality, in 4K resolution.</strong>
         <br />
         Powered by Google's Nano Banana Pro.
       </>
@@ -46,7 +46,7 @@ export const MODEL_OPTIONS: ModelOption[] = [
     ),
     description: (
       <>
-        <strong>Highest quality in standard resolution (default).</strong>
+        <strong>Best quality, in standard resolution (default).</strong>
         <br />
         Powered by Google's Nano Banana Pro.
       </>
