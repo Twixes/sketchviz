@@ -1,6 +1,6 @@
 import { Cross2Icon, ImageIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useReferenceUploadMutation } from "@/hooks/use-reference-upload-mutation";
 import { Button } from "@/lib/components/ui/Button";
@@ -212,12 +212,28 @@ interface ImageModalProps {
 }
 
 function ImageModal({ image, onClose }: ImageModalProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      e.stopPropagation();
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   if (typeof document === "undefined") {
     return null;
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xl p-4">
+    // biome-ignore lint/a11y/noStaticElementInteractions: Modal backdrop pattern
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Keyboard handled via document-level Escape listener
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xl p-4 cursor-pointer"
+      onClick={onClose}
+    >
       <Button
         variant="icon"
         colorScheme="light"
@@ -227,7 +243,12 @@ function ImageModal({ image, onClose }: ImageModalProps) {
       >
         <Cross2Icon className="h-5 w-5" />
       </Button>
-      <div className="max-w-[90vw] max-h-[90vh] relative">
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: Image container needs stopPropagation */}
+      <div
+        className="max-w-[90vw] max-h-[90vh] relative cursor-default"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
         <img
           src={image.localSrc}
           alt="Reference full view"
