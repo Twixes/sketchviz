@@ -188,7 +188,7 @@ export async function generateVisualizationImage(
     prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
   }
   prompt +=
-    ". Use the last image of the first message as the base. Only make the image more photo-realistic, without changing any of the details (unless the user asks otherwise).";
+    ".\nUse the last image of the first message as the base. Only make the image photo-realistic and high-resolution, without changing any of the details (unless the user asks otherwise).";
 
   if (params.editDescription) {
     prompt += `\n\nSpecific requests from the user:\n${params.editDescription}`;
@@ -214,37 +214,37 @@ export async function generateIterationImage(
 ): Promise<GeneratedImage> {
   // Build the prompt for iteration - no "Turn this SketchUp render" prefix
   let prompt =
-    "Refine this visualization based on the user's feedback. Preserve the overall style, perspective, and composition unless specifically asked to change them";
+    "Refine this visualization based on the user's feedback. Preserve the overall style, perspective, and composition unless specifically asked to change them.";
 
   // Handle outdoor lighting
   if (params.outdoorLight === "sunny") {
-    prompt += ". Apply sunny outdoor lighting";
+    prompt += " Apply sunny outdoor lighting.";
   } else if (params.outdoorLight === "overcast") {
-    prompt += ". Apply overcast outdoor lighting";
+    prompt += " Apply overcast outdoor lighting.";
   } else if (params.outdoorLight === "night") {
-    prompt += ". Apply night-time outdoor lighting";
+    prompt += " Apply night-time outdoor lighting.";
   } else if (params.outdoorLight) {
-    prompt += `. Apply outdoor lighting as follows: ${params.outdoorLight}`;
+    prompt += ` Apply outdoor lighting as follows: ${params.outdoorLight}.`;
   }
 
   // Handle indoor lighting
   if (params.indoorLight === "all_off") {
-    prompt += ", all indoor lights should be off";
+    prompt += " All indoor lights should be off.";
   } else if (params.indoorLight === "all_on") {
-    prompt += ", all visible indoor lights should be on";
+    prompt += " All visible indoor lights should be on.";
   } else if (params.indoorLight) {
-    prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
+    prompt += ` Make the indoor lighting as follows: ${params.indoorLight}.`;
   }
 
   if (params.editDescription) {
-    prompt += `. User's specific requests: ${params.editDescription}`;
+    prompt += `\n\nUser's specific requests:\n${params.editDescription}\n\n`;
   }
 
   // Add reference to provided reference images
   if (params.referenceImages && params.referenceImages.length > 0) {
-    prompt += `. Use the reference image${
+    prompt += `\n\nUse the reference image${
       params.referenceImages.length > 1 ? "s" : ""
-    } provided for materials, textures, and style`;
+    } provided for materials, textures, and style.`;
   }
 
   return generateImageFromPrompt(params, prompt);
