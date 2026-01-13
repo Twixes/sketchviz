@@ -173,19 +173,27 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
 
       // Actions
       setThread: (thread) => {
-        // Navigate to the latest layer when setting thread
-        // Latest layer gets fresh/default params (ready for next generation)
-        const latestIndex = thread.generations.length;
-        set({
-          thread,
-          activeLayerIndex: latestIndex,
-          outdoorLight: null,
-          indoorLight: null,
-          editDescription: null,
-          model: `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
-          aspectRatio: null,
-          inputImageDimensions: null, // Clear stale dimensions from previous thread
-        });
+        const { thread: currentThread, activeLayerIndex } = get();
+        const isSameThread = currentThread?.id === thread.id;
+
+        if (isSameThread) {
+          // Updating existing thread: preserve current layer and params
+          set({ thread, activeLayerIndex: activeLayerIndex + 1 });
+        } else {
+          // New thread: Navigate to the latest layer when setting thread
+          // Latest layer gets fresh/default params (ready for next generation)
+          const latestIndex = thread.generations.length;
+          set({
+            thread,
+            activeLayerIndex: latestIndex,
+            outdoorLight: null,
+            indoorLight: null,
+            editDescription: null,
+            model: `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
+            aspectRatio: null,
+            inputImageDimensions: null, // Clear stale dimensions from previous thread
+          });
+        }
       },
 
       addGeneration: (generation) => {

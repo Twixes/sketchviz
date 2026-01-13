@@ -1,6 +1,5 @@
 "use client";
 
-import { ReloadIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
@@ -14,7 +13,6 @@ import {
   TIME_MACHINE_LAYER_SPRING,
 } from "@/lib/animation-constants";
 import type { AspectRatio } from "@/lib/aspect-ratio";
-import { Button } from "@/lib/components/ui/Button";
 import type { Generation } from "@/stores/thread-editor-store";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
@@ -42,7 +40,6 @@ interface TimeMachineViewerProps {
   activeLayerIndex?: number;
   onLayerClick?: (index: number) => void;
   isGenerating?: boolean;
-  onVisualizeAgain?: () => void;
   aspectRatio?: AspectRatio | null;
   threadId?: string;
   threadTitle?: string | null;
@@ -56,7 +53,6 @@ function LayerImage({
   relativePosition,
   onClick,
   isGenerating,
-  onVisualizeAgain,
   threadTitle,
   isComparing,
 }: {
@@ -65,7 +61,6 @@ function LayerImage({
   relativePosition: number; // 0 = active, negative = behind
   onClick: () => void;
   isGenerating?: boolean;
-  onVisualizeAgain?: () => void;
   threadTitle?: string | null;
   isComparing?: boolean;
 }) {
@@ -153,7 +148,7 @@ function LayerImage({
           </div>
         )}
 
-        {/* Layer label and actions */}
+        {/* Layer label */}
         <div className="absolute bottom-3 left-3 flex items-center gap-2">
           <div
             className={clsx(
@@ -163,20 +158,6 @@ function LayerImage({
           >
             {layer.label}
           </div>
-          {isActive && layer.index > 0 && onVisualizeAgain && !isGenerating && (
-            <Button
-              variant="secondary"
-              size="sm"
-              leftIcon={<ReloadIcon className="w-3 h-3" />}
-              onClick={(e) => {
-                e.stopPropagation();
-                onVisualizeAgain();
-              }}
-              tooltip="This layer will be regenerated from the previous layer, with current parameters applied"
-            >
-              Regenerate
-            </Button>
-          )}
         </div>
         {signedUrl && layer.index > 0 && (
           <div className="absolute bottom-3 right-3">
@@ -204,7 +185,6 @@ export function TimeMachineViewer({
   activeLayerIndex = 0,
   onLayerClick,
   isGenerating = false,
-  onVisualizeAgain,
   aspectRatio,
   threadTitle,
   onNavigatePrevious,
@@ -324,7 +304,6 @@ export function TimeMachineViewer({
                 relativePosition={relativePosition}
                 onClick={() => onLayerClick?.(layer.index)}
                 isGenerating={isGenerating}
-                onVisualizeAgain={onVisualizeAgain}
                 threadTitle={threadTitle}
                 isComparing={isComparing}
               />

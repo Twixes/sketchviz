@@ -23,6 +23,7 @@ interface GenerateButtonProps {
    * When true, shows "Iterate" label and UpdateIcon.
    */
   isIteration?: boolean;
+  hasGenerations?: boolean;
   onGenerate: () => void;
   onSignIn: () => void;
 }
@@ -34,6 +35,7 @@ export function GenerateButton({
   planType,
   isGenerating,
   isIteration = false,
+  hasGenerations = false,
   onGenerate,
   onSignIn,
 }: GenerateButtonProps) {
@@ -54,6 +56,9 @@ export function GenerateButton({
     }
     if (isIteration) {
       return "Iterate";
+    }
+    if (hasGenerations) {
+      return "Re-visualize";
     }
     return "Visualize";
   };

@@ -234,6 +234,8 @@ export default function ThreadDetailPage({
         // Clear tentative ID to signal we've transitioned to existing thread
         threadEditorStore.setTentativeThreadId(null);
       }
+    } catch (error) {
+      console.error("Failed to generate initial image:", error);
     } finally {
       threadEditorStore.setIsBusyForUser(false);
     }
@@ -279,26 +281,26 @@ export default function ThreadDetailPage({
     }
   }, [threadEditorStore, iterateMutation, queryClient, threadId]);
 
+  // Re-visualize the initial layer (layer 0) with current parameters
   const handleVisualizeAgain = useCallback(async () => {
-    const activeGen = threadEditorStore.getActiveGeneration();
-    if (!activeGen?.id) return;
+    const thread = threadEditorStore.thread;
+    const generations = thread?.generations ?? [];
+    const firstGen = generations[0];
 
-    threadEditorStore.setIsGenerating(true);
-    try {
-      await regenerateMutation.mutateAsync({
-        generationId: activeGen.id,
-        outdoorLight: threadEditorStore.outdoorLight,
-        indoorLight: threadEditorStore.indoorLight,
-        editDescription: threadEditorStore.editDescription,
-        model: threadEditorStore.model,
-        aspectRatio: threadEditorStore.aspectRatio,
-      });
+    if (!firstGen?.id) return;
 
-      // The generation output is already updated by the mutation's onSuccess handler
-      queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
-    } finally {
-      threadEditorStore.setIsGenerating(false);
-    }
+    // The mutation handles setIsGenerating automatically
+    await regenerateMutation.mutateAsync({
+      generationId: firstGen.id,
+      outdoorLight: threadEditorStore.outdoorLight,
+      indoorLight: threadEditorStore.indoorLight,
+      editDescription: threadEditorStore.editDescription,
+      model: threadEditorStore.model,
+      aspectRatio: threadEditorStore.aspectRatio,
+    });
+
+    // The generation output is already updated by the mutation's onSuccess handler
+    queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
   }, [threadEditorStore, regenerateMutation, queryClient, threadId]);
 
   const handleReferenceImageDrop = async (file: File) => {
@@ -340,9 +342,14 @@ export default function ThreadDetailPage({
   const hasGenerations = generations.length > 0;
   const activeGeneration = threadEditorStore.getActiveGeneration();
   const canIterate = hasGenerations && !!activeGeneration?.output_url;
-
   // Determine the appropriate generate handler
-  const handleGenerate = hasGenerations ? handleIterate : handleInitialGenerate;
+  const activeLayerIndex = threadEditorStore.activeLayerIndex;
+  const handleGenerate =
+    activeLayerIndex === 0 && hasGenerations
+      ? handleVisualizeAgain
+      : activeLayerIndex > 0
+        ? handleIterate
+        : handleInitialGenerate;
 
   // Loading state for existing threads
   if (!isNewThread && user && isLoading) {
@@ -396,7 +403,6 @@ export default function ThreadDetailPage({
             activeLayerIndex={threadEditorStore.activeLayerIndex}
             onLayerClick={threadEditorStore.navigateToLayer}
             isGenerating={isGenerating}
-            onVisualizeAgain={handleVisualizeAgain}
             aspectRatio={aspectRatio}
             threadTitle={thread?.title}
             onNavigatePrevious={threadEditorStore.navigatePrevious}
@@ -429,6 +435,7 @@ export default function ThreadDetailPage({
             planType={creditsData?.planType}
             isGenerating={isGenerating}
             isIteration={canIterate}
+            hasGenerations={hasGenerations}
             onGenerate={handleGenerate}
             onSignIn={handleSignIn}
           />
