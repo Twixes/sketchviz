@@ -166,14 +166,14 @@ export async function generateVisualizationImage(
     "Turn this Sketchup render into a realistic 3D visualization with full lighting";
   // Handle outdoor lighting
   if (params.outdoorLight === "sunny") {
-    prompt += " with sunny outdoor light";
+    prompt += ", with sunny outdoor light";
   } else if (params.outdoorLight === "overcast") {
-    prompt += " with overcast outdoor light";
+    prompt += ", with overcast outdoor light";
   } else if (params.outdoorLight === "night") {
-    prompt += " with night-time outdoor light";
+    prompt += ", with night-time outdoor light";
   } else if (params.outdoorLight) {
     // Custom outdoor lighting description
-    prompt += ` with outdoor light as follows: ${params.outdoorLight}`;
+    prompt += `, with outdoor light as follows: ${params.outdoorLight}`;
   }
 
   // Handle indoor lighting
@@ -186,15 +186,15 @@ export async function generateVisualizationImage(
     prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
   }
   prompt +=
-    ". Use the last image of the first message as the base. Preserve the current perspective unless user asks otherwise";
+    ". Use the last image of the first message as the base. Only make the image more photo-realistic, without changing any of the details (unless the user asks otherwise).";
 
   if (params.editDescription) {
-    prompt += `. Specific requests from the user: ${params.editDescription}`;
+    prompt += `\n\nSpecific requests from the user:\n${params.editDescription}`;
   }
 
   // Add reference to provided reference images
   if (params.referenceImages && params.referenceImages.length > 0) {
-    prompt += `. Use the reference image${
+    prompt += `\n\nUse the reference image${
       params.referenceImages.length > 1 ? "s" : ""
     } provided for materials, textures, and style`;
   }
@@ -246,6 +246,41 @@ export async function generateIterationImage(
   }
 
   return generateImageFromPrompt(params, prompt);
+}
+
+export async function cleanUpEditDescription(params: {
+  editDescription: string;
+  userId: string;
+}): Promise<string> {
+  if (process.env.SKIP_AI === "1") {
+    return params.editDescription;
+  }
+  const model = withTracing(
+    googleClient.languageModel("gemini-3-flash-preview"),
+    posthogNode,
+    {
+      posthogDistinctId: params.userId,
+    },
+  );
+  const prompt = `
+Polish the following description of changes to an image that were requested by the user, so that we have a clear list of bullet points in English:
+<user_request>
+${params.editDescription}
+</user_request>
+
+Notes: If the user said "this" or "that", they're likely referring to the image they're editing, or their reference images.
+Output ONLY the final list of clear and actionable bullet points.
+`.trim();
+  const result = await generateText({
+    model,
+    prompt: [
+      {
+        role: "user",
+        content: [{ type: "text", text: prompt }],
+      },
+    ],
+  });
+  return result.text;
 }
 
 export async function titleVisualizationImage(params: {

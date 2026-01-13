@@ -1,6 +1,10 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import sharp from "sharp";
-import { generateIterationImage, generateVisualizationImage } from "./ai";
+import {
+  cleanUpEditDescription,
+  generateIterationImage,
+  generateVisualizationImage,
+} from "./ai";
 import type { AspectRatio } from "./aspect-ratio";
 import { calculateCropDimensions } from "./aspect-ratio";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "./constants";
@@ -240,15 +244,24 @@ export async function generateAndUploadImage({
     ...(generationType === "regeneration" && { is_regeneration: true }),
   };
 
-  await polar.events.ingest({
-    events: [
-      {
-        name: "image_generation_started",
-        externalCustomerId: userId,
-        metadata: analyticsMetadata,
-      },
-    ],
-  });
+  // Parallelize cleanup and analytics ingestion
+  const [cleanedEditDescription] = await Promise.all([
+    editDescription
+      ? cleanUpEditDescription({
+          editDescription,
+          userId,
+        })
+      : Promise.resolve(editDescription),
+    polar.events.ingest({
+      events: [
+        {
+          name: "image_generation_started",
+          externalCustomerId: userId,
+          metadata: analyticsMetadata,
+        },
+      ],
+    }),
+  ]);
   posthogNode.capture({
     distinctId: userId,
     event: "image_generation_started",
@@ -270,7 +283,7 @@ export async function generateAndUploadImage({
     filename: preparedImage.filename,
     outdoorLight,
     indoorLight,
-    editDescription,
+    editDescription: cleanedEditDescription,
     model,
     referenceImages: preparedImage.referenceImageBuffers,
     aspectRatio,
