@@ -92,6 +92,8 @@ export async function POST(request: Request) {
       referenceImageUrls: reference_image_urls || [],
     });
 
+    const traceId = crypto.randomUUID();
+
     // Run image generation and title generation in parallel
     const [{ outputUrl, creditCost, width, height }] = await Promise.all([
       generateAndUploadImage({
@@ -104,11 +106,13 @@ export async function POST(request: Request) {
         model,
         aspectRatio: aspect_ratio,
         generationType: "initial",
+        traceId,
       }),
       updateThreadWithTitle(supabase, {
         preparedImage,
         threadId,
         userId,
+        traceId,
       }),
     ]);
 
@@ -185,12 +189,14 @@ async function updateThreadWithTitle(
     preparedImage: PreparedImageData;
     threadId: string;
     userId: string;
+    traceId: string;
   },
 ): Promise<string> {
   const title = await titleVisualizationImage({
     buffer: params.preparedImage.imageBuffer,
     mediaType: params.preparedImage.contentType,
     userId: params.userId,
+    traceId: params.traceId,
   });
   await supabase.from("threads").update({ title }).eq("id", params.threadId);
   return title;

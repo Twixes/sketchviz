@@ -36,6 +36,7 @@ type GenerateImageParams = {
   referenceImages?: Array<{ buffer: Buffer; mediaType: string }>;
   aspectRatio?: AspectRatio | null;
   userId: string;
+  traceId: string;
 };
 
 async function generateImageFromPrompt(
@@ -73,6 +74,7 @@ async function generateImageFromPrompt(
       posthogNode,
       {
         posthogDistinctId: params.userId,
+        posthogTraceId: params.traceId,
       },
     );
   } else {
@@ -251,6 +253,7 @@ export async function generateIterationImage(
 export async function cleanUpEditDescription(params: {
   editDescription: string;
   userId: string;
+  traceId: string;
 }): Promise<string> {
   if (process.env.SKIP_AI === "1") {
     return params.editDescription;
@@ -260,6 +263,7 @@ export async function cleanUpEditDescription(params: {
     posthogNode,
     {
       posthogDistinctId: params.userId,
+      posthogTraceId: params.traceId,
     },
   );
   const prompt = `
@@ -287,6 +291,7 @@ export async function titleVisualizationImage(params: {
   buffer: Buffer;
   mediaType: string;
   userId: string;
+  traceId: string;
 }): Promise<string> {
   if (process.env.SKIP_AI === "1") {
     return "Octocat Test";

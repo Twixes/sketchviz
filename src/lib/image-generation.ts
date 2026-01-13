@@ -1,4 +1,5 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { randomUUID } from "crypto";
 import sharp from "sharp";
 import {
   cleanUpEditDescription,
@@ -35,6 +36,7 @@ export interface PreparedImageData {
 interface ProcessImageGenerationParams {
   supabase: SupabaseClient;
   user: User;
+  traceId: string;
   inputUrl: string;
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
@@ -202,6 +204,7 @@ export async function prepareImageForGeneration({
 export async function generateAndUploadImage({
   supabase,
   userId,
+  traceId,
   preparedImage,
   outdoorLight,
   indoorLight,
@@ -213,6 +216,7 @@ export async function generateAndUploadImage({
 }: {
   supabase: SupabaseClient;
   userId: string;
+  traceId: string;
   preparedImage: PreparedImageData;
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
@@ -244,12 +248,12 @@ export async function generateAndUploadImage({
     ...(generationType === "regeneration" && { is_regeneration: true }),
   };
 
-  // Parallelize cleanup and analytics ingestion
   const [cleanedEditDescription] = await Promise.all([
     editDescription
       ? cleanUpEditDescription({
           editDescription,
           userId,
+          traceId,
         })
       : Promise.resolve(editDescription),
     polar.events.ingest({
@@ -288,6 +292,7 @@ export async function generateAndUploadImage({
     referenceImages: preparedImage.referenceImageBuffers,
     aspectRatio,
     userId,
+    traceId,
   });
 
   // Extract dimensions from generated image
@@ -329,6 +334,7 @@ export async function generateAndUploadImage({
 export async function processImageGeneration({
   supabase,
   user,
+  traceId,
   inputUrl,
   outdoorLight,
   indoorLight,
@@ -357,5 +363,6 @@ export async function processImageGeneration({
     aspectRatio,
     generationType,
     useBasePrompt,
+    traceId,
   });
 }

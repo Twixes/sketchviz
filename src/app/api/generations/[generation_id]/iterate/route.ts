@@ -106,11 +106,14 @@ export async function POST(
   }
   const newGenerationId = newGeneration.id;
 
+  const traceId = crypto.randomUUID();
+
   try {
     const { outputUrl, creditCost, width, height } =
       await processImageGeneration({
         supabase,
         user,
+        traceId,
         inputUrl,
         outdoorLight: outdoor_light,
         indoorLight: indoor_light,
