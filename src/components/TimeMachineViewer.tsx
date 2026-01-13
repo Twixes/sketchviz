@@ -237,17 +237,15 @@ export function TimeMachineViewer({
 
   // Calculate CSS aspect ratio for the viewer
   const cssAspectRatio = useMemo(() => {
-    // If user has set an aspect ratio in the editor, respect it (shows crop preview)
-    if (aspectRatio) {
-      return aspectRatio.replace(":", "/");
-    }
-
-    // Layer N (N > 0) = generation at index N-1, use stored output dimensions
     if (activeLayerIndex > 0) {
+      // Layer N (N > 0) = generation at index N-1, use real output dimensions
       const activeGen = generations[activeLayerIndex - 1];
       if (activeGen?.width && activeGen?.height) {
         return `${activeGen.width}/${activeGen.height}`;
       }
+    } else if (aspectRatio) {
+      // For the initial generation, preview the crop
+      return aspectRatio.replace(":", "/");
     }
 
     // Use inputImageDimensions from store (set by handleImageLoad when active layer loads)

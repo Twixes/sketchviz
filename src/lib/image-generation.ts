@@ -63,11 +63,13 @@ export async function prepareImageForGeneration({
   inputUrl,
   aspectRatio,
   referenceImageUrls,
+  generationType,
 }: {
   supabase: SupabaseClient;
   inputUrl: string;
   aspectRatio: AspectRatio | null;
   referenceImageUrls: string[];
+  generationType: "iteration" | "regeneration" | "initial";
 }): Promise<PreparedImageData> {
   // Download the input image
   const parsed = parseStorageUrl(inputUrl);
@@ -106,8 +108,8 @@ export async function prepareImageForGeneration({
   const arrayBuffer = await blob.arrayBuffer();
   let imageBuffer: Buffer = Buffer.from(arrayBuffer);
 
-  // Crop image if aspect ratio is specified
-  if (aspectRatio) {
+  // Crop image if aspect ratio is specified (skip cropping for iterations, let the LLM choose)
+  if (aspectRatio && generationType !== "iteration") {
     const sharpImage = sharp(imageBuffer);
     const metadata = await sharpImage.metadata();
 
@@ -349,6 +351,7 @@ export async function processImageGeneration({
     inputUrl,
     aspectRatio,
     referenceImageUrls,
+    generationType,
   });
 
   return generateAndUploadImage({

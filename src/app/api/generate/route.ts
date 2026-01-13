@@ -90,6 +90,7 @@ export async function POST(request: Request) {
       inputUrl: blobUrl,
       aspectRatio: aspect_ratio,
       referenceImageUrls: reference_image_urls || [],
+      generationType: "initial",
     });
 
     const traceId = crypto.randomUUID();
