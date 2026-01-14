@@ -1,6 +1,6 @@
 "use client";
 
-import type { SupabaseClient, User } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import posthog from "posthog-js";
@@ -14,8 +14,19 @@ import {
 import { extractFirstName } from "@/lib/language-utils";
 import { createClient } from "@/lib/supabase/client";
 
+/** Lightweight user info derived from JWT claims (faster than getUser()) */
+export type SessionUser = {
+  id: string;
+  email: string;
+  user_metadata: {
+    full_name: string;
+    avatar_url?: string;
+    email_verified?: boolean;
+  };
+};
+
 type SessionContextType = {
-  user: User | null;
+  user: SessionUser | null;
   supabase: SupabaseClient;
 };
 
@@ -26,10 +37,10 @@ export function SessionProvider({
   initialUser,
 }: {
   children: ReactNode;
-  initialUser: User | null;
+  initialUser: SessionUser | null;
 }) {
   const [supabase] = useState(() => createClient());
-  const [user, setUser] = useState<User | null>(initialUser);
+  const [user, setUser] = useState<SessionUser | null>(initialUser);
   const pathname = usePathname();
   const queryClient = useQueryClient();
 
@@ -60,14 +71,25 @@ export function SessionProvider({
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      // Extract minimal user info from session (matches getClaims structure)
+      const sessionUser: SessionUser | null = session?.user
+        ? {
+            id: session.user.id,
+            email: session.user.email!,
+            user_metadata: session.user
+              .user_metadata as SessionUser["user_metadata"],
+          }
+        : null;
+      setUser(sessionUser);
       // Invalidate plan query to refetch with new auth state
       queryClient.invalidateQueries({ queryKey: ["plan"] });
-      if (session?.user) {
-        posthog.identify(session?.user?.id, {
-          email: session?.user?.email,
-          name: session?.user?.user_metadata.full_name,
-          first_name: extractFirstName(session?.user?.user_metadata.full_name),
+      if (sessionUser) {
+        posthog.identify(sessionUser.id, {
+          email: sessionUser.email,
+          name: sessionUser.user_metadata?.full_name,
+          first_name: sessionUser.user_metadata?.full_name
+            ? extractFirstName(sessionUser.user_metadata.full_name)
+            : undefined,
         });
       } else {
         posthog.reset();

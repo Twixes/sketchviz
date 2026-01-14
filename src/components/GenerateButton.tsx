@@ -7,13 +7,13 @@ import {
   EyeOpenIcon,
   UpdateIcon,
 } from "@radix-ui/react-icons";
-import type { User } from "@supabase/supabase-js";
 import { Button } from "@/lib/components/ui/Button";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
+import type { SessionUser } from "./SessionProvider";
 
 interface GenerateButtonProps {
-  user: User | null;
+  user: SessionUser | null;
   model: Model;
   credits: number | null | undefined;
   planType: "free" | "pro" | null | undefined;

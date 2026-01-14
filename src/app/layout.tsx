@@ -5,7 +5,10 @@ import "./globals.css";
 import Head from "next/head";
 import Script from "next/script";
 import { QueryProvider } from "@/components/QueryProvider";
-import { SessionProvider } from "@/components/SessionProvider";
+import {
+  SessionProvider,
+  type SessionUser,
+} from "@/components/SessionProvider";
 import { createClient } from "@/lib/supabase/server";
 
 const outfit = Outfit({
@@ -26,9 +29,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims() is faster than getUser() as it only parses the JWT locally
+  const { data } = await supabase.auth.getClaims();
+  const user: SessionUser | null = data?.claims?.sub
+    ? {
+        id: data.claims.sub,
+        email: data.claims.email as string,
+        user_metadata: data.claims
+          .user_metadata as SessionUser["user_metadata"],
+      }
+    : null;
 
   return (
     <html lang="en">

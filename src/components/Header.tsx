@@ -6,7 +6,6 @@ import {
   RocketIcon,
   UploadIcon,
 } from "@radix-ui/react-icons";
-import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -22,9 +21,10 @@ import { FADE_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
+import type { SessionUser } from "./SessionProvider";
 
 interface HeaderProps {
-  user: User | null;
+  user: SessionUser | null;
 }
 
 export function Header({ user }: HeaderProps) {

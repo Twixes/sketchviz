@@ -1,14 +1,14 @@
 "use client";
 
-import type { User } from "@supabase/supabase-js";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import { Header } from "./Header";
 import { NeonBackground } from "./NeonBackground";
+import type { SessionUser } from "./SessionProvider";
 
 interface PageWrapperProps {
-  user: User | null;
+  user: SessionUser | null;
   children: ReactNode;
   /** Gap between content items (title, children). Defaults to 'normal' (gap-12). */
   gap?: "small" | "normal" | "large";
