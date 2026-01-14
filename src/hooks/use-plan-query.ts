@@ -16,5 +16,8 @@ export function usePlanQuery(): UseQueryResult<PlanResponse, Error> {
     queryFn: fetchPlan,
     refetchOnWindowFocus: true,
     staleTime: 30000, // Consider data fresh for 30 seconds
+    // Keep refetching while planType is null (Polar still processing signup)
+    refetchInterval: (query) =>
+      query.state.data?.planType === null ? 2000 : false,
   });
 }

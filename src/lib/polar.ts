@@ -26,7 +26,10 @@ export async function getCreditsForUser(
       meterId: CREDIT_METER_ID,
     });
     const creditMeter = customerMetersPage.result.items[0];
-    return creditMeter?.balance ?? null;
+
+    // If the credit meter doesn't exist yet, show the free allowance
+    // (Polar may still be processing signup)
+    return creditMeter?.balance ?? DEFAULT_FREE_PLAN_CREDITS;
   } catch (error) {
     posthogNode.captureException(error, userId);
     console.error("Error fetching credits:", error);
