@@ -1,4 +1,3 @@
-import { RocketIcon } from "@radix-ui/react-icons";
 import type React from "react";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
@@ -35,7 +34,6 @@ export const MODEL_OPTIONS: ModelOption[] = [
         Powered by Google's Nano Banana Pro.
       </>
     ),
-    icon: RocketIcon,
   },
   {
     value: "google/gemini-3-pro-image-preview",
@@ -56,7 +54,6 @@ export const MODEL_OPTIONS: ModelOption[] = [
         Powered by Google's Nano Banana Pro.
       </>
     ),
-    icon: RocketIcon,
   },
 ];
 

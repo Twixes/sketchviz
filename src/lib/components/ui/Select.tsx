@@ -8,7 +8,7 @@ import { Button } from "./Button";
 export interface SelectOption<T> {
   value: T;
   label: string | React.ReactNode;
-  icon: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<{ className?: string }>;
   description?: string | React.ReactNode;
   disabledReason?: string;
 }
@@ -56,7 +56,9 @@ export function Select<T extends string | null>({
           <span id={label} className="flex items-center gap-2 truncate">
             {currentOption ? (
               <>
-                <currentOption.icon className="size-4 shrink-0" />
+                {currentOption.icon && (
+                  <currentOption.icon className="size-4 shrink-0" />
+                )}
                 <div className="flex items-center gap-2">
                   {currentOption.label}
                 </div>
@@ -66,7 +68,9 @@ export function Select<T extends string | null>({
             ) : (
               // Fallback to first option if no match
               <>
-                <fallbackOption.icon className="size-4 shrink-0" />
+                {fallbackOption.icon && (
+                  <fallbackOption.icon className="size-4 shrink-0" />
+                )}
                 <div className="flex items-center gap-2">
                   {fallbackOption.label}
                 </div>
@@ -106,12 +110,14 @@ export function Select<T extends string | null>({
                   }}
                   className="group relative w-full pr-8"
                 >
-                  <option.icon
-                    className={cn(
-                      "size-4 shrink-0 transition-transform duration-150",
-                      !isSelected && !isDisabled && "group-hover:scale-110",
-                    )}
-                  />
+                  {option.icon && (
+                    <option.icon
+                      className={cn(
+                        "size-4 shrink-0 transition-transform duration-150",
+                        !isSelected && !isDisabled && "group-hover:scale-110",
+                      )}
+                    />
+                  )}
                   <div className="flex flex-col items-start flex-1">
                     <span
                       className={cn(
