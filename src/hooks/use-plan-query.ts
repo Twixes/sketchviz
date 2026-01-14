@@ -1,5 +1,6 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import type { PlanResponse } from "@/app/api/plan/types";
+import { useSession } from "@/components/SessionProvider";
 
 async function fetchPlan(): Promise<PlanResponse> {
   const response = await fetch("/api/plan");
@@ -11,13 +12,14 @@ async function fetchPlan(): Promise<PlanResponse> {
 }
 
 export function usePlanQuery(): UseQueryResult<PlanResponse, Error> {
+  const { user } = useSession();
   return useQuery({
     queryKey: ["plan"],
     queryFn: fetchPlan,
     refetchOnWindowFocus: true,
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    // Keep refetching while planType is null (Polar still processing signup)
+    staleTime: 300_000, // Consider data fresh for 5 minutes
     refetchInterval: (query) =>
-      query.state.data?.planType === null ? 2000 : false,
+      // Keep refetching if user is logged in but planType is null (Polar still processing signup)
+      user && query.state.data?.planType === null ? 2000 : false,
   });
 }

@@ -1,6 +1,10 @@
 import { geolocation } from "@vercel/functions";
 import { NextResponse } from "next/server";
-import { getCreditsForUser, getPlanForUser } from "@/lib/polar";
+import {
+  DEFAULT_FREE_PLAN_CREDITS,
+  getCreditsForUser,
+  getPlanForUser,
+} from "@/lib/polar";
 import { createClient } from "@/lib/supabase/server";
 import type { PlanResponse } from "./types";
 
@@ -44,13 +48,17 @@ export async function GET(
 
   const userId = data?.claims?.sub;
 
-  const [credits, [planType]] = userId
+  let [credits, [planType]] = userId
     ? await Promise.all([getCreditsForUser(userId), getPlanForUser(userId)])
     : ([null, [null]] as const);
 
   const isVatApplicable =
     (!!geo.country && COUNTRIES_WITH_VAT.includes(geo.country)) ||
     process.env.NODE_ENV === "development";
+
+  if (!planType && !credits) {
+    credits = DEFAULT_FREE_PLAN_CREDITS;
+  }
 
   return NextResponse.json({ credits, planType, isVatApplicable });
 }

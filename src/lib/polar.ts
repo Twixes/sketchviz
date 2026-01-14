@@ -4,7 +4,7 @@ import { Polar } from "@polar-sh/sdk";
 import { CREDIT_METER_ID, PRO_PLAN_PRODUCT_ID } from "./constants";
 import { posthogNode } from "./posthog/server";
 
-const DEFAULT_FREE_PLAN_CREDITS = 100;
+export const DEFAULT_FREE_PLAN_CREDITS = 100;
 
 export const polar = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN,
@@ -26,10 +26,7 @@ export async function getCreditsForUser(
       meterId: CREDIT_METER_ID,
     });
     const creditMeter = customerMetersPage.result.items[0];
-
-    // If the credit meter doesn't exist yet, show the free allowance
-    // (Polar may still be processing signup)
-    return creditMeter?.balance ?? DEFAULT_FREE_PLAN_CREDITS;
+    return creditMeter?.balance ?? null;
   } catch (error) {
     posthogNode.captureException(error, userId);
     console.error("Error fetching credits:", error);
