@@ -1,4 +1,4 @@
-import { LightningBoltIcon, RocketIcon } from "@radix-ui/react-icons";
+import { RocketIcon } from "@radix-ui/react-icons";
 import type React from "react";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
@@ -17,17 +17,10 @@ interface ModelSelectorProps {
 export const MODEL_OPTIONS: ModelOption[] = [
   {
     value: "google/gemini-3-pro-image-preview/4k",
-    label: (
-      <>
-        High{" "}
-        <span className="bg-black rounded-md px-1 ml-1 text-xs font-semibold border border-white text-white">
-          4K
-        </span>
-      </>
-    ),
+    label: "4K",
     description: (
       <>
-        <strong>Best quality, in 4K resolution.</strong>
+        <strong>High quality. Maximum resolution.</strong>
         <br />
         Powered by Google's Nano Banana Pro.
       </>
@@ -36,43 +29,15 @@ export const MODEL_OPTIONS: ModelOption[] = [
   },
   {
     value: "google/gemini-3-pro-image-preview",
-    label: (
-      <>
-        High{" "}
-        <span className="bg-neutral-200 rounded-md px-1 ml-1 text-xs font-semibold border border-white text-neutral-800">
-          2K
-        </span>
-      </>
-    ),
+    label: "2K",
     description: (
       <>
-        <strong>Best quality, in standard resolution (default).</strong>
+        <strong>High quality. Standard resolution.</strong>
         <br />
         Powered by Google's Nano Banana Pro.
       </>
     ),
     icon: RocketIcon,
-  },
-  {
-    value: "google/gemini-2.5-flash-image-preview",
-    label: (
-      <>
-        Low{" "}
-        <span className="bg-neutral-200 rounded-md px-1 ml-1 text-xs font-semibold border border-white text-neutral-800">
-          1K
-        </span>
-      </>
-    ),
-    description: (
-      <>
-        <strong>
-          Faster and cheaper, but less reliable & lower resolution.
-        </strong>
-        <br />
-        Powered by Google's Nano Banana.
-      </>
-    ),
-    icon: LightningBoltIcon,
   },
 ];
 
@@ -83,7 +48,7 @@ export function ModelSelector({
 }: ModelSelectorProps) {
   return (
     <Select
-      label="Quality"
+      label="Resolution"
       value={value}
       options={MODEL_OPTIONS.map((option) => ({
         ...option,
