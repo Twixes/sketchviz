@@ -21,9 +21,7 @@ function toKebabCase(str: string): string {
     .toLowerCase()
     .replace(/[^\w\s-:]/g, "") // Remove punctuation
     .replace(/:/g, "--") // Replace colons with double hyphens
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
-    .replace(/-+/g, "-") // Collapse multiple hyphens
-    .replace(/^-|-$/g, ""); // Trim leading/trailing hyphens
+    .replace(/\s+/g, "-"); // Replace spaces with hyphens
 }
 
 interface Layer {
