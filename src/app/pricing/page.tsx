@@ -17,7 +17,7 @@ const FREE_FEATURES = [
   "High-fidelity visualization",
   "Output in maximum resolution (4K)",
   "Reference images for materials/textures/style",
-  "Limited to 100 credits (4-25 renders)",
+  "Limited to 100 credits (4-7 renders)",
   "Standard support",
 ];
 
@@ -25,7 +25,7 @@ const PRO_FEATURES = [
   "High-fidelity visualization",
   "Output in maximum resolution (4K)",
   "Reference images for materials/textures/style",
-  "1,000 credits included each month (40-250 renders)",
+  "1,000 credits included each month (40-70 renders)",
   "Then, unlimited usage at $0.015/credit",
   "Priority support",
 ];
