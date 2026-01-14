@@ -162,18 +162,19 @@ function CreditsButton(): JSX.Element {
 function NewRenderButton(): JSX.Element {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const accept = useMemo(() => ACCEPTED_MIME_TYPES.join(","), []);
-  const { setTentativeThreadId } = useThreadEditorStore();
+  const { setTentativeThreadId, reset } = useThreadEditorStore();
   const uploadMutation = useUploadMutation();
   const router = useRouter();
 
   const handleFileSelected = useCallback(
     (file: File) => {
       const threadId = uuidv7();
+      reset();
       setTentativeThreadId(threadId);
       uploadMutation.mutate({ file });
       router.push(`/threads/${threadId}`);
     },
-    [uploadMutation, router, setTentativeThreadId],
+    [uploadMutation, router, setTentativeThreadId, reset],
   );
 
   return (
