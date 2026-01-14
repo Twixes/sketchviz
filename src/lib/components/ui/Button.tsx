@@ -188,15 +188,9 @@ export const Button = ({
       )}
       {...props}
     >
-      {loading ? (
-        <LoadingSpinner size={size} />
-      ) : (
-        <>
-          {leftIcon}
-          {children}
-          {rightIcon}
-        </>
-      )}
+      {loading ? <LoadingSpinner size={size} /> : leftIcon}
+      {children}
+      {rightIcon}
     </button>
   );
 

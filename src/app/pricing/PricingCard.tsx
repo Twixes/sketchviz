@@ -14,6 +14,7 @@ interface PricingCardProps {
   buttonText: string;
   buttonVariant: "primary" | "secondary";
   buttonDisabled?: boolean;
+  buttonLoading?: boolean;
   onButtonClick?: () => void;
   animationDelay: number;
 }
@@ -28,6 +29,7 @@ export function PricingCard({
   buttonText,
   buttonVariant,
   buttonDisabled = false,
+  buttonLoading = false,
   onButtonClick,
   animationDelay,
 }: PricingCardProps) {
@@ -153,6 +155,7 @@ export function PricingCard({
           isPro ? "shadow-lg transition-shadow hover:shadow-xl" : ""
         }`}
         disabled={buttonDisabled}
+        loading={buttonLoading}
         onClick={onButtonClick}
       >
         {buttonText}

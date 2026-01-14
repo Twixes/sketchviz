@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import posthog from "posthog-js";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NeonShapesPricing } from "@/components/NeonShapesPricing";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
@@ -34,38 +34,8 @@ export default function PricingPage() {
   let { user } = useSession();
   const handleSignIn = useSignInCallback();
   const { data: planData } = usePlanQuery();
-
-  useEffect(() => {
-    posthog.capture("pricing_page_viewed", {
-      user_id: user?.id,
-      current_plan: planData?.planType,
-    });
-  }, [user?.id, planData?.planType]);
-
-  const handleUpgradeToPro = async () => {
-    posthog.capture("upgrade_to_pro_clicked", {
-      user_id: user?.id,
-      current_plan: planData?.planType,
-    });
-    if (!user) {
-      user = await handleSignIn();
-    }
-    if (user) {
-      window.location.href = "/billing/upgrade";
-    }
-  };
-  const handleManagePlan = async () => {
-    posthog.capture("manage_plan_clicked", {
-      user_id: user?.id,
-      current_plan: planData?.planType,
-    });
-    if (!user) {
-      user = await handleSignIn();
-    }
-    if (user) {
-      window.location.href = "/billing/portal";
-    }
-  };
+  const [isLoadingBillingPortal, setIsLoadingBillingPortal] = useState(false);
+  const [isUpgrading, setIsUpgrading] = useState(false);
 
   return (
     <PageWrapper user={user} gap="large">
@@ -95,13 +65,27 @@ export default function PricingPage() {
               }
               buttonVariant={user ? "secondary" : "primary"}
               buttonDisabled={!!user && planData?.planType === "free"}
-              onButtonClick={
-                !user
-                  ? handleSignIn
-                  : planData?.planType === "pro"
-                    ? handleManagePlan
-                    : undefined
-              }
+              buttonLoading={isLoadingBillingPortal}
+              onButtonClick={async () => {
+                setIsLoadingBillingPortal(true);
+                if (!user) {
+                  await handleSignIn();
+                  setIsLoadingBillingPortal(false);
+                } else if (planData?.planType === "pro") {
+                  posthog.capture("manage_plan_clicked", {
+                    user_id: user?.id,
+                    current_plan: planData?.planType,
+                  });
+                  if (!user) {
+                    user = await handleSignIn();
+                  }
+                  if (user) {
+                    window.location.href = "/billing/portal";
+                  } else {
+                    setIsLoadingBillingPortal(false);
+                  }
+                }
+              }}
               animationDelay={0.3}
             />
 
@@ -113,6 +97,7 @@ export default function PricingPage() {
               description="For professionals and power users"
               features={PRO_FEATURES}
               buttonDisabled={planData?.planType === "pro"}
+              buttonLoading={isUpgrading}
               buttonText={
                 user
                   ? planData?.planType === "pro"
@@ -121,7 +106,21 @@ export default function PricingPage() {
                   : "Get Pro"
               }
               buttonVariant={user ? "primary" : "secondary"}
-              onButtonClick={handleUpgradeToPro}
+              onButtonClick={async () => {
+                setIsUpgrading(true);
+                posthog.capture("upgrade_to_pro_clicked", {
+                  user_id: user?.id,
+                  current_plan: planData?.planType,
+                });
+                if (!user) {
+                  user = await handleSignIn();
+                }
+                if (user) {
+                  window.location.href = "/billing/upgrade";
+                } else {
+                  setIsUpgrading(false);
+                }
+              }}
               animationDelay={0.4}
             />
           </div>

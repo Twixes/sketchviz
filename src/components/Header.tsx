@@ -11,7 +11,7 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { JSX } from "react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
 import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
@@ -112,6 +112,7 @@ export function Header({ user }: HeaderProps) {
 
 function CreditsButton(): JSX.Element {
   const { data: creditsData, isLoading: isLoadingCredits } = usePlanQuery();
+  const [isLoadingBillingPortal, setIsLoadingBillingPortal] = useState(false);
 
   return (
     <Button
@@ -120,6 +121,8 @@ function CreditsButton(): JSX.Element {
       link="/billing/portal"
       className="border-dashed bg-transparent hover:border-black/40 hover:bg-black/5 gap-1.5"
       rightIcon={<InfoCircledIcon />}
+      onClick={() => setIsLoadingBillingPortal(true)}
+      loading={isLoadingBillingPortal}
       tooltip={
         <>
           {!isLoadingCredits &&
