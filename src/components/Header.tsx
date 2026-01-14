@@ -139,8 +139,8 @@ function CreditsButton(): JSX.Element {
     >
       <span className="text-black/50">Credits left:</span>
       {isLoadingCredits ? (
-        <span>...</span>
-      ) : creditsData?.planType === "pro" &&
+        "..."
+      ) : creditsData &&
         creditsData.credits !== null &&
         creditsData.credits <= 0 ? (
         <>
@@ -150,7 +150,7 @@ function CreditsButton(): JSX.Element {
           </span>
         </>
       ) : (
-        <span>{creditsData?.credits ?? "none"}</span>
+        <span>{creditsData?.credits ?? "..."}</span>
       )}
     </Button>
   );

@@ -48,17 +48,13 @@ export async function GET(
 
   const userId = data?.claims?.sub;
 
-  let [credits, [planType]] = userId
+  const [credits, [planType]] = userId
     ? await Promise.all([getCreditsForUser(userId), getPlanForUser(userId)])
     : ([null, [null]] as const);
 
   const isVatApplicable =
     (!!geo.country && COUNTRIES_WITH_VAT.includes(geo.country)) ||
     process.env.NODE_ENV === "development";
-
-  if (!planType && !credits) {
-    credits = DEFAULT_FREE_PLAN_CREDITS;
-  }
 
   return NextResponse.json({ credits, planType, isVatApplicable });
 }
