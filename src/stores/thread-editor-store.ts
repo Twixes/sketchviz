@@ -387,6 +387,20 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
     {
       name: "sketchviz-storage",
       partialize: (state) => ({ model: state.model }),
+      migrate: (state, version) => {
+        if (typeof state !== "object" || state === null) {
+          return state;
+        }
+        if (
+          version === 0 &&
+          "model" in state &&
+          state.model === "google/gemini-2.5-flash-image-preview"
+        ) {
+          state.model = `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`;
+        }
+        return state;
+      },
+      version: 1,
     },
   ),
 );
