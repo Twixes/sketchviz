@@ -79,7 +79,7 @@ export default function PricingPage() {
                   if (!user) {
                     userId = await handleSignIn();
                   }
-                  if (userId) {
+                  if (user || userId) {
                     window.location.href = "/billing/portal";
                   } else {
                     setIsLoadingBillingPortal(false);
@@ -116,7 +116,7 @@ export default function PricingPage() {
                 if (!user) {
                   userId = await handleSignIn();
                 }
-                if (userId) {
+                if (user || userId) {
                   window.location.href = "/billing/upgrade";
                 } else {
                   setIsUpgrading(false);
