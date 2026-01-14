@@ -22,15 +22,32 @@ export async function GET(request: Request) {
         await polar.customers.getExternal({ externalId: user.id });
       } catch (error) {
         if (error instanceof Error && error.name === "ResourceNotFound") {
-          await polar.customers.create({
-            externalId: user.id,
-            email: user.email!,
-            name: user.user_metadata.full_name,
-          });
-          await polar.subscriptions.create({
-            externalCustomerId: user.id,
-            productId: FREE_PLAN_PRODUCT_ID, // Free plan
-          });
+          try {
+            await polar.customers.create({
+              externalId: user.id,
+              email: user.email!,
+              name: user.user_metadata.full_name,
+            });
+            await polar.subscriptions.create({
+              externalCustomerId: user.id,
+              productId: FREE_PLAN_PRODUCT_ID, // Free plan
+            });
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              error.name === "HTTPValidationError" &&
+              error.message?.includes(
+                "A customer with this email address already exists.",
+              )
+            ) {
+              posthogNode.captureException(error, user.id);
+              console.error(
+                "A Polar customer with this email address already exists, skipping creation",
+              );
+            } else {
+              throw error;
+            }
+          }
           posthogNode.capture({
             distinctId: user.id,
             event: "signed_up",
