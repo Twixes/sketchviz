@@ -1,9 +1,8 @@
-import type { User } from "@supabase/supabase-js";
 import posthog from "posthog-js";
 import { useCallback } from "react";
 import { useSession } from "@/components/SessionProvider";
 
-export function useSignInCallback(): () => Promise<User | null> {
+export function useSignInCallback(): () => Promise<string | null> {
   const { supabase } = useSession();
 
   return useCallback(async () => {
@@ -47,16 +46,14 @@ export function useSignInCallback(): () => Promise<User | null> {
       );
     }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (user) {
+    const { data } = await supabase.auth.getClaims();
+    const userId = data?.claims?.sub;
+    if (userId) {
       posthog.capture("sign_in_completed", {
-        user_id: user.id,
+        user_id: userId,
       });
     }
 
-    return user || null;
+    return userId || null;
   }, [supabase]);
 }

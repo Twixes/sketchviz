@@ -35,11 +35,10 @@ export async function POST(
 
   // Get user session
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
 
-  if (!user) {
+  const userId = data?.claims?.sub;
+  if (!userId) {
     return NextResponse.json(
       { error: "Authentication required" },
       { status: 401 },
@@ -97,7 +96,7 @@ export async function POST(
     const { outputUrl, creditCost, width, height } =
       await processImageGeneration({
         supabase,
-        user,
+        userId,
         traceId,
         inputUrl,
         outdoorLight: outdoor_light,
@@ -134,7 +133,7 @@ export async function POST(
 
     // Track successful regeneration
     posthogNode.capture({
-      distinctId: user.id,
+      distinctId: userId,
       event: "regeneration_succeeded",
       properties: {
         thread_id: threadId,
@@ -164,7 +163,7 @@ export async function POST(
 
     // Track failed regeneration
     posthogNode.capture({
-      distinctId: user.id,
+      distinctId: userId,
       event: "regeneration_failed",
       properties: {
         thread_id: threadId,

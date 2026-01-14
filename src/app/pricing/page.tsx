@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import posthog from "posthog-js";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NeonShapesPricing } from "@/components/NeonShapesPricing";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
@@ -31,7 +31,7 @@ const PRO_FEATURES = [
 ];
 
 export default function PricingPage() {
-  let { user } = useSession();
+  const { user } = useSession();
   const handleSignIn = useSignInCallback();
   const { data: planData } = usePlanQuery();
   const [isLoadingBillingPortal, setIsLoadingBillingPortal] = useState(false);
@@ -70,16 +70,16 @@ export default function PricingPage() {
                 setIsLoadingBillingPortal(true);
                 if (!user) {
                   await handleSignIn();
-                  setIsLoadingBillingPortal(false);
                 } else if (planData?.planType === "pro") {
                   posthog.capture("manage_plan_clicked", {
                     user_id: user?.id,
                     current_plan: planData?.planType,
                   });
+                  let userId = null;
                   if (!user) {
-                    user = await handleSignIn();
+                    userId = await handleSignIn();
                   }
-                  if (user) {
+                  if (userId) {
                     window.location.href = "/billing/portal";
                   } else {
                     setIsLoadingBillingPortal(false);
@@ -112,10 +112,11 @@ export default function PricingPage() {
                   user_id: user?.id,
                   current_plan: planData?.planType,
                 });
+                let userId = null;
                 if (!user) {
-                  user = await handleSignIn();
+                  userId = await handleSignIn();
                 }
-                if (user) {
+                if (userId) {
                   window.location.href = "/billing/upgrade";
                 } else {
                   setIsUpgrading(false);

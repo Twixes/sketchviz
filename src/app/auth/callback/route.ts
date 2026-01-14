@@ -14,22 +14,23 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient();
     await supabase.auth.exchangeCodeForSession(code);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (user) {
+    const { data } = await supabase.auth.getClaims();
+    const userId = data?.claims?.sub;
+    const userEmail = data?.claims?.email;
+    const userMetadata = data?.claims?.user_metadata!;
+    if (userId) {
       try {
-        await polar.customers.getExternal({ externalId: user.id });
+        await polar.customers.getExternal({ externalId: userId });
       } catch (error) {
         if (error instanceof Error && error.name === "ResourceNotFound") {
           try {
             await polar.customers.create({
-              externalId: user.id,
-              email: user.email!,
-              name: user.user_metadata.full_name,
+              externalId: userId,
+              email: userEmail!,
+              name: userMetadata.full_name!,
             });
             await polar.subscriptions.create({
-              externalCustomerId: user.id,
+              externalCustomerId: userId,
               productId: FREE_PLAN_PRODUCT_ID, // Free plan
             });
           } catch (error) {
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
                 "A customer with this email address already exists.",
               )
             ) {
-              posthogNode.captureException(error, user.id);
+              posthogNode.captureException(error, userId);
               console.error(
                 "A Polar customer with this email address already exists, skipping creation",
               );
@@ -49,13 +50,13 @@ export async function GET(request: Request) {
             }
           }
           posthogNode.capture({
-            distinctId: user.id,
+            distinctId: userId,
             event: "signed_up",
             properties: {
               $set: {
-                email: user.email,
-                name: user.user_metadata.full_name,
-                first_name: extractFirstName(user.user_metadata.full_name),
+                email: userEmail,
+                name: userMetadata.full_name!,
+                first_name: extractFirstName(userMetadata.full_name!),
               },
             },
           });

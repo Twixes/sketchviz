@@ -34,7 +34,7 @@ export interface PreparedImageData {
 
 interface ProcessImageGenerationParams {
   supabase: SupabaseClient;
-  user: User;
+  userId: string;
   traceId: string;
   inputUrl: string;
   outdoorLight: OutdoorLight;
@@ -334,7 +334,7 @@ export async function generateAndUploadImage({
  */
 export async function processImageGeneration({
   supabase,
-  user,
+  userId,
   traceId,
   inputUrl,
   outdoorLight,
@@ -356,7 +356,7 @@ export async function processImageGeneration({
 
   return generateAndUploadImage({
     supabase,
-    userId: user.id,
+    userId,
     preparedImage,
     outdoorLight,
     indoorLight,
