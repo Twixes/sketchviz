@@ -160,8 +160,11 @@ export default function ThreadDetailPage({
         const previousGen = generations[previousGenIndex];
         if (previousGen?.user_params) {
           threadEditorStore.setModel(
-            previousGen.user_params.model ??
-              `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
+            previousGen.user_params.model &&
+              previousGen.user_params.model !==
+                "google/gemini-2.5-flash-image-preview"
+              ? previousGen.user_params.model
+              : `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
           );
         }
       }

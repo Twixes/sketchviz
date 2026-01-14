@@ -7,6 +7,7 @@ import {
   EyeOpenIcon,
   UpdateIcon,
 } from "@radix-ui/react-icons";
+import { cn } from "@/lib/cn";
 import { Button } from "@/lib/components/ui/Button";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
@@ -75,7 +76,6 @@ export function GenerateButton({
         className="relative w-full px-20"
       >
         Sign up with Google to try for free
-        <CreditBadge creditCost={creditCost} />
       </Button>
     );
   }
@@ -96,20 +96,30 @@ export function GenerateButton({
       className="relative w-full px-20"
     >
       {getLabel()}
-      <CreditBadge creditCost={creditCost} />
+      <CreditBadge
+        creditCost={creditCost}
+        className="absolute top-3 bottom-3 right-3 border-white/60"
+      />
     </Button>
   );
 }
 
-function CreditBadge({
+export function CreditBadge({
   creditCost,
   hasWarning = false,
+  className,
 }: {
   creditCost: number;
   hasWarning?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="absolute top-3 bottom-3 right-3 rounded flex items-center px-1 border border-white/60 text-xs">
+    <div
+      className={cn(
+        "rounded flex items-center px-1 border border-black/20 text-xs",
+        className,
+      )}
+    >
       {hasWarning && <ExclamationTriangleIcon className="mr-0.5" />}
       {creditCost} credits
     </div>

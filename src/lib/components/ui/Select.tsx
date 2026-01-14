@@ -57,7 +57,9 @@ export function Select<T extends string | null>({
             {currentOption ? (
               <>
                 <currentOption.icon className="size-4 shrink-0" />
-                <span>{currentOption.label}</span>
+                <div className="flex items-center gap-2">
+                  {currentOption.label}
+                </div>
               </>
             ) : isCustomValue ? (
               value
@@ -65,7 +67,9 @@ export function Select<T extends string | null>({
               // Fallback to first option if no match
               <>
                 <fallbackOption.icon className="size-4 shrink-0" />
-                <span>{fallbackOption.label}</span>
+                <div className="flex items-center gap-2">
+                  {fallbackOption.label}
+                </div>
               </>
             )}
           </span>
@@ -109,7 +113,12 @@ export function Select<T extends string | null>({
                     )}
                   />
                   <div className="flex flex-col items-start flex-1">
-                    <span className={cn(option.description && "font-medium")}>
+                    <span
+                      className={cn(
+                        "flex items-center gap-2",
+                        option.description && "font-medium",
+                      )}
+                    >
                       {option.label}
                     </span>
                     {option.description && (
