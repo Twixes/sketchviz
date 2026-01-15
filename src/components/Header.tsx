@@ -140,7 +140,7 @@ function CreditsButton(): JSX.Element {
         </>
       }
     >
-      <span className="text-black/50">Credits left:</span>
+      <span className="text-black/50">Credits in plan:</span>
       {isLoadingCredits ? (
         "..."
       ) : creditsData &&
