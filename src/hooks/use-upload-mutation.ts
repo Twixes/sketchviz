@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import posthog from "posthog-js";
+import toast from "react-hot-toast";
 import {
   ACCEPTED_MIME_TYPES,
   getAcceptedFormatsString,
@@ -92,6 +93,7 @@ export function useUploadMutation() {
         error instanceof Error ? error.message : "Something went wrong.";
       setError(message);
       setIsUploading(false);
+      toast.error(message);
       posthog.capture("base_image_upload_failed", {
         error: message,
       });

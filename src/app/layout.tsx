@@ -1,6 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import Head from "next/head";
 import Script from "next/script";
@@ -84,6 +85,7 @@ export default async function RootLayout({
         <QueryProvider>
           <SessionProvider initialUser={user}>{children}</SessionProvider>
         </QueryProvider>
+        <Toaster position="bottom-right" />
         <SpeedInsights />
       </body>
     </html>

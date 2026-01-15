@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
+import toast from "react-hot-toast";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
@@ -108,6 +109,7 @@ export function useGenerateMutation() {
         error instanceof Error ? error.message : "Something went wrong.";
       setError(message);
       setIsGenerating(false);
+      toast.error(message);
       posthog.capture("generation_failed", {
         error: message,
         outdoor_light: variables.outdoorLight,
