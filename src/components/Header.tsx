@@ -34,12 +34,12 @@ export function Header({ user }: HeaderProps) {
     <motion.header
       initial={false}
       transition={FADE_TRANSITION}
-      className="flex flex-wrap items-center justify-between z-10 gap-4"
+      className="flex flex-wrap items-center justify-between z-10 gap-2 md:gap-4"
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center flex-wrap gap-2 md:gap-4">
         <a
           href="/"
-          className="flex items-center gap-3 cursor-pointer whitespace-nowrap"
+          className="flex items-center gap-2 md:gap-3 cursor-pointer whitespace-nowrap"
         >
           <Image
             src="/icon.png"
@@ -54,7 +54,7 @@ export function Header({ user }: HeaderProps) {
         </a>
         {user && <CreditsButton />}
       </div>
-      <div className="flex flex-wrap justify-end items-center gap-3 whitespace-nowrap">
+      <div className="flex flex-wrap justify-end items-center gap-2 md:gap-3 whitespace-nowrap">
         {user ? (
           <>
             <NewRenderButton />
