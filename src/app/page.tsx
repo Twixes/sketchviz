@@ -37,15 +37,15 @@ export default function Home() {
 
   return (
     <PageWrapper user={user}>
-      <section className="grid gap-12 items-center lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid gap-8 sm:gap-12 items-center lg:grid-cols-[1.05fr_0.95fr]">
         <div className="contents lg:block lg:space-y-8">
           <Hero />
-          <div className="order-3 lg:order-none">
+          <div className="order-2 lg:order-0">
             <HeroFeatures />
           </div>
         </div>
 
-        <div className="relative order-4 lg:order-none">
+        <div className="relative order-4 lg:order-0">
           <NeonShapesHero />
           <UploadDropzone
             onFileSelected={handleFileSelected}
@@ -53,7 +53,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="order-2 lg:order-none lg:col-span-2">
+        <div className="order-3 lg:order-0 lg:col-span-2">
           <Examples />
         </div>
       </section>

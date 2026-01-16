@@ -24,7 +24,7 @@ const FEATURES = [
 
 export function HeroFeatures() {
   return (
-    <div className="grid gap-4 sm:grid-cols-3">
+    <div className="grid gap-x-4 gap-y-2 sm:grid-cols-3">
       {FEATURES.map((item, index) => (
         <motion.div
           key={item.label}
