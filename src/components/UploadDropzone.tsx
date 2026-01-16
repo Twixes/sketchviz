@@ -146,7 +146,7 @@ export function UploadDropzone({
             </div>
             <div className="space-y-2">
               <p className="text-xl font-semibold text-black">
-                Drop or paste your SketchUp render
+                Drop or paste your SketchUp render now
               </p>
               <p className="text-sm text-black/60">
                 PNG, JPG, WEBP, HEIC, or HEIF – up to 20 MB
@@ -159,7 +159,7 @@ export function UploadDropzone({
               <span className="text-xs text-black/40">
                 {planData?.planType === "pro"
                   ? "Let's get right into it"
-                  : "Try for free now"}
+                  : "Try for free"}
               </span>
             </div>
           </>

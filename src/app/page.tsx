@@ -40,21 +40,23 @@ export default function Home() {
       <section className="grid gap-12 items-center lg:grid-cols-[1.05fr_0.95fr]">
         <div className="contents lg:block lg:space-y-8">
           <Hero />
-          <div className="order-2 lg:order-none">
+          <div className="order-3 lg:order-none">
             <HeroFeatures />
           </div>
         </div>
 
-        <div className="relative order-1 lg:order-none">
+        <div className="relative order-4 lg:order-none">
           <NeonShapesHero />
           <UploadDropzone
             onFileSelected={handleFileSelected}
             className="min-h-[320px] border border-dashed border-black/20 hover:border-black/60 cursor-pointer bg-white/85"
           />
         </div>
-      </section>
 
-      <Examples />
+        <div className="order-2 lg:order-none lg:col-span-2">
+          <Examples />
+        </div>
+      </section>
     </PageWrapper>
   );
 }

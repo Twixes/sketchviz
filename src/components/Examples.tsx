@@ -77,7 +77,7 @@ export function Examples() {
   };
 
   return (
-    <section className="grid gap-6 sm:grid-cols-3 text-balance">
+    <section className="grid gap-6 md:grid-cols-3 text-balance">
       {EXAMPLES.map((example, index) => (
         <BeforeAfterComparison
           key={example.label}
