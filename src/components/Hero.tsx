@@ -15,8 +15,9 @@ export function Hero() {
         transition={SLOW_TRANSITION}
         className="text-4xl font-semibold leading-tight text-black sm:text-5xl"
       >
-        Transform your <span className="outline-title">SketchUp renders</span>{" "}
-        into <span className="gradient-title">photorealistic visuals</span>.
+        Transform your{" "}
+        <span className="outline-title">SketchUp&nbsp;renders</span> into{" "}
+        <span className="gradient-title">photorealistic visuals</span>.
       </motion.h1>
       <motion.p
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
