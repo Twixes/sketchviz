@@ -2,7 +2,6 @@ import {
   ClockIcon,
   ExitIcon,
   InfoCircledIcon,
-  PlusIcon,
   RocketIcon,
   UploadIcon,
 } from "@radix-ui/react-icons";
@@ -128,9 +127,9 @@ function CreditsButton(): JSX.Element {
           {!isLoadingCredits &&
             (creditsData?.planType === "pro" ? (
               <>
-                This is your monthly Pro allowance.
+                The Pro plan includes 1,000 credits per month.
                 <br />
-                Pro usage beyond the allowance is $0.015/credit.
+                Usage beyond the allowance is pay-as-you-go at $0.015/credit.
               </>
             ) : (
               "This is your free allowance. Upgrade to render more."
@@ -140,16 +139,17 @@ function CreditsButton(): JSX.Element {
         </>
       }
     >
-      <span className="text-black/50">Credits in plan:</span>
+      <span className="text-black/50">Credits left:</span>
       {isLoadingCredits ? (
         "..."
-      ) : creditsData &&
-        creditsData.credits !== null &&
-        creditsData.credits <= 0 ? (
+      ) : creditsData && creditsData.planType === "pro" ? (
         <>
-          <span>0</span>
+          <span className="text-xl leading-none">∞</span>
           <span className="text-black/40 font-normal">
-            (pay-as-you-go: {Math.abs(creditsData.credits)})
+            {creditsData.credits !== null &&
+              (creditsData.credits > 0
+                ? `(included in plan: ${creditsData.credits})`
+                : `(pay-as-you-go: ${Math.abs(creditsData.credits)})`)}
           </span>
         </>
       ) : (
