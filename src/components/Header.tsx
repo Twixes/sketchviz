@@ -129,10 +129,14 @@ function CreditsButton(): JSX.Element {
               <>
                 The Pro plan includes 1,000 credits per month.
                 <br />
-                Usage beyond the allowance is pay-as-you-go at $0.015/credit.
+                Usage beyond that is pay-as-you-go at $0.015/credit.
               </>
             ) : (
-              "This is your free allowance. Upgrade to render more."
+              <>
+                This is your free monthly allowance.
+                <br />
+                Upgrade to Pro for unlimited rendering.
+              </>
             ))}
           <br />
           Click to manage your plan
