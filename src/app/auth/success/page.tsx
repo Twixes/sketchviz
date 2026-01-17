@@ -4,12 +4,12 @@ import { useEffect } from "react";
 
 export default function AuthSuccess() {
   useEffect(() => {
-    // Close the popup window after successful authentication
     if (window.opener) {
+      // Close the popup - parent window polls for closure and checks auth status
       window.close();
     } else {
-      // If not in a popup, redirect to home
-      window.location.href = "/";
+      // If not in a popup, redirect to dashboard
+      window.location.href = "/dashboard";
     }
   }, []);
 

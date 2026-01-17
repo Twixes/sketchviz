@@ -4,17 +4,19 @@ import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 
+export interface ThreadData {
+  id: string;
+  title: string;
+  created_at: string;
+  generation_count: number;
+  latest_generation: {
+    output_url: string | null;
+    input_url: string;
+  } | null;
+}
+
 interface ThreadCardProps {
-  thread: {
-    id: string;
-    title: string;
-    created_at: string;
-    generation_count: number;
-    latest_generation: {
-      output_url: string | null;
-      input_url: string;
-    } | null;
-  };
+  thread: ThreadData;
 }
 
 export function ThreadCard({ thread }: ThreadCardProps) {

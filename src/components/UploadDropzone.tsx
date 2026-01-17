@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import { parseAspectRatio } from "@/lib/aspect-ratio";
+import { cn } from "@/lib/cn";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 import { Hint } from "./Hint";
@@ -103,12 +104,12 @@ export function UploadDropzone({
     <motion.div className="relative w-full text-balance">
       {/* biome-ignore lint/a11y/noStaticElementInteractions: this is a special dropzone use case */}
       <div
-        className={clsx([
+        className={cn([
           "group relative flex cursor-pointer flex-col items-center justify-center gap-4 max-h-[75vh] max-w-full mx-auto text-center transition",
-          "rounded-3xl bg-white/85 px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]",
+          "rounded-xl border border-black/30 bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-lg px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]",
           isDragging
             ? "border-pink-400 bg-pink-50/80"
-            : "hover:border-black/30",
+            : "hover:border-black/60",
           className,
         ])}
         style={
@@ -135,7 +136,7 @@ export function UploadDropzone({
               src={inputSignedUrl}
               alt="Original"
               onLoad={handleInputLoad}
-              className="absolute inset-0 h-full w-full bg-black object-cover rounded-3xl"
+              className="absolute inset-0 h-full w-full bg-black object-cover rounded-xl"
             />
             <Hint position="top-right">Click to replace image</Hint>
           </>

@@ -53,7 +53,7 @@ export default function Home() {
           <NeonShapesHero />
           <UploadDropzone
             onFileSelected={handleFileSelected}
-            className="min-h-[320px] border border-dashed border-black/20 hover:border-black/60 cursor-pointer bg-white/85"
+            className="min-h-[320px] border-dashed rounded-3xl"
           />
         </div>
 

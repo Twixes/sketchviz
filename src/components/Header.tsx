@@ -1,5 +1,6 @@
 import {
   ClockIcon,
+  DashboardIcon,
   ExitIcon,
   InfoCircledIcon,
   RocketIcon,
@@ -7,7 +8,7 @@ import {
 } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
@@ -27,8 +28,14 @@ interface HeaderProps {
 }
 
 export function Header({ user }: HeaderProps) {
-  const handleSignIn = useSignInCallback();
+  const pathname = usePathname();
+  const signIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
+
+  const handleSignIn = useCallback(() => {
+    // If on home page, redirect to dashboard after login
+    signIn(pathname === "/" ? { redirectAfterLogin: "/dashboard" } : undefined);
+  }, [signIn, pathname]);
 
   return (
     <motion.header
@@ -60,12 +67,11 @@ export function Header({ user }: HeaderProps) {
             <NewRenderButton />
             <Button
               variant="secondary"
-              leftIcon={<ClockIcon />}
+              leftIcon={<DashboardIcon />}
               className="cursor-pointer"
-              link="/threads"
-              tooltip="View your past visualizations"
+              link="/dashboard"
             >
-              History
+              Dashboard
             </Button>
             <Button
               variant="secondary"
