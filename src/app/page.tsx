@@ -11,6 +11,7 @@ import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
+import { cn } from "@/lib/cn";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 export default function Home() {
@@ -45,7 +46,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative order-4 lg:order-0">
+        <div
+          // For logged-in users, show dropzone up top for convenience
+          className={cn("relative lg:order-0", user ? "order-1" : "order-4")}
+        >
           <NeonShapesHero />
           <UploadDropzone
             onFileSelected={handleFileSelected}
