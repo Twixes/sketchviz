@@ -176,10 +176,10 @@ function ReferenceImagePreview({
             animation: "var(--animate-ring-spin)",
           }}
         />
-        <button
-          type="button"
+        <Button
+          variant="ghost"
           onClick={onClick}
-          className="size-16 rounded-lg border border-black/20 overflow-hidden relative cursor-zoom-in transition-all hover:ring-2 hover:ring-black/30 hover:ring-offset-1 cursor-zoom-in"
+          className="size-16 !p-0 rounded-lg border border-black/20 overflow-hidden relative cursor-zoom-in hover:ring-2 hover:ring-black/30 hover:ring-offset-1"
           aria-label="View reference image full size"
         >
           <img
@@ -187,7 +187,7 @@ function ReferenceImagePreview({
             alt="Reference"
             className="size-full object-cover"
           />
-        </button>
+        </Button>
       </div>
       <Button
         variant="icon"
