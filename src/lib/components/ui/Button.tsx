@@ -11,7 +11,7 @@ export interface ButtonProps
   variant?: "primary" | "secondary" | "ghost" | "icon" | "list-item";
 
   // Sizes
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
 
   // Icon support (auto-scaled based on size)
   leftIcon?: React.ReactNode;
@@ -31,8 +31,9 @@ export interface ButtonProps
   tooltip?: string | React.ReactNode;
 }
 
-const LoadingSpinner = ({ size }: { size: "sm" | "md" | "lg" }) => {
+const LoadingSpinner = ({ size }: { size: "xs" | "sm" | "md" | "lg" }) => {
   const sizeClass = {
+    xs: "size-3",
     sm: "size-3.5",
     md: "size-4",
     lg: "size-5",
@@ -135,26 +136,31 @@ export const Button = ({
   // Size-specific classes
   const sizeClasses = {
     primary: {
+      xs: "px-2 py-1 text-xs gap-1 rounded-md",
       sm: "px-3 py-1.5 text-xs gap-1.5 rounded-lg",
       md: "px-4 py-2 text-sm gap-2 rounded-xl",
       lg: "px-6 py-3 text-sm gap-2 rounded-xl",
     },
     secondary: {
+      xs: "px-1.5 py-0.5 text-xs gap-1 rounded-md",
       sm: "px-2 py-0.75 text-xs gap-1.5 rounded-lg",
       md: "px-4 py-2 text-sm gap-2 rounded-xl",
       lg: "px-6 py-3 text-sm gap-2 rounded-xl",
     },
     ghost: {
+      xs: "px-1.5 py-0.5 text-xs gap-1 rounded-md",
       sm: "px-2 py-0.75 text-xs gap-1.5 rounded-lg",
       md: "px-3 py-2 text-sm gap-2 rounded-xl",
       lg: "px-4 py-3 text-sm gap-2 rounded-xl",
     },
     icon: {
+      xs: "p-0.5 rounded-md",
       sm: "p-1 rounded-lg",
       md: "p-2 rounded-xl",
       lg: "p-3 rounded-xl",
     },
     "list-item": {
+      xs: "px-1.5 py-0.5 text-xs gap-1 rounded-md",
       sm: "px-2 py-0.75 text-xs gap-2 rounded-lg",
       md: "px-3 py-2 text-sm gap-2 rounded-lg",
       lg: "px-4 py-3 text-sm gap-2 rounded-lg",
