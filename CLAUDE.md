@@ -85,14 +85,15 @@ pnpm format
 - Credits checked and deducted in `/api/generate` before AI generation
 
 **Analytics (PostHog)**
-- `lib/posthog/`: PostHog client setup (server-side with AI tracing)
+- `lib/posthog/server.ts`: Server-side PostHog client with AI tracing
+- `src/instrumentation-client.ts`: Client-side PostHog initialization
 - AI calls wrapped with `withTracing()` for observability
 - Event tracking for generation steps and error capture
 
 **AI Integration**
 - `lib/ai.ts`: Core AI functions for image generation and titling
 - Prompt engineering: base prompt + conditional parameters + reference images
-- Set `SKIP_AI=1` in `.env.local` to use test data instead of calling Gemini
+- Set `SKIP_AI=1` in `.env.local` to skip Gemini calls (returns "deep fried" input image for testing)
 
 **Validation**
 - Zod schemas in `lib/schemas.ts` validate API inputs
@@ -111,7 +112,6 @@ pnpm format
   - `posthog/`: Analytics integration
 - `src/types/`: TypeScript type definitions
 - `src/icons/`: SVG icons (imported as React components)
-- `src/test-data/`: Test data for SKIP_AI mode development
 
 ### UI Components
 
@@ -151,7 +151,7 @@ The visual identity is inspired by **Marszałkowska Dzielnica Mieszkaniowa (MDM)
 - Smooth only – no flicker effects
 - `NEON_BREATHING`: Gentle opacity pulse (3s cycle)
 - `NEON_DRIFT`: Slow positional float (20s cycle)
-- Respects `prefers-reduced-motion`
+- Components use `use-prefers-reduced-motion` hook to respect user preferences
 
 **Component Usage:**
 ```tsx
@@ -183,7 +183,7 @@ See `.env.example` for required variables. Key ones:
 - `NEXT_PUBLIC_POSTHOG_HOST`: PostHog instance host URL
 
 **Optional:**
-- `SKIP_AI=1`: Skip AI calls during development (uses test data from `src/test-data/`)
+- `SKIP_AI=1`: Skip AI calls during development (returns "deep fried" input image)
 
 ## Working with Supabase
 - Local Supabase CLI is configured (at `supabase/config.toml`)
