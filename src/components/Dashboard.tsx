@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { DashboardStats } from "@/components/DashboardStats";
 import { Examples } from "@/components/Examples";
+import { NeonShapesDashboard } from "@/components/NeonShapesDashboard";
 import { NeonShapesHero } from "@/components/NeonShapesHero";
 import { PageWrapper } from "@/components/PageWrapper";
 import { RecentThreads } from "@/components/RecentThreads";
@@ -55,41 +56,45 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
   if (!isLoadingThreads && !hasThreads) {
     return (
       <PageWrapper user={user} title={greeting} gap="small">
-        <section className="space-y-6">
-          <div className="relative">
-            <NeonShapesHero />
-            <UploadDropzone
-              onFileSelected={onFileSelected}
-              className="min-h-[320px] border-dashed"
-            />
-          </div>
-          <div className="text-center">
-            <p className="text-lg text-black/60">
-              Create your first visualization to get started
-            </p>
-          </div>
-          <Examples />
-        </section>
+        <NeonShapesDashboard>
+          <section className="space-y-6">
+            <div className="relative">
+              <NeonShapesHero />
+              <UploadDropzone
+                onFileSelected={onFileSelected}
+                className="min-h-[320px] border-dashed"
+              />
+            </div>
+            <div className="text-center">
+              <p className="text-lg text-black/60">
+                Create your first visualization to get started
+              </p>
+            </div>
+            <Examples />
+          </section>
+        </NeonShapesDashboard>
       </PageWrapper>
     );
   }
 
   return (
     <PageWrapper user={user} title={greeting} gap="small">
-      <section className="space-y-6">
-        <DashboardStats />
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-black">New render</h2>
-          <div className="relative">
-            <UploadDropzone
-              onFileSelected={onFileSelected}
-              className="min-h-[200px] border-dashed"
-            />
-          </div>
+      <NeonShapesDashboard>
+        <section className="space-y-6">
+          <DashboardStats />
+          <section className="space-y-4">
+            <h2 className="text-lg font-semibold text-black">New render</h2>
+            <div className="relative">
+              <UploadDropzone
+                onFileSelected={onFileSelected}
+                className="min-h-[200px] border-dashed"
+              />
+            </div>
+          </section>
+          {isFreeUser && <UpgradeBanner />}
+          <RecentThreads />
         </section>
-        {isFreeUser && <UpgradeBanner />}
-        <RecentThreads />
-      </section>
+      </NeonShapesDashboard>
     </PageWrapper>
   );
 }
