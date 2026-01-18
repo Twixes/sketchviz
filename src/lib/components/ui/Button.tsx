@@ -105,7 +105,7 @@ export const Button = ({
       "border border-black/20 bg-white/75 font-medium text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
-        : "hover:border-black/30 hover:bg-white/90",
+        : "hover:border-black/40 hover:bg-white/90",
     ]),
     ghost: cn([
       "text-black",
