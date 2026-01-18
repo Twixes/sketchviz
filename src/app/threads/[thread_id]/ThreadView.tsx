@@ -394,6 +394,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
       <motion.section className="space-y-6">
         <div className="relative space-y-6">
           <TimeMachineViewer
+            threadId={threadId}
             inputSrc={threadEditorStore.inputSrc}
             generations={generations}
             activeLayerIndex={threadEditorStore.activeLayerIndex}

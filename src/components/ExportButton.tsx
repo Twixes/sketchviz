@@ -1,6 +1,6 @@
-import { CheckIcon, DownloadIcon } from "@radix-ui/react-icons";
+import { DownloadIcon } from "@radix-ui/react-icons";
 import posthog from "posthog-js";
-import { useState } from "react";
+import toast from "react-hot-toast";
 import { Button } from "@/lib/components/ui/Button";
 
 interface ExportButtonProps {
@@ -70,8 +70,6 @@ function saveWithFallback(blob: Blob, filename: string): void {
 }
 
 export function ExportButton({ imageUrl, filename }: ExportButtonProps) {
-  const [isCompleted, setIsCompleted] = useState(false);
-
   const handleExport = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     try {
@@ -89,14 +87,15 @@ export function ExportButton({ imageUrl, filename }: ExportButtonProps) {
         used_file_picker: usedFilePicker,
       });
 
-      setIsCompleted(true);
-      setTimeout(() => setIsCompleted(false), 2000);
+      toast.success(
+        <span>
+          <strong>{filename}</strong> saved
+        </span>,
+      );
     } catch (error) {
       console.error("Failed to export image:", error);
-      posthog.capture("image_export_failed", {
-        filename,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+      toast.error("Failed to export image");
+      posthog.captureException(error);
     }
   };
 
@@ -104,13 +103,7 @@ export function ExportButton({ imageUrl, filename }: ExportButtonProps) {
     <Button
       variant="secondary"
       size="sm"
-      leftIcon={
-        isCompleted ? (
-          <CheckIcon className="w-3 h-3" />
-        ) : (
-          <DownloadIcon className="w-3 h-3" />
-        )
-      }
+      leftIcon={<DownloadIcon className="w-3 h-3" />}
       onClick={handleExport}
       tooltip={
         <>

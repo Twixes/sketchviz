@@ -7,6 +7,7 @@ import type { SyntheticEvent } from "react";
 import { useEffect, useMemo, useRef } from "react";
 import { ExportButton } from "@/components/ExportButton";
 import { LayerNavigationControls } from "@/components/LayerNavigationControls";
+import { ShareButton } from "@/components/ShareButton";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import {
   TIME_MACHINE_CONFIG,
@@ -40,7 +41,7 @@ interface TimeMachineViewerProps {
   onLayerClick?: (index: number) => void;
   isGenerating?: boolean;
   aspectRatio?: AspectRatio | null;
-  threadId?: string;
+  threadId: string;
   threadTitle?: string | null;
   onNavigatePrevious?: () => void;
   onNavigateNext?: () => void;
@@ -52,6 +53,7 @@ function LayerImage({
   relativePosition,
   onClick,
   isGenerating,
+  threadId,
   threadTitle,
   isComparing,
 }: {
@@ -60,6 +62,7 @@ function LayerImage({
   relativePosition: number; // 0 = active, negative = behind
   onClick: () => void;
   isGenerating?: boolean;
+  threadId: string;
   threadTitle?: string | null;
   isComparing?: boolean;
 }) {
@@ -159,7 +162,8 @@ function LayerImage({
           </div>
         </div>
         {signedUrl && layer.index > 0 && (
-          <div className="absolute bottom-3 right-3">
+          <div className="absolute bottom-3 right-3 flex gap-2">
+            <ShareButton threadId={threadId} />
             <ExportButton
               imageUrl={signedUrl}
               filename={
@@ -185,6 +189,7 @@ export function TimeMachineViewer({
   onLayerClick,
   isGenerating = false,
   aspectRatio,
+  threadId,
   threadTitle,
   onNavigatePrevious,
   onNavigateNext,
@@ -301,6 +306,7 @@ export function TimeMachineViewer({
                 relativePosition={relativePosition}
                 onClick={() => onLayerClick?.(layer.index)}
                 isGenerating={isGenerating}
+                threadId={threadId}
                 threadTitle={threadTitle}
                 isComparing={isComparing}
               />
