@@ -45,7 +45,7 @@ export function Header({ user }: HeaderProps) {
       transition={FADE_TRANSITION}
       className="flex flex-wrap items-center justify-between z-10 gap-4"
     >
-      <Logo user={user} />
+      <Logo />
       <div className="flex items-center flex-wrap-reverse grow gap-2 lg:gap-3 whitespace-nowrap">
         {user ? (
           <>
@@ -78,6 +78,7 @@ export function Header({ user }: HeaderProps) {
           </>
         ) : (
           <>
+            <div className="grow" />
             <Button
               variant="secondary"
               leftIcon={<RocketIcon />}
@@ -101,38 +102,23 @@ export function Header({ user }: HeaderProps) {
   );
 }
 
-function Logo({ user }: { user: SessionUser | null }): JSX.Element {
+function Logo(): JSX.Element {
   return (
-    <Tooltip.Provider>
-      <Tooltip.Root delayDuration={200}>
-        <Tooltip.Trigger asChild>
-          <Link
-            href={user ? "/dashboard" : "/"}
-            className="flex items-center gap-2 lg:gap-3 cursor-pointer whitespace-nowrap"
-          >
-            <Image
-              src="/icon.png"
-              alt="SketchViz"
-              className="size-16 -m-1"
-              width={64}
-              height={64}
-            />
-            <p className="text-lg font-semibold tracking-tight leading-tight text-black">
-              SketchViz
-            </p>
-          </Link>
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content
-            className="z-50 rounded-lg bg-black px-3 py-2 text-xs text-white shadow-lg"
-            sideOffset={5}
-          >
-            {user ? "Go to dashboard" : "Go to home"}
-            <Tooltip.Arrow className="fill-black" />
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    </Tooltip.Provider>
+    <Link
+      href="/"
+      className="flex items-center gap-2 lg:gap-3 whitespace-nowrap"
+    >
+      <Image
+        src="/icon.png"
+        alt="SketchViz"
+        className="size-16 -m-1"
+        width={64}
+        height={64}
+      />
+      <p className="text-lg font-semibold tracking-tight leading-tight text-black">
+        SketchViz
+      </p>
+    </Link>
   );
 }
 
