@@ -76,15 +76,8 @@ export default function ThreadsPage() {
   }
 
   return (
-    <PageWrapper user={user}>
+    <PageWrapper user={user} gap="small">
       <div>
-        <Link
-          href="/dashboard"
-          className="mb-2 flex items-center gap-1 text-sm text-black/60 transition-colors hover:text-black"
-        >
-          <ArrowLeftIcon className="size-4" />
-          Back to Dashboard
-        </Link>
         <h1 className="text-2xl font-semibold text-black lg:text-3xl">
           History
         </h1>
