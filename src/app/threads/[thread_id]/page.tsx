@@ -20,7 +20,9 @@ export async function generateMetadata({
     .single();
 
   return {
-    title: thread?.title ? `${thread.title} • SketchViz` : "ThreSketchVizad",
+    title: thread?.title
+      ? `${thread.title} • SketchViz`
+      : "New thread • SketchViz",
   };
 }
 
