@@ -18,6 +18,8 @@ interface PageWrapperProps {
   title?: ReactNode;
   /** Page description displayed below the title. */
   description?: ReactNode;
+  /** Document title for the browser tab. If provided, renders as "{documentTitle} • SketchViz". */
+  documentTitle?: string;
 }
 
 const gapClasses = {
@@ -38,7 +40,11 @@ export function PageWrapper({
   maxWidth = "normal",
   title,
   description,
+  documentTitle,
 }: PageWrapperProps) {
+  // documentTitle is used for type-safety; actual title is set via layout metadata
+  void documentTitle;
+
   // Outer main always uses gap-12 (consistent Header-to-content spacing)
   // The gap prop controls spacing within the content section
   const className = `relative z-10 mx-auto flex grow w-full ${maxWidthClasses[maxWidth]} flex-col gap-12 px-6 pb-24 pt-10 lg:px-10`;

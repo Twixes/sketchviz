@@ -65,7 +65,12 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
   // Empty state for new users
   if (!isLoadingThreads && !hasThreads) {
     return (
-      <PageWrapper user={user} title={greeting} gap="small">
+      <PageWrapper
+        user={user}
+        title={greeting}
+        documentTitle="Dashboard"
+        gap="small"
+      >
         <NeonShapesDashboard>
           <section className="space-y-6">
             <div className="relative">
@@ -88,7 +93,12 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
   }
 
   return (
-    <PageWrapper user={user} title={greeting} gap="small">
+    <PageWrapper
+      user={user}
+      title={greeting}
+      documentTitle="Dashboard"
+      gap="small"
+    >
       <NeonShapesDashboard>
         <section className="space-y-6">
           <DashboardStats />

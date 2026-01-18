@@ -1,4 +1,5 @@
 import { ArrowLeftIcon, LockClosedIcon } from "@radix-ui/react-icons";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -8,6 +9,10 @@ import { Button } from "@/lib/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
 import { UserTableContainer } from "./UserTableContainer";
 import { UserTableSkeleton } from "./UserTableSkeleton";
+
+export const metadata: Metadata = {
+  title: "Admin",
+};
 
 interface AdminPageProps {
   searchParams: Promise<{ page?: string }>;

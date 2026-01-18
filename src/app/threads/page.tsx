@@ -76,13 +76,13 @@ export default function ThreadsPage() {
   }
 
   return (
-    <PageWrapper user={user} gap="small">
-      <div>
-        <h1 className="text-2xl font-semibold text-black lg:text-3xl">
-          History
-        </h1>
-        <p className="mt-2 text-lg text-black/70">Your past visualizations</p>
-      </div>
+    <PageWrapper
+      user={user}
+      gap="small"
+      title="History"
+      description="Your past visualizations"
+      documentTitle="History"
+    >
       <motion.section className="space-y-8">
         {isLoading ? (
           <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">

@@ -18,7 +18,10 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "SketchViz",
+  title: {
+    default: "SketchViz",
+    template: "%s • SketchViz",
+  },
   description:
     "Turn SketchUp renders into photorealistic visualizations with AI.",
   appleWebApp: {
