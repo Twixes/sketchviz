@@ -45,7 +45,7 @@ export async function POST(
     );
   }
 
-  // Fetch the current generation and verify ownership through RLS
+  // Fetch the current generation
   const { data: currentGeneration, error: fetchError } = await supabase
     .from("generations")
     .select(
@@ -65,8 +65,17 @@ export async function POST(
 
   if (fetchError || !currentGeneration) {
     return NextResponse.json(
-      { error: "Generation not found or access denied" },
+      { error: "Generation not found" },
       { status: 404 },
+    );
+  }
+
+  // Verify ownership (RLS SELECT is public, so we must check explicitly)
+  const thread = currentGeneration.threads as unknown as { user_id: string };
+  if (thread.user_id !== userId) {
+    return NextResponse.json(
+      { error: "You don't have permission to regenerate this thread" },
+      { status: 403 },
     );
   }
 

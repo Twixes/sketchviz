@@ -31,7 +31,8 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
     queryFn: async () => {
       const { count, error } = await supabase
         .from("threads")
-        .select("*", { count: "exact", head: true });
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
 
       if (error) {
         console.error("Failed to check threads:", error);

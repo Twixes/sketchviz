@@ -35,6 +35,7 @@ export default function ThreadsPage() {
           )
         `,
         )
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .order("created_at", {
           referencedTable: "generations",

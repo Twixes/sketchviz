@@ -24,10 +24,11 @@ export function useDashboardStats() {
         return { totalGenerations: 0, monthlyGenerations: 0, dailyCounts: [] };
       }
 
-      // Fetch total generations count
+      // Fetch total generations count (user's own generations only)
       const { count: totalGenerations, error: totalError } = await supabase
         .from("generations")
-        .select("*", { count: "exact", head: true });
+        .select("*, threads!inner(user_id)", { count: "exact", head: true })
+        .eq("threads.user_id", user.id);
 
       if (totalError) {
         console.error("Failed to fetch total generations:", totalError);
@@ -42,7 +43,8 @@ export function useDashboardStats() {
       );
       const { count: monthlyGenerations, error: monthlyError } = await supabase
         .from("generations")
-        .select("*", { count: "exact", head: true })
+        .select("*, threads!inner(user_id)", { count: "exact", head: true })
+        .eq("threads.user_id", user.id)
         .gte("created_at", startOfMonth.toISOString());
 
       if (monthlyError) {
@@ -63,7 +65,8 @@ export function useDashboardStats() {
 
       const { data: recentGenerations, error: recentError } = await supabase
         .from("generations")
-        .select("created_at")
+        .select("created_at, threads!inner(user_id)")
+        .eq("threads.user_id", user.id)
         .gte("created_at", startDate.toISOString())
         .order("created_at", { ascending: true });
 
