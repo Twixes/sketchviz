@@ -12,13 +12,9 @@ const EXAMPLES: {
   generateParams?: Partial<GenerateRequest>;
 }[] = [
   {
-    before: "/kitchen-before.webp",
-    after: "/kitchen-after.webp",
-    label: "For interior design",
-    generateParams: {
-      indoor_light: "all_on",
-      outdoor_light: "night",
-    },
+    before: "/kitchen-2-before.jpg",
+    after: "/kitchen-2-after.jpg",
+    label: "For residential interiors",
   },
   {
     before: "/house-before.webp",
@@ -30,9 +26,14 @@ const EXAMPLES: {
     },
   },
   {
-    before: "/anything-before.webp",
-    after: "/anything-after.webp",
-    label: "For industrial design",
+    before: "/cafe-before.jpg",
+    after: "/cafe-after.jpg",
+    label: "For commercial interiors",
+    generateParams: {
+      indoor_light: "all_on",
+      edit_description:
+        "The concrete floor is matte. Keep the sunlight coming in according to the visible shadows",
+    },
   },
 ];
 
