@@ -69,7 +69,7 @@ export function DashboardStats() {
               <span className="text-3xl font-semibold text-black tabular-nums">
                 {Math.max(0, planData?.credits ?? 0)}
               </span>
-              <span className="text-sm text-black/40">in plan</span>
+              <span className="text-sm text-black/40">left in plan</span>
             </p>
             <p className="flex items-baseline gap-1.5">
               {(planData?.credits ?? 0) <= 0 ? (
@@ -78,15 +78,15 @@ export function DashboardStats() {
                     {Math.abs(planData?.credits ?? 0)}
                   </span>
                   <span className="text-sm text-black/40">pay-as-you-go</span>
-                  <span className="text-xs text-black/40">
-                    Credits reset 1st of every month.
-                  </span>
                 </>
               ) : (
                 <span className="text-xs text-black/40">
-                  0 pay-as-you-go. Credits reset 1st of every month.
+                  0 pay-as-you-go usage this month.
                 </span>
               )}
+            </p>
+            <p className="text-xs text-black/40">
+              Credits reset 1st of every month.
             </p>
           </div>
         ) : (
