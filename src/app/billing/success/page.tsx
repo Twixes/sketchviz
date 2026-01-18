@@ -73,7 +73,7 @@ export default function BillingSuccessPage() {
             transition={{ ...FADE_TRANSITION, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Button size="lg" link="/">
+            <Button size="lg" link="/dashboard">
               Get back to creating
             </Button>
             <Button size="lg" variant="secondary" link="/billing/portal">

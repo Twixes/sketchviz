@@ -17,7 +17,7 @@ export function NeonShapesPricing({ children }: NeonShapesPricingProps) {
         color="turquoise"
         size="lg"
         animation="drift"
-        className="absolute -left-16 top-1/4 hidden opacity-70 lg:block"
+        className="absolute -left-16 top-1/4 opacity-70"
       />
 
       {/* Coral crescent - right side */}
@@ -26,7 +26,7 @@ export function NeonShapesPricing({ children }: NeonShapesPricingProps) {
         color="coral"
         size="md"
         animation="breathing"
-        className="absolute -right-12 bottom-1/3 hidden opacity-60 lg:block"
+        className="absolute -right-12 bottom-1/3 opacity-60"
       />
 
       {/* Pink star - subtle top accent */}
@@ -35,7 +35,7 @@ export function NeonShapesPricing({ children }: NeonShapesPricingProps) {
         color="pink"
         size="sm"
         animation="breathing"
-        className="absolute right-1/4 -top-8 hidden opacity-50 lg:block"
+        className="absolute right-1/4 -top-8 opacity-50"
       />
 
       {children}

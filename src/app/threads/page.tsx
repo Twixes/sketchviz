@@ -1,24 +1,15 @@
 "use client";
 
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
+import { ThreadCard, type ThreadData } from "@/components/ThreadCard";
 import { Button } from "@/lib/components/ui/Button";
-import { ThreadCard } from "./ThreadCard";
-
-interface Thread {
-  id: string;
-  title: string;
-  created_at: string;
-  generation_count: number;
-  latest_generation: {
-    output_url: string | null;
-    input_url: string;
-  } | null;
-}
 
 export default function ThreadsPage() {
   const router = useRouter();
@@ -71,7 +62,7 @@ export default function ThreadsPage() {
         };
       });
 
-      return threadsWithStats as Thread[];
+      return threadsWithStats as ThreadData[];
     },
     enabled: !!user,
   });
@@ -85,11 +76,13 @@ export default function ThreadsPage() {
   }
 
   return (
-    <PageWrapper
-      user={user}
-      title="History"
-      description="Your past visualizations"
-    >
+    <PageWrapper user={user} gap="small">
+      <div>
+        <h1 className="text-2xl font-semibold text-black lg:text-3xl">
+          History
+        </h1>
+        <p className="mt-2 text-lg text-black/70">Your past visualizations</p>
+      </div>
       <motion.section className="space-y-8">
         {isLoading ? (
           <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">

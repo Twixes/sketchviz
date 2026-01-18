@@ -1,3 +1,4 @@
+import { uuidv7 } from "uuidv7";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { type AspectRatio, findClosestAspectRatio } from "@/lib/aspect-ratio";
@@ -32,6 +33,16 @@ export interface Thread {
   title: string | null;
   created_at: string;
   generations: Generation[];
+}
+
+interface StartNewThreadOptions {
+  initialParams?: {
+    inputSrc?: string;
+    blobUrl?: string;
+    editDescription?: string | null;
+    indoorLight?: IndoorLight;
+    outdoorLight?: OutdoorLight;
+  };
 }
 
 interface ThreadEditorState {
@@ -104,6 +115,7 @@ interface ThreadEditorState {
   setIsBusyForUser: (isBusy: boolean) => void;
   setIsComparing: (isComparing: boolean) => void;
   reset: () => void;
+  startNewThread: (options?: StartNewThreadOptions) => string;
 }
 
 const initialState = {
@@ -382,6 +394,29 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
 
         // Reset but preserve model selection
         set({ ...initialState, model });
+      },
+
+      startNewThread: (options) => {
+        get().reset();
+        const threadId = uuidv7();
+        set({ tentativeThreadId: threadId });
+
+        if (options?.initialParams) {
+          const {
+            inputSrc,
+            blobUrl,
+            editDescription,
+            indoorLight,
+            outdoorLight,
+          } = options.initialParams;
+          if (inputSrc !== undefined) get().setInputSrc(inputSrc);
+          if (blobUrl !== undefined) set({ blobUrl });
+          if (editDescription !== undefined) set({ editDescription });
+          if (indoorLight !== undefined) set({ indoorLight });
+          if (outdoorLight !== undefined) set({ outdoorLight });
+        }
+
+        return threadId;
       },
     }),
     {
