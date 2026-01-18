@@ -43,15 +43,14 @@ export function Header({ user }: HeaderProps) {
     <motion.header
       initial={false}
       transition={FADE_TRANSITION}
-      className="flex flex-wrap items-center justify-between z-10 gap-2 lg:gap-4"
+      className="flex flex-wrap items-center justify-between z-10 gap-4"
     >
-      <div className="flex items-center flex-wrap gap-2 lg:gap-4">
-        <Logo user={user} />
-        {user && <CreditsButton />}
-      </div>
-      <div className="flex flex-wrap justify-end items-center gap-2 lg:gap-3 whitespace-nowrap">
+      <Logo user={user} />
+      <div className="flex items-center flex-wrap-reverse grow gap-2 lg:gap-3 whitespace-nowrap">
         {user ? (
           <>
+            <CreditsButton />
+            <div className="grow" />
             <NewRenderButton />
             <Button
               variant="secondary"
