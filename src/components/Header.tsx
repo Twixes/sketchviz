@@ -8,6 +8,7 @@ import {
 } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -44,8 +45,8 @@ export function Header({ user }: HeaderProps) {
       className="flex flex-wrap items-center justify-between z-10 gap-2 lg:gap-4"
     >
       <div className="flex items-center flex-wrap gap-2 lg:gap-4">
-        <a
-          href="/"
+        <Link
+          href={user ? "/dashboard" : "/"}
           className="flex items-center gap-2 lg:gap-3 cursor-pointer whitespace-nowrap"
         >
           <Image
@@ -58,7 +59,7 @@ export function Header({ user }: HeaderProps) {
           <p className="text-lg font-semibold tracking-tight leading-tight text-black">
             SketchViz
           </p>
-        </a>
+        </Link>
         {user && <CreditsButton />}
       </div>
       <div className="flex flex-wrap justify-end items-center gap-2 lg:gap-3 whitespace-nowrap">
@@ -67,19 +68,11 @@ export function Header({ user }: HeaderProps) {
             <NewRenderButton />
             <Button
               variant="secondary"
+              link="/dashboard"
               leftIcon={<DashboardIcon />}
               className="cursor-pointer"
-              link="/dashboard"
             >
               Dashboard
-            </Button>
-            <Button
-              variant="secondary"
-              leftIcon={<RocketIcon />}
-              className="cursor-pointer"
-              link="/pricing"
-            >
-              Pricing
             </Button>
             <Button
               variant="secondary"
