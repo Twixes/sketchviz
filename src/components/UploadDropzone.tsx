@@ -29,7 +29,13 @@ export function UploadDropzone({
     inputSrc,
     setInputImageDimensions,
     aspectRatio: selectedAspectRatio,
+    reset,
   } = useThreadEditorStore();
+
+  // Reset thread editor state when dropzone mounts (user navigated back to upload)
+  useEffect(() => {
+    reset();
+  }, [reset]);
   const { data: planData } = usePlanQuery();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
