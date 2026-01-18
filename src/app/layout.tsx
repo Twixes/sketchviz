@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import Head from "next/head";
 import Script from "next/script";
 import { QueryProvider } from "@/components/QueryProvider";
 import {
@@ -22,6 +21,18 @@ export const metadata: Metadata = {
   title: "SketchViz",
   description:
     "Turn SketchUp renders into photorealistic visualizations with AI.",
+  appleWebApp: {
+    title: "SketchViz",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default async function RootLayout({
@@ -43,23 +54,6 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <Head>
-        <meta name="apple-mobile-web-app-title" content="SketchViz" />
-        <link
-          rel="icon"
-          type="image/png"
-          href="/favicon-96x96.png"
-          sizes="96x96"
-        />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
-        />
-        <link rel="manifest" href="/site.webmanifest" />
-      </Head>
       <Script
         async
         src="https://www.googletagmanager.com/gtag/js?id=AW-971292206"
