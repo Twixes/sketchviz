@@ -51,9 +51,15 @@ export function useDashboardStats() {
       }
 
       // Fetch daily counts for the last N days (for sparkline)
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - DAYS_FOR_SPARKLINE + 1);
-      startDate.setHours(0, 0, 0, 0);
+      // Use UTC consistently to avoid timezone mismatches
+      const now = new Date();
+      const startDate = new Date(
+        Date.UTC(
+          now.getUTCFullYear(),
+          now.getUTCMonth(),
+          now.getUTCDate() - DAYS_FOR_SPARKLINE + 1,
+        ),
+      );
 
       const { data: recentGenerations, error: recentError } = await supabase
         .from("generations")
@@ -76,8 +82,7 @@ export function useDashboardStats() {
       // Build array for all days in range (including zeros)
       const dailyCounts: DailyCount[] = [];
       for (let i = 0; i < DAYS_FOR_SPARKLINE; i++) {
-        const date = new Date(startDate);
-        date.setDate(startDate.getDate() + i);
+        const date = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
         const dateStr = date.toISOString().split("T")[0];
         dailyCounts.push({
           date: dateStr,
