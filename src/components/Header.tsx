@@ -1,6 +1,7 @@
 import {
   ClockIcon,
   DashboardIcon,
+  DotFilledIcon,
   ExitIcon,
   InfoCircledIcon,
   RocketIcon,
@@ -68,8 +69,15 @@ export function Header({ user }: HeaderProps) {
             <Button
               variant="secondary"
               link="/dashboard"
-              leftIcon={<DashboardIcon />}
+              leftIcon={
+                pathname === "/dashboard" ? (
+                  <DotFilledIcon />
+                ) : (
+                  <DashboardIcon />
+                )
+              }
               className="cursor-pointer"
+              tooltip={pathname === "/dashboard" ? "You are here" : undefined}
             >
               Dashboard
             </Button>

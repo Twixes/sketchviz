@@ -47,10 +47,20 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
   const firstName = extractFirstName(user.user_metadata.full_name);
   const hour = new Date().getHours();
   const timeGreeting =
-    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    hour < 5
+      ? "Burning the midnight oil"
+      : hour < 12
+        ? "How's your morning"
+        : hour < 17
+          ? "Good afternoon"
+          : hour < 21
+            ? "Good evening"
+            : "Working late";
+  const isQuestion = timeGreeting.startsWith("How");
+  const punctuation = isQuestion ? "?" : "!";
   const greeting = firstName
-    ? `${timeGreeting}, ${firstName}!`
-    : `${timeGreeting}!`;
+    ? `${timeGreeting}, ${firstName}${punctuation}`
+    : `${timeGreeting}${punctuation}`;
 
   // Empty state for new users
   if (!isLoadingThreads && !hasThreads) {
