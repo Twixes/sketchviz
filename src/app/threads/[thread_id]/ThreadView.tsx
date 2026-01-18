@@ -63,25 +63,18 @@ export function ThreadView({ threadId }: { threadId: string }) {
     router,
   ]);
 
-  // Redirect to signin for unauthenticated users trying to access existing threads
-  // (new threads are allowed for the preview flow)
-  useEffect(() => {
-    if (!user && !isNewThread) {
-      router.push(`/auth/signin?redirect=/threads/${threadId}`);
-    }
-  }, [user, isNewThread, router, threadId]);
-
-  // Fetch thread data (only for existing threads)
+  // Fetch thread data (only for existing threads - works for anyone due to public RLS)
   const { data: fetchedThread, isLoading } = useQuery({
     queryKey: ["thread", threadId],
     queryFn: async () => {
-      if (!user || isNewThread) return null;
+      if (isNewThread) return null;
 
       const { data, error } = await supabase
         .from("threads")
         .select(
           `
           id,
+          user_id,
           title,
           created_at,
           generations (
@@ -112,8 +105,12 @@ export function ThreadView({ threadId }: { threadId: string }) {
 
       return data as Thread;
     },
-    enabled: !!user && !isNewThread,
+    enabled: !isNewThread,
   });
+
+  // Derive ownership and read-only state
+  const isOwner = user?.id === fetchedThread?.user_id;
+  const isReadOnly = !isNewThread && !isOwner;
 
   // Update store when thread data is fetched
   useEffect(() => {
@@ -199,10 +196,11 @@ export function ThreadView({ threadId }: { threadId: string }) {
         aspectRatio: threadEditorStore.aspectRatio,
       });
 
-      if (result.threadId) {
+      if (result.threadId && user) {
         // Construct thread from data we already have (no fetch needed)
         const newThread: Thread = {
           id: result.threadId,
+          user_id: user.id,
           title: null, // Will be generated async by the backend
           created_at: new Date().toISOString(),
           generations: [
@@ -237,7 +235,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
     } finally {
       threadEditorStore.setIsBusyForUser(false);
     }
-  }, [threadEditorStore, uploadMutation, generateMutation, threadId]);
+  }, [threadEditorStore, uploadMutation, generateMutation, threadId, user]);
 
   // Handle iteration (existing thread)
   const handleIterate = useCallback(async () => {
@@ -350,7 +348,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
         : handleInitialGenerate;
 
   // Loading state for existing threads
-  if (!isNewThread && user && isLoading) {
+  if (!isNewThread && isLoading) {
     return (
       <PageWrapper user={user} gap="small">
         <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
@@ -361,7 +359,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
   }
 
   // Thread not found (only for existing threads that failed to load)
-  if (!isNewThread && user && !thread) {
+  if (!isNewThread && !thread) {
     return (
       <PageWrapper user={user} gap="small">
         <motion.section className="space-y-6">
@@ -416,6 +414,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
             aspectRatio={aspectRatio}
             referenceImages={referenceImages}
             isLoading={isGenerating}
+            disabled={isReadOnly}
             onOutdoorLightChange={setOutdoorLight}
             onIndoorLightChange={setIndoorLight}
             onEditDescriptionChange={setEditDescription}
@@ -426,17 +425,25 @@ export function ThreadView({ threadId }: { threadId: string }) {
             onGenerate={handleGenerate}
           />
 
-          <GenerateButton
-            user={user}
-            model={model}
-            credits={creditsData?.credits}
-            planType={creditsData?.planType}
-            isGenerating={isGenerating}
-            isIteration={canIterate}
-            hasGenerations={hasGenerations}
-            onGenerate={handleGenerate}
-            onSignIn={handleSignIn}
-          />
+          {isReadOnly ? (
+            <div className="rounded-2xl border border-black/10 bg-white/75 p-4 text-center">
+              <p className="text-sm text-black/60 cursor-default">
+                You're viewing a shared thread. Sign in as the owner to iterate.
+              </p>
+            </div>
+          ) : (
+            <GenerateButton
+              user={user}
+              model={model}
+              credits={creditsData?.credits}
+              planType={creditsData?.planType}
+              isGenerating={isGenerating}
+              isIteration={canIterate}
+              hasGenerations={hasGenerations}
+              onGenerate={handleGenerate}
+              onSignIn={handleSignIn}
+            />
+          )}
         </div>
       </motion.section>
     </PageWrapper>

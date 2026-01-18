@@ -22,6 +22,7 @@ interface ControlPanelProps {
   aspectRatio: AspectRatio | null;
   referenceImages: ReferenceImage[];
   isLoading: boolean;
+  disabled?: boolean;
   onOutdoorLightChange: (value: OutdoorLight) => void;
   onIndoorLightChange: (value: IndoorLight) => void;
   onEditDescriptionChange: (value: string | null) => void;
@@ -81,6 +82,8 @@ export function ControlPanel(props: ControlPanelProps) {
     }
   };
 
+  const isDisabled = props.isLoading || props.disabled;
+
   return (
     <div className="space-y-2">
       {/* Light and Model Selectors */}
@@ -90,25 +93,25 @@ export function ControlPanel(props: ControlPanelProps) {
           value={props.outdoorLight}
           options={OUTDOOR_LIGHT_OPTIONS}
           onChange={props.onOutdoorLightChange}
-          disabled={props.isLoading}
+          disabled={isDisabled}
         />
         <LightSelector
           label="Indoor lighting"
           value={props.indoorLight}
           options={INDOOR_LIGHT_OPTIONS}
           onChange={props.onIndoorLightChange}
-          disabled={props.isLoading}
+          disabled={isDisabled}
         />
         <AspectRatioSelector
           value={props.aspectRatio}
           onChange={props.onAspectRatioChange}
           hasReferenceImages={props.referenceImages.length > 0}
-          disabled={props.isLoading}
+          disabled={isDisabled}
         />
         <ModelSelector
           value={props.model}
           onChange={props.onModelChange}
-          disabled={props.isLoading}
+          disabled={isDisabled}
         />
       </div>
 
@@ -133,7 +136,7 @@ export function ControlPanel(props: ControlPanelProps) {
           }}
           placeholder="Describe the changes you want – be as specific as you can (optional)"
           minRows={1}
-          disabled={props.isLoading}
+          disabled={isDisabled}
           className={clsx([
             "w-full rounded-xl border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40",
             "focus:outline-none focus:ring-2 focus:ring-black/20 resize-none transition-colors",
@@ -143,7 +146,7 @@ export function ControlPanel(props: ControlPanelProps) {
           ])}
         />
         <ReferenceImageUpload
-          disabled={props.isLoading}
+          disabled={isDisabled}
           referenceImages={props.referenceImages}
           onFileDrop={props.onReferenceImageDrop}
           onRemove={props.onReferenceImageRemove}

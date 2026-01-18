@@ -1,4 +1,3 @@
-import { uuidv7 } from "uuidv7";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { type AspectRatio, findClosestAspectRatio } from "@/lib/aspect-ratio";
@@ -30,6 +29,7 @@ export interface Generation {
 
 export interface Thread {
   id: string;
+  user_id: string;
   title: string | null;
   created_at: string;
   generations: Generation[];
@@ -398,7 +398,7 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
 
       startNewThread: (options) => {
         get().reset();
-        const threadId = uuidv7();
+        const threadId = crypto.randomUUID();
         set({ tentativeThreadId: threadId });
 
         if (options?.initialParams) {
