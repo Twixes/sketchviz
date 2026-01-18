@@ -151,7 +151,7 @@ export function DashboardStats() {
             data={sparklineData}
             strokeColor="rgb(0 0 0 / 0.25)"
             fillColor="rgb(0 0 0 / 0.04)"
-            className="absolute -bottom-px right-px w-[60%] h-24"
+            className="absolute -bottom-0.5 right-0.5 w-[60%] h-24"
           />
         )}
       </div>
