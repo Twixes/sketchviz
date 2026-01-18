@@ -11,21 +11,21 @@ export function PricingHeader() {
         color="violet"
         size="md"
         animation="drift"
-        className="absolute -left-14 -top-6 hidden opacity-70 lg:block"
+        className="absolute -left-14 -top-6 opacity-70"
       />
       <NeonShape
         shape="arrow"
         color="amber"
         size="sm"
         animation="breathing"
-        className="absolute -right-10 top-2 hidden rotate-45 opacity-60 lg:block"
+        className="absolute -right-10 top-2 rotate-45 opacity-60"
       />
       <NeonShape
         shape="crescent"
         color="coral"
         size="sm"
         animation="breathing"
-        className="absolute -right-20 -bottom-2 hidden opacity-50 lg:block"
+        className="absolute -right-20 -bottom-2 opacity-50"
       />
 
       <motion.h1

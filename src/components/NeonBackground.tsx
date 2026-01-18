@@ -19,7 +19,7 @@ export function NeonBackground({ children }: NeonBackgroundProps) {
           color="pink"
           size="xl"
           animation="both"
-          className="absolute left-[8%] top-[18%] hidden rotate-12 lg:block"
+          className="absolute left-[8%] top-[18%] rotate-12"
         />
 
         {/* Turquoise star - top right, small accent */}
@@ -28,7 +28,7 @@ export function NeonBackground({ children }: NeonBackgroundProps) {
           color="turquoise"
           size="md"
           animation="breathing"
-          className="absolute right-[12%] top-[12%] hidden lg:block"
+          className="absolute right-[12%] top-[12%]"
         />
 
         {/* Coral spiral - left side, mid-height */}
@@ -37,7 +37,7 @@ export function NeonBackground({ children }: NeonBackgroundProps) {
           color="coral"
           size="lg"
           animation="drift"
-          className="absolute left-[3%] top-[55%] hidden -rotate-12 lg:block"
+          className="absolute left-[3%] top-[55%] -rotate-12"
         />
 
         {/* Violet zigzag - bottom right */}
@@ -46,7 +46,7 @@ export function NeonBackground({ children }: NeonBackgroundProps) {
           color="violet"
           size="lg"
           animation="both"
-          className="absolute right-[6%] bottom-[22%] hidden rotate-6 lg:block"
+          className="absolute right-[6%] bottom-[22%] rotate-6"
         />
 
         {/* Amber crescent - bottom left, subtle */}
@@ -55,7 +55,7 @@ export function NeonBackground({ children }: NeonBackgroundProps) {
           color="amber"
           size="md"
           animation="breathing"
-          className="absolute left-[15%] bottom-[12%] hidden opacity-80 lg:block"
+          className="absolute left-[15%] bottom-[12%] opacity-80"
         />
       </div>
 

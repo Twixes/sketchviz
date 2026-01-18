@@ -12,7 +12,7 @@ export function NeonShapesHero() {
         color="pink"
         size="lg"
         animation="breathing"
-        className="absolute -left-10 -top-8 hidden lg:block"
+        className="absolute -left-10 -top-8"
       />
 
       {/* Turquoise arrow - right side, pointing down */}
@@ -21,7 +21,7 @@ export function NeonShapesHero() {
         color="turquoise"
         size="md"
         animation="drift"
-        className="absolute -right-6 top-1/4 hidden rotate-90 lg:block"
+        className="absolute -right-6 top-1/4 rotate-90"
       />
 
       {/* Amber spiral - bottom left */}
@@ -30,7 +30,7 @@ export function NeonShapesHero() {
         color="amber"
         size="md"
         animation="both"
-        className="absolute -left-4 bottom-1/4 hidden lg:block"
+        className="absolute -left-4 bottom-1/4"
       />
 
       {/* Violet crescent - top right accent */}
@@ -39,7 +39,7 @@ export function NeonShapesHero() {
         color="violet"
         size="sm"
         animation="breathing"
-        className="absolute right-4 -top-4 hidden opacity-90 lg:block"
+        className="absolute right-4 -top-4 opacity-90"
       />
     </>
   );
