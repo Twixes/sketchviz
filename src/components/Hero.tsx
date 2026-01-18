@@ -26,7 +26,7 @@ export function Hero() {
         className="max-w-xl text-lg text-black/70"
       >
         <strong>
-          You don't need to be a 3D artist for great visualizations anymore.
+          You don't need to be a 3D expert for great visualizations anymore.
         </strong>
         <br />
         Upload a raw render and get polished, photorealistic output with refined

@@ -31,7 +31,7 @@ export function HeroFeatures() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...SLOW_TRANSITION, delay: index * 0.05 }}
-          className="rounded-2xl border border-black/10 bg-white/75 px-4 py-3 text-left"
+          className="rounded-2xl border border-black/[0.12] bg-gradient-to-br from-white/70 via-white/60 to-amber-50/30 backdrop-blur-lg px-4 py-3 text-left"
         >
           <p className="text-xs uppercase tracking-widest font-semibold mb-1 text-black/40">
             {item.label}
