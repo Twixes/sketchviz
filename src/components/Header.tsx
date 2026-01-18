@@ -12,7 +12,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { uuidv7 } from "uuidv7";
 import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
@@ -165,19 +164,17 @@ function CreditsButton(): JSX.Element {
 function NewRenderButton(): JSX.Element {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const accept = useMemo(() => ACCEPTED_MIME_TYPES.join(","), []);
-  const { setTentativeThreadId, reset } = useThreadEditorStore();
+  const { startNewThread } = useThreadEditorStore();
   const uploadMutation = useUploadMutation();
   const router = useRouter();
 
   const handleFileSelected = useCallback(
     (file: File) => {
-      const threadId = uuidv7();
-      reset();
-      setTentativeThreadId(threadId);
+      const threadId = startNewThread();
       uploadMutation.mutate({ file });
       router.push(`/threads/${threadId}`);
     },
-    [uploadMutation, router, setTentativeThreadId, reset],
+    [uploadMutation, router, startNewThread],
   );
 
   return (

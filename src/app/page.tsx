@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
-import { uuidv7 } from "uuidv7";
 import { Examples } from "@/components/Examples";
 import { Hero } from "@/components/Hero";
 import { HeroFeatures } from "@/components/HeroFeatures";
@@ -19,21 +18,18 @@ export default function Home() {
   const { user } = useSession();
 
   // Zustand store - minimal usage, just for upload
-  const { setTentativeThreadId } = useThreadEditorStore();
+  const { startNewThread } = useThreadEditorStore();
 
   // TanStack Query mutations
   const uploadMutation = useUploadMutation();
 
   const handleFileSelected = useCallback(
     (file: File) => {
-      // Generate a tentative thread ID and navigate immediately
-      const threadId = uuidv7();
-      setTentativeThreadId(threadId);
-      // Start upload and navigate - upload continues on the thread page
+      const threadId = startNewThread();
       uploadMutation.mutate({ file });
       router.push(`/threads/${threadId}`);
     },
-    [uploadMutation, router, setTentativeThreadId],
+    [uploadMutation, router, startNewThread],
   );
 
   return (
