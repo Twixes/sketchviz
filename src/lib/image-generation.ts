@@ -227,7 +227,10 @@ export async function generateAndUploadImage({
   generationType: "iteration" | "regeneration" | "initial";
   useBasePrompt?: boolean;
 }): Promise<ProcessImageGenerationResult> {
-  const creditCost = determineCreditCostOfImageGeneration({ model });
+  const creditCost = determineCreditCostOfImageGeneration({
+    model,
+    referenceImageCount: preparedImage.referenceImageBuffers.length,
+  });
 
   const [creditsAvailable, [planType]] = await Promise.all([
     getCreditsForUser(userId),

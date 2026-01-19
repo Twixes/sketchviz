@@ -25,6 +25,8 @@ interface GenerateButtonProps {
    */
   isIteration?: boolean;
   hasGenerations?: boolean;
+  /** Number of reference images, used for BFL model credit calculation. */
+  referenceImageCount?: number;
   onGenerate: () => void;
   onSignIn: () => void;
 }
@@ -37,10 +39,14 @@ export function GenerateButton({
   isGenerating,
   isIteration = false,
   hasGenerations = false,
+  referenceImageCount = 0,
   onGenerate,
   onSignIn,
 }: GenerateButtonProps) {
-  const creditCost = determineCreditCostOfImageGeneration({ model });
+  const creditCost = determineCreditCostOfImageGeneration({
+    model,
+    referenceImageCount,
+  });
   // Only show insufficient credits for free users - Pro users are billed for overages
   const hasInsufficientCredits = !!(
     user &&
@@ -106,10 +112,13 @@ export function GenerateButton({
 
 export function CreditBadge({
   creditCost,
+  perRefCost,
   hasWarning = false,
   className,
 }: {
   creditCost: number;
+  /** Cost per reference image, shown as "+X/ref" when provided */
+  perRefCost?: number;
   hasWarning?: boolean;
   className?: string;
 }) {
@@ -121,7 +130,7 @@ export function CreditBadge({
       )}
     >
       {hasWarning && <ExclamationTriangleIcon className="mr-0.5" />}
-      {creditCost} credits
+      {creditCost} credits{perRefCost ? ` + ${perRefCost}/reference` : ""}
     </div>
   );
 }

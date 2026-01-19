@@ -30,8 +30,10 @@ pnpm format
 - **State Management**: Zustand (client state), TanStack Query (server state)
 - **Database**: Supabase (PostgreSQL with Row Level Security)
 - **Storage**: Supabase Storage (private buckets with RLS)
-- **AI**: Google Gemini via AI SDK
-  - Models: `gemini-3-pro-image-preview` (generation 2K, 14 credits), `gemini-3-pro-image-preview/4k` (generation 4K, 24 credits), `gemini-2.5-flash-image-preview` (generation, 4 credits), `gemini-flash-lite-latest` (titles)
+- **AI**: Google Gemini and Black Forest Labs FLUX via AI SDK
+  - Pro models (Google Gemini): `google/gemini-3-pro-image-preview` (2K/4MP, 14 credits), `google/gemini-3-pro-image-preview/4k` (4K/16MP, 24 credits)
+  - Lite models (BFL FLUX): `bfl/flux-2-klein-9b` (1K/1MP, 2 credits + 1/ref), `bfl/flux-2-klein-9b/1.5k` (1.5K/2MP, 4 credits + 1/ref) - max dimension 2048
+  - Titling: `gemini-flash-lite-latest`
 - **Payments**: Polar SDK (credit system, subscriptions)
 - **Analytics**: PostHog (event tracking, AI tracing, error tracking)
 - **Code Quality**: Biome (linting + formatting with Next.js/React domains), Lefthook (pre-commit hooks)
@@ -42,13 +44,13 @@ pnpm format
 2. User optionally uploads up to 3 reference images for materials/textures/style (stored in `input-images` bucket)
 3. User adjusts parameters:
    - Lighting (outdoor: sunny/overcast/night, indoor: all_on/all_off, or custom text)
-   - AI model selection (gemini-3-pro or gemini-2.5-flash)
+   - Quality/model selection (Pro 4K/2K via Gemini, Lite 4K/2K via FLUX)
    - Aspect ratio (if using reference images, required due to Gemini limitations)
    - Optional edit description for specific requests
 4. User clicks generate → `/api/generate` validates request and checks credits via Polar
-5. `/api/generate` fetches images from Supabase Storage, sends to Gemini with constructed prompt (base + lighting + edit description + reference images)
-6. Gemini returns photorealistic image → stored in Supabase Storage (`output-images` bucket)
-7. Credits deducted via Polar (14 for gemini-3-pro, 4 for gemini-2.5-flash)
+5. `/api/generate` fetches images from Supabase Storage, sends to AI model with constructed prompt (base + lighting + edit description + reference images)
+6. AI returns photorealistic image → stored in Supabase Storage (`output-images` bucket)
+7. Credits deducted via Polar (see model credit costs above)
 8. Thread + generation records created in Supabase with user params stored as JSONB (authenticated users only)
 9. Thread title auto-generated in background via Gemini Flash
 10. User can view thread history at `/threads` and individual generations at `/threads/[thread_id]`
@@ -92,8 +94,10 @@ pnpm format
 
 **AI Integration**
 - `lib/ai.ts`: Core AI functions for image generation and titling
+- Supports Google Gemini (Pro) and Black Forest Labs FLUX (Lite) models
 - Prompt engineering: base prompt + conditional parameters + reference images
-- Set `SKIP_AI=1` in `.env.local` to skip Gemini calls (returns "deep fried" input image for testing)
+- BFL models require explicit width/height calculated from aspect ratio (`lib/aspect-ratio.ts`)
+- Set `SKIP_AI=1` in `.env.local` to skip AI calls (returns "deep fried" input image for testing)
 
 **Validation**
 - Zod schemas in `lib/schemas.ts` validate API inputs
@@ -177,7 +181,8 @@ See `.env.example` for required variables. Key ones:
 **Required:**
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Supabase anonymous/public key
-- `GOOGLE_GENERATIVE_AI_API_KEY`: Google AI Studio API key for Gemini
+- `GOOGLE_GENERATIVE_AI_API_KEY`: Google AI Studio API key for Gemini (Pro models)
+- `BFL_API_KEY`: Black Forest Labs API key for FLUX (Lite models)
 - `POLAR_ACCESS_TOKEN`: Polar API access token for credit/billing management
 - `NEXT_PUBLIC_POSTHOG_API_KEY`: PostHog project API key
 - `NEXT_PUBLIC_POSTHOG_HOST`: PostHog instance host URL

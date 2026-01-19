@@ -1,3 +1,4 @@
+import { LightningBoltIcon, RocketIcon } from "@radix-ui/react-icons";
 import type React from "react";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
@@ -14,12 +15,39 @@ interface ModelSelectorProps {
   disabled?: boolean;
 }
 
+function ResolutionBadge({
+  resolution,
+}: {
+  resolution: "1K" | "1.5K" | "2K" | "4K";
+}) {
+  const styles: Record<typeof resolution, string> = {
+    "4K": "bg-black border-white text-white",
+    "2K": "bg-neutral-300 border-black/10 text-neutral-800",
+    "1.5K": "bg-neutral-200 border-black/10 text-neutral-800",
+    "1K": "bg-neutral-100 border-black/10 text-neutral-800",
+  };
+  const labels: Record<typeof resolution, string> = {
+    "4K": "4K",
+    "2K": "1440p",
+    "1.5K": "1080p",
+    "1K": "720p",
+  };
+  return (
+    <span
+      className={`rounded px-1 text-xs font-semibold border ${styles[resolution]}`}
+    >
+      {labels[resolution]}
+    </span>
+  );
+}
+
 export const MODEL_OPTIONS: ModelOption[] = [
   {
     value: "google/gemini-3-pro-image-preview/4k",
+    icon: RocketIcon,
     label: (
       <>
-        4K{" "}
+        Pro <ResolutionBadge resolution="4K" />{" "}
         <CreditBadge
           creditCost={determineCreditCostOfImageGeneration({
             model: "google/gemini-3-pro-image-preview/4k",
@@ -31,15 +59,16 @@ export const MODEL_OPTIONS: ModelOption[] = [
       <>
         <strong>High quality. Maximum resolution (16 megapixels).</strong>
         <br />
-        Powered by Google's Nano Banana Pro.
+        Powered by Google Gemini.
       </>
     ),
   },
   {
     value: "google/gemini-3-pro-image-preview",
+    icon: RocketIcon,
     label: (
       <>
-        2K{" "}
+        Pro <ResolutionBadge resolution="2K" />{" "}
         <CreditBadge
           creditCost={determineCreditCostOfImageGeneration({
             model: "google/gemini-3-pro-image-preview",
@@ -49,9 +78,53 @@ export const MODEL_OPTIONS: ModelOption[] = [
     ),
     description: (
       <>
-        <strong>High quality. Standard resolution (4 megapixels).</strong>
+        <strong>High quality. High resolution (4 megapixels).</strong>
         <br />
-        Powered by Google's Nano Banana Pro.
+        Powered by Google Gemini.
+      </>
+    ),
+  },
+  {
+    value: "bfl/flux-2-klein-9b/1.5k",
+    icon: LightningBoltIcon,
+    label: (
+      <>
+        Lite <ResolutionBadge resolution="1.5K" />{" "}
+        <CreditBadge
+          creditCost={determineCreditCostOfImageGeneration({
+            model: "bfl/flux-2-klein-9b/1.5k",
+          })}
+          perRefCost={1}
+        />
+      </>
+    ),
+    description: (
+      <>
+        <strong>Fast results. Standard resolution (2 megapixels).</strong>
+        <br />
+        Powered by Black Forest Labs FLUX.
+      </>
+    ),
+  },
+  {
+    value: "bfl/flux-2-klein-9b/1k",
+    icon: LightningBoltIcon,
+    label: (
+      <>
+        Lite <ResolutionBadge resolution="1K" />{" "}
+        <CreditBadge
+          creditCost={determineCreditCostOfImageGeneration({
+            model: "bfl/flux-2-klein-9b/1k",
+          })}
+          perRefCost={1}
+        />
+      </>
+    ),
+    description: (
+      <>
+        <strong>Fast results. Low resolution (1 megapixel).</strong>
+        <br />
+        Powered by Black Forest Labs FLUX.
       </>
     ),
   },
@@ -64,7 +137,7 @@ export function ModelSelector({
 }: ModelSelectorProps) {
   return (
     <Select
-      label="Resolution"
+      label="Quality"
       value={value}
       options={MODEL_OPTIONS}
       onChange={onChange}

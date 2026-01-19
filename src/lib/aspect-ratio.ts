@@ -62,6 +62,49 @@ export function findClosestAspectRatio(imageRatio: number): AspectRatio {
 }
 
 /**
+ * Calculate output dimensions for a target megapixel count while maintaining aspect ratio.
+ * Used for BFL models that require explicit width and height.
+ * @param aspectRatio - The aspect ratio string (e.g., "16:9") or numeric ratio
+ * @param megapixels - Target total pixels in millions (1 for 1K, 2 for 1.5K)
+ * @param maxDimension - Maximum allowed width or height (default: no limit)
+ * @returns Object with width and height in pixels
+ */
+export function calculateDimensionsForMegapixels(params: {
+  aspectRatio: AspectRatio | number;
+  megapixels: number;
+  maxDimension?: number;
+}): { width: number; height: number } {
+  const { aspectRatio, megapixels, maxDimension } = params;
+  const ratio =
+    typeof aspectRatio === "number"
+      ? aspectRatio
+      : parseAspectRatio(aspectRatio);
+
+  const totalPixels = megapixels * 1_000_000;
+  // width * height = totalPixels, width / height = ratio
+  // height = sqrt(totalPixels / ratio), width = height * ratio
+  let height = Math.floor(Math.sqrt(totalPixels / ratio));
+  let width = Math.floor(height * ratio);
+
+  // Cap dimensions if maxDimension is specified
+  if (maxDimension) {
+    if (width > maxDimension) {
+      width = maxDimension;
+      height = Math.floor(width / ratio);
+    }
+    if (height > maxDimension) {
+      height = maxDimension;
+      width = Math.floor(height * ratio);
+    }
+    // Final clamp to ensure neither dimension exceeds max after all calculations
+    width = Math.min(width, maxDimension);
+    height = Math.min(height, maxDimension);
+  }
+
+  return { width, height };
+}
+
+/**
  * Calculate dimensions to crop an image to match target aspect ratio
  * using "cover" logic (image fills the aspect ratio, content may be cut off)
  * @returns Object with width, height, left, top for cropping

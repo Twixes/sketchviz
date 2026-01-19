@@ -1,12 +1,18 @@
+import { createBlackForestLabs } from "@ai-sdk/black-forest-labs";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { withTracing } from "@posthog/ai";
-import { generateText, type LanguageModel } from "ai";
+import { generateImage, generateText, type LanguageModel } from "ai";
 import sharp from "sharp";
-import type { AspectRatio } from "./aspect-ratio";
+import {
+  type AspectRatio,
+  calculateDimensionsForMegapixels,
+  findClosestAspectRatio,
+} from "./aspect-ratio";
 import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 
 const googleClient = createGoogleGenerativeAI();
+const bflClient = createBlackForestLabs();
 
 const IMAGE_DESCRIPTION_PROMPT = `
 Describe this SketchUp render in a brief plain-text title.
@@ -62,11 +68,17 @@ async function generateImageFromPrompt(
     };
   }
 
-  // Select the model, stripping the provider prefix (google/)
+  // Select the model, stripping the provider prefix
   // Also extract imageSize from model name if present (e.g., "gemini-3-pro-image-preview/4k" -> "4k")
   const [modelProvider, modelName, imageSizeFromModel] =
     params.model.split("/");
 
+  // Handle BFL models separately as they use a different API
+  if (modelProvider === "bfl") {
+    return generateBflImage(params, prompt, modelName, imageSizeFromModel);
+  }
+
+  // Google Gemini models
   let imageEditingModel: LanguageModel;
   if (modelProvider === "google") {
     imageEditingModel = withTracing(
@@ -160,6 +172,75 @@ async function generateImageFromPrompt(
   };
 }
 
+async function generateBflImage(
+  params: GenerateImageParams,
+  prompt: string,
+  modelName: string,
+  imageSizeFromModel: string | undefined,
+): Promise<GeneratedImage> {
+  // Determine aspect ratio: use provided or calculate from input image
+  let aspectRatio: AspectRatio | number;
+  if (params.aspectRatio) {
+    aspectRatio = params.aspectRatio;
+  } else {
+    // Calculate aspect ratio from input image dimensions
+    const metadata = await sharp(params.imageBuffer).metadata();
+    if (!metadata.width || !metadata.height) {
+      throw new Error("Could not determine input image dimensions");
+    }
+    aspectRatio = metadata.width / metadata.height;
+  }
+
+  // Calculate dimensions: 1MP for 1K, 2MP for 1.5K (BFL max dimension is 1920)
+  const megapixels = imageSizeFromModel === "1.5k" ? 2 : 1;
+  const { width, height } = calculateDimensionsForMegapixels({
+    aspectRatio,
+    megapixels,
+    maxDimension: 1920,
+  });
+
+  // Build images array: reference images + input image (as Buffers)
+  const images: Buffer[] = [];
+  if (params.referenceImages && params.referenceImages.length > 0) {
+    for (const refImage of params.referenceImages) {
+      images.push(refImage.buffer);
+    }
+  }
+  // Add the input image as the primary reference
+  images.push(params.imageBuffer);
+
+  // Use the BFL image model (tracing not supported for image models)
+  const bflModel = bflClient.image(modelName);
+
+  const result = await generateImage({
+    model: bflModel,
+    prompt: {
+      text: prompt,
+      images,
+    },
+    providerOptions: {
+      blackForestLabs: {
+        width,
+        height,
+      },
+    },
+  });
+
+  if (!result.images || result.images.length === 0) {
+    throw new Error("No image returned by Black Forest Labs.");
+  }
+
+  const generatedImage = result.images[0];
+  const uint8Array = generatedImage.uint8Array;
+  const base64 = Buffer.from(uint8Array).toString("base64");
+
+  return {
+    mediaType: "image/png",
+    base64,
+    uint8Array,
+  };
+}
+
 export async function generateVisualizationImage(
   params: GenerateImageParams,
 ): Promise<GeneratedImage> {
@@ -188,7 +269,7 @@ export async function generateVisualizationImage(
     prompt += `, with indoor lighting as follows: ${params.indoorLight}`;
   }
   prompt +=
-    ".\nUse the last image of the first message as the base. Only make the image photo-realistic and high-resolution, without changing any of the details (unless the user asks otherwise).";
+    ".\nIf shadows are present, keep them and use the same light direction. Use the last image of the first message as the base. Only make the image photo-realistic and high-resolution, without changing any of the details (unless the user asks otherwise).";
 
   if (params.editDescription) {
     prompt += `\n\nSpecific requests from the user:\n${params.editDescription}`;
@@ -259,7 +340,7 @@ export async function cleanUpEditDescription(params: {
     return params.editDescription;
   }
   const model = withTracing(
-    googleClient.languageModel("gemini-3-flash-preview"),
+    googleClient.languageModel("gemini-2.5-flash-lite"),
     posthogNode,
     {
       posthogDistinctId: params.userId,

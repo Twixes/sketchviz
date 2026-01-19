@@ -441,6 +441,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
               isGenerating={isGenerating}
               isIteration={canIterate}
               hasGenerations={hasGenerations}
+              referenceImageCount={referenceImages.length}
               onGenerate={handleGenerate}
               onSignIn={handleSignIn}
             />
