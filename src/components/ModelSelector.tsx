@@ -94,7 +94,6 @@ export const MODEL_OPTIONS: ModelOption[] = [
           creditCost={determineCreditCostOfImageGeneration({
             model: "bfl/flux-2-klein-9b/1.5k",
           })}
-          perRefCost={1}
         />
       </>
     ),
@@ -116,7 +115,6 @@ export const MODEL_OPTIONS: ModelOption[] = [
           creditCost={determineCreditCostOfImageGeneration({
             model: "bfl/flux-2-klein-9b/1k",
           })}
-          perRefCost={1}
         />
       </>
     ),

@@ -32,7 +32,7 @@ pnpm format
 - **Storage**: Supabase Storage (private buckets with RLS)
 - **AI**: Google Gemini and Black Forest Labs FLUX via AI SDK
   - Pro models (Google Gemini): `google/gemini-3-pro-image-preview` (2K/4MP, 14 credits), `google/gemini-3-pro-image-preview/4k` (4K/16MP, 24 credits)
-  - Lite models (BFL FLUX): `bfl/flux-2-klein-9b` (1K/1MP, 2 credits + 1/ref), `bfl/flux-2-klein-9b/1.5k` (1.5K/2MP, 4 credits + 1/ref) - max dimension 2048
+  - Lite models (BFL FLUX): `bfl/flux-2-klein-9b` (1K/1MP, 3 credits), `bfl/flux-2-klein-9b/1.5k` (1.5K/2MP, 5 credits) - max dimension 2048
   - Titling: `gemini-flash-lite-latest`
 - **Payments**: Polar SDK (credit system, subscriptions)
 - **Analytics**: PostHog (event tracking, AI tracing, error tracking)

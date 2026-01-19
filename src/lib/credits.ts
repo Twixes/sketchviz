@@ -2,7 +2,6 @@ import type { Model } from "./schemas";
 
 export function determineCreditCostOfImageGeneration({
   model,
-  referenceImageCount = 0,
 }: {
   model: Model;
   referenceImageCount?: number;
@@ -18,10 +17,10 @@ export function determineCreditCostOfImageGeneration({
     return 4; // Each output image is 0.04 USD
   }
   if (model === "bfl/flux-2-klein-9b/1k") {
-    return 3 + referenceImageCount; // Base 2 credits + 1 per reference image (1K/1MP)
+    return 3; // https://bfl.ai/pricing
   }
   if (model === "bfl/flux-2-klein-9b/1.5k") {
-    return 5 + referenceImageCount; // Base 4 credits + 1 per reference image (1.5K/2MP)
+    return 5; // https://bfl.ai/pricing
   }
   return 0;
 }

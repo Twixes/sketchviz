@@ -43,10 +43,7 @@ export function GenerateButton({
   onGenerate,
   onSignIn,
 }: GenerateButtonProps) {
-  const creditCost = determineCreditCostOfImageGeneration({
-    model,
-    referenceImageCount,
-  });
+  const creditCost = determineCreditCostOfImageGeneration({ model });
   // Only show insufficient credits for free users - Pro users are billed for overages
   const hasInsufficientCredits = !!(
     user &&
