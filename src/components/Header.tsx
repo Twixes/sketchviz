@@ -1,5 +1,4 @@
 import {
-  ClockIcon,
   DashboardIcon,
   DotFilledIcon,
   ExitIcon,
@@ -7,7 +6,6 @@ import {
   RocketIcon,
   UploadIcon,
 } from "@radix-ui/react-icons";
-import * as Tooltip from "@radix-ui/react-tooltip";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,6 +31,7 @@ export function Header({ user }: HeaderProps) {
   const pathname = usePathname();
   const signIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
+  const { data: planData } = usePlanQuery();
 
   const handleSignIn = useCallback(() => {
     // If on home page, redirect to dashboard after login
@@ -67,6 +66,16 @@ export function Header({ user }: HeaderProps) {
             >
               Dashboard
             </Button>
+            {planData?.planType === "free" && (
+              <Button
+                variant="secondary"
+                leftIcon={<RocketIcon />}
+                className="cursor-pointer"
+                link="/pricing"
+              >
+                Pricing
+              </Button>
+            )}
             <Button
               variant="secondary"
               onClick={handleSignOut}
