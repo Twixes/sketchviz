@@ -56,6 +56,7 @@ function LayerImage({
   threadId,
   threadTitle,
   isComparing,
+  estimatedSeconds,
 }: {
   layer: Layer;
   isActive: boolean;
@@ -65,6 +66,7 @@ function LayerImage({
   threadId: string;
   threadTitle?: string | null;
   isComparing?: boolean;
+  estimatedSeconds: number;
 }) {
   const signedUrl = useSignedUrl(layer.imageUrl);
   const config = TIME_MACHINE_CONFIG;
@@ -177,7 +179,17 @@ function LayerImage({
           </div>
         )}
       </div>
-      {isActive && isGenerating && <div className="loading-ring" aria-hidden />}
+      {isActive && isGenerating && (
+        <div
+          className="loading-ring"
+          style={
+            {
+              "--ring-estimated-seconds": estimatedSeconds,
+            } as React.CSSProperties
+          }
+          aria-hidden
+        />
+      )}
     </motion.div>
   );
 }
@@ -199,6 +211,8 @@ export function TimeMachineViewer({
     (state) => state.inputImageDimensions,
   );
   const isComparing = useThreadEditorStore((state) => state.isComparing);
+  const model = useThreadEditorStore((state) => state.model);
+  const estimatedSeconds = model.startsWith("bfl/") ? 7 : 30;
 
   // Build layers array: original input (index 0) + generation outputs (index 1+)
   const layers = useMemo<Layer[]>(() => {
@@ -309,6 +323,7 @@ export function TimeMachineViewer({
                 threadId={threadId}
                 threadTitle={threadTitle}
                 isComparing={isComparing}
+                estimatedSeconds={estimatedSeconds}
               />
             );
           })}

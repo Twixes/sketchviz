@@ -140,6 +140,7 @@ strong {
 .loading-ring {
   --ring-size: 6px;
   --ring-radius: 16px;
+  --ring-estimated-seconds: 30; /* Estimated time to reach 98% */
   position: absolute;
   border-radius: calc(var(--ring-radius) + var(--ring-size));
   padding: var(--ring-size);
@@ -159,7 +160,9 @@ strong {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   box-sizing: border-box;
-  animation: ring-progress 3600s cubic-bezier(0.2, 0.25, 0.8, 0.75) infinite;
+  /* Duration scales with estimated seconds: 98% reached at 1.67% of duration */
+  animation: ring-progress calc(var(--ring-estimated-seconds) * 60s)
+    cubic-bezier(0.2, 0.25, 0.8, 0.75) infinite;
   pointer-events: none;
 }
 
