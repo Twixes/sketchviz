@@ -36,7 +36,7 @@ export function BeforeAfterComparison({
   generateParams,
   onTryExample,
 }: BeforeAfterComparisonProps) {
-  const [revealPercent, setRevealPercent] = useState(50 - (1 - index) * 10);
+  const [revealPercent, setRevealPercent] = useState(40);
   const [isDragging, setIsDragging] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
