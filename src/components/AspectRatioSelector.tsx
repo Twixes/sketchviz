@@ -10,6 +10,7 @@ import {
   type AspectRatio,
 } from "@/lib/aspect-ratio";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
+import type { Model } from "@/lib/schemas";
 
 export interface AspectRatioOption extends SelectOption<AspectRatio | null> {
   description?: string;
@@ -20,6 +21,7 @@ interface AspectRatioSelectorProps {
   value: AspectRatio | null;
   onChange: (value: AspectRatio | null) => void;
   hasReferenceImages: boolean;
+  model: Model;
   disabled?: boolean;
 }
 
@@ -37,16 +39,19 @@ export function AspectRatioSelector({
   value,
   onChange,
   hasReferenceImages,
+  model,
   disabled,
 }: AspectRatioSelectorProps) {
+  const preserveDisabledReason =
+    hasReferenceImages && model.startsWith("google/")
+      ? "This AI model requires a concrete aspect ratio when reference images are included"
+      : undefined;
   const preserveOption: AspectRatioOption = {
     value: null,
     label: "Preserve",
     description: "Keep original aspect ratio",
     icon: AspectRatioIcon,
-    disabledReason: hasReferenceImages
-      ? "The AI models require a concrete aspect ratio when reference images are included"
-      : undefined,
+    disabledReason: preserveDisabledReason,
   };
 
   const aspectRatioOptions: AspectRatioOption[] = ASPECT_RATIOS.map(

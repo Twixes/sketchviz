@@ -106,6 +106,7 @@ export function ControlPanel(props: ControlPanelProps) {
           value={props.aspectRatio}
           onChange={props.onAspectRatioChange}
           hasReferenceImages={props.referenceImages.length > 0}
+          model={props.model}
           disabled={isDisabled}
         />
         <ModelSelector
