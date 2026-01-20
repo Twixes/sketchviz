@@ -134,7 +134,7 @@ export function ControlPanel(props: ControlPanelProps) {
               props.onGenerate();
             }
           }}
-          placeholder="Describe the changes you want – be as specific as you can (optional)"
+          placeholder="Optional: Describe extra changes – be as specific as you can"
           minRows={1}
           disabled={isDisabled}
           className={clsx([
