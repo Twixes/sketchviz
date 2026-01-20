@@ -1,3 +1,7 @@
 export function extractFirstName(fullName: string): string {
-  return fullName.split(" ").at(0) ?? "";
+  const nameSplit = fullName.split(" ");
+  if (nameSplit[0] === "Studio" && nameSplit.length > 1) {
+    return nameSplit.slice(1).join(" ");
+  }
+  return nameSplit[0] ?? "";
 }
