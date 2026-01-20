@@ -1,10 +1,12 @@
 "use client";
 
+import { TrashIcon } from "@radix-ui/react-icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import type { SyntheticEvent } from "react";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExportButton } from "@/components/ExportButton";
 import { LayerNavigationControls } from "@/components/LayerNavigationControls";
 import { ShareButton } from "@/components/ShareButton";
@@ -14,6 +16,10 @@ import {
   TIME_MACHINE_LAYER_SPRING,
 } from "@/lib/animation-constants";
 import type { AspectRatio } from "@/lib/aspect-ratio";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+} from "@/lib/components/ui/DropdownMenu";
 import type { Generation } from "@/stores/thread-editor-store";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
@@ -45,6 +51,8 @@ interface TimeMachineViewerProps {
   threadTitle?: string | null;
   onNavigatePrevious?: () => void;
   onNavigateNext?: () => void;
+  /** Whether the current user owns this thread (can delete generations) */
+  isOwner?: boolean;
 }
 
 function LayerImage({
@@ -57,6 +65,9 @@ function LayerImage({
   threadTitle,
   isComparing,
   estimatedSeconds,
+  isOwner,
+  generationId,
+  onDeleted,
 }: {
   layer: Layer;
   isActive: boolean;
@@ -67,12 +78,43 @@ function LayerImage({
   threadTitle?: string | null;
   isComparing?: boolean;
   estimatedSeconds: number;
+  isOwner?: boolean;
+  generationId?: string;
+  onDeleted?: () => void;
 }) {
   const signedUrl = useSignedUrl(layer.imageUrl);
   const config = TIME_MACHINE_CONFIG;
   const setInputImageDimensions = useThreadEditorStore(
     (state) => state.setInputImageDimensions,
   );
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      if (!generationId) throw new Error("No generation ID");
+      const response = await fetch(`/api/generations/${generationId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete generation");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
+      onDeleted?.();
+    },
+  });
+
+  const handleDelete = useCallback(() => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+    deleteMutation.mutate(undefined, {
+      onSettled: () => setIsDeleting(false),
+    });
+  }, [deleteMutation, isDeleting]);
 
   // Store Original layer dimensions when image loads (regardless of active state)
   const originalDimensionsRef = useRef<{
@@ -165,6 +207,18 @@ function LayerImage({
         </div>
         {signedUrl && layer.index > 0 && (
           <div className="absolute bottom-3 right-3 flex gap-2">
+            {signedUrl && layer.index > 0 && isOwner && generationId && (
+              <DropdownMenu buttonVariant="secondary" dropdownAlign="start">
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  destructive
+                  disabled={isDeleting}
+                >
+                  <TrashIcon className="size-4" />
+                  {isDeleting ? "Deleting..." : "Delete iteration"}
+                </DropdownMenuItem>
+              </DropdownMenu>
+            )}
             <ShareButton threadId={threadId} />
             <ExportButton
               imageUrl={signedUrl}
@@ -205,6 +259,7 @@ export function TimeMachineViewer({
   threadTitle,
   onNavigatePrevious,
   onNavigateNext,
+  isOwner = false,
 }: TimeMachineViewerProps) {
   // Get state from store
   const inputImageDimensions = useThreadEditorStore(
@@ -312,6 +367,9 @@ export function TimeMachineViewer({
         <AnimatePresence mode="popLayout">
           {layers.map((layer) => {
             const relativePosition = layer.index - activeLayerIndex;
+            // Get the generation ID for this layer (layer 0 is original, no generation)
+            const generationId =
+              layer.index > 0 ? generations[layer.index - 1]?.id : undefined;
             return (
               <LayerImage
                 key={layer.id}
@@ -324,6 +382,14 @@ export function TimeMachineViewer({
                 threadTitle={threadTitle}
                 isComparing={isComparing}
                 estimatedSeconds={estimatedSeconds}
+                isOwner={isOwner}
+                generationId={generationId}
+                onDeleted={() => {
+                  // Navigate to previous layer if we're on the deleted one
+                  if (layer.index === activeLayerIndex && layer.index > 0) {
+                    onLayerClick?.(layer.index - 1);
+                  }
+                }}
               />
             );
           })}

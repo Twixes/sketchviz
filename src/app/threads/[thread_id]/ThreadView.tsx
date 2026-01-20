@@ -404,6 +404,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
             threadTitle={thread?.title}
             onNavigatePrevious={threadEditorStore.navigatePrevious}
             onNavigateNext={threadEditorStore.navigateNext}
+            isOwner={isOwner}
           />
 
           <ControlPanel

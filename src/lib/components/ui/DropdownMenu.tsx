@@ -4,25 +4,31 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { Button } from "./Button";
 
 interface DropdownMenuProps {
   children: ReactNode;
   /** Custom trigger element, defaults to "..." icon button */
   trigger?: ReactNode;
+  /** Variant of the button trigger. @default "ghost" */
+  buttonVariant?: "primary" | "secondary" | "ghost";
+  /** Alignment of the dropdown menu. @default "end" */
+  dropdownAlign?: "start" | "end";
 }
 
-export function DropdownMenu({ children, trigger }: DropdownMenuProps) {
+export function DropdownMenu({
+  children,
+  trigger,
+  buttonVariant = "ghost",
+  dropdownAlign = "end",
+}: DropdownMenuProps) {
   return (
     <DropdownMenuPrimitive.Root>
       <DropdownMenuPrimitive.Trigger asChild>
         {trigger ?? (
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg p-1.5 text-black/50 hover:bg-black/5 hover:text-black transition-colors"
-            aria-label="Actions"
-          >
+          <Button variant={buttonVariant} size="sm" aria-label="Actions">
             <DotsHorizontalIcon className="size-4" />
-          </button>
+          </Button>
         )}
       </DropdownMenuPrimitive.Trigger>
       <DropdownMenuPrimitive.Portal>
@@ -32,7 +38,7 @@ export function DropdownMenu({ children, trigger }: DropdownMenuProps) {
             "animate-in fade-in-0 zoom-in-95",
           )}
           sideOffset={4}
-          align="end"
+          align={dropdownAlign}
         >
           {children}
         </DropdownMenuPrimitive.Content>
