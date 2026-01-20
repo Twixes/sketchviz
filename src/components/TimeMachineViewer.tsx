@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import type { SyntheticEvent } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { ExportButton } from "@/components/ExportButton";
 import { LayerNavigationControls } from "@/components/LayerNavigationControls";
 import { ShareButton } from "@/components/ShareButton";
@@ -20,7 +20,7 @@ import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/lib/components/ui/DropdownMenu";
-import type { Generation } from "@/stores/thread-editor-store";
+import type { Generation, Thread } from "@/stores/thread-editor-store";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
 function toKebabCase(str: string): string {
@@ -88,7 +88,7 @@ function LayerImage({
     (state) => state.setInputImageDimensions,
   );
   const queryClient = useQueryClient();
-  const [isDeleting, setIsDeleting] = useState(false);
+  const threadQueryKey = ["thread", threadId];
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -102,19 +102,43 @@ function LayerImage({
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
+    onMutate: async () => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: threadQueryKey });
+
+      // Snapshot the previous value
+      const previousThread = queryClient.getQueryData<Thread>(threadQueryKey);
+
+      // Optimistically remove the generation from the thread
+      queryClient.setQueryData<Thread>(threadQueryKey, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          generations: old.generations.filter((g) => g.id !== generationId),
+        };
+      });
+
+      // Navigate to previous layer before the UI updates
       onDeleted?.();
+
+      // Return context with the previous value
+      return { previousThread };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousThread) {
+        queryClient.setQueryData(threadQueryKey, context.previousThread);
+      }
+    },
+    onSettled: () => {
+      // Refetch to ensure consistency
+      queryClient.invalidateQueries({ queryKey: threadQueryKey });
     },
   });
 
   const handleDelete = useCallback(() => {
-    if (isDeleting) return;
-    setIsDeleting(true);
-    deleteMutation.mutate(undefined, {
-      onSettled: () => setIsDeleting(false),
-    });
-  }, [deleteMutation, isDeleting]);
+    deleteMutation.mutate();
+  }, [deleteMutation]);
 
   // Store Original layer dimensions when image loads (regardless of active state)
   const originalDimensionsRef = useRef<{
@@ -212,10 +236,12 @@ function LayerImage({
                 <DropdownMenuItem
                   onClick={handleDelete}
                   destructive
-                  disabled={isDeleting}
+                  disabled={deleteMutation.isPending}
                 >
                   <TrashIcon className="size-4" />
-                  {isDeleting ? "Deleting..." : "Delete iteration"}
+                  {deleteMutation.isPending
+                    ? "Deleting..."
+                    : "Delete iteration"}
                 </DropdownMenuItem>
               </DropdownMenu>
             )}
