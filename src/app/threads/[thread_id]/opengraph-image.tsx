@@ -47,8 +47,11 @@ export default async function Image({ params }: Props) {
 
   const outputUrl = latestGeneration?.output_url;
 
-  // Fetch icon as base64 for embedding
-  const iconUrl = new URL("/icon.png", process.env.NEXT_PUBLIC_SITE_URL);
+  // Build icon URL - use VERCEL_URL for preview deployments, production domain otherwise
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "https://sketchviz.app";
+  const iconUrl = `${baseUrl}/icon.png`;
 
   if (!outputUrl) {
     // Fallback: just show the icon centered
@@ -64,12 +67,7 @@ export default async function Image({ params }: Props) {
         }}
       >
         {/* biome-ignore lint/performance/noImgElement: ImageResponse requires img */}
-        <img
-          src={iconUrl.toString()}
-          alt="SketchViz"
-          width={200}
-          height={200}
-        />
+        <img src={iconUrl} alt="SketchViz" width={200} height={200} />
       </div>,
       { ...size },
     );
@@ -104,7 +102,7 @@ export default async function Image({ params }: Props) {
         }}
       >
         {/* biome-ignore lint/performance/noImgElement: ImageResponse requires img */}
-        <img src={iconUrl.toString()} alt="SketchViz" width={80} height={80} />
+        <img src={iconUrl} alt="SketchViz" width={80} height={80} />
       </div>
     </div>,
     { ...size },
