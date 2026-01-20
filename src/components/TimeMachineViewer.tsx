@@ -382,7 +382,7 @@ export function TimeMachineViewer({
           onPrevious={onNavigatePrevious}
           onNext={onNavigateNext}
           disabled={isGenerating}
-          className="flex justify-center min-[75rem]:hidden -mt-4 mb-12 z-1"
+          className="flex justify-center min-[75rem]:hidden -mt-4 mb-12 relative z-20"
         />
       )}
       {/* Container with dynamic aspect ratio */}
