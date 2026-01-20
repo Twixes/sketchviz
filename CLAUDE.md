@@ -45,7 +45,7 @@ pnpm format
 3. User adjusts parameters:
    - Lighting (outdoor: sunny/overcast/night, indoor: all_on/all_off, or custom text)
    - Quality/model selection (Pro 4K/2K via Gemini, Lite 4K/2K via FLUX)
-   - Aspect ratio (if using reference images, required due to Gemini limitations)
+   - Aspect ratio (required if using reference images with a Google model)
    - Optional edit description for specific requests
 4. User clicks generate → `/api/generate` validates request and checks credits via Polar
 5. `/api/generate` fetches images from Supabase Storage, sends to AI model with constructed prompt (base + lighting + edit description + reference images)

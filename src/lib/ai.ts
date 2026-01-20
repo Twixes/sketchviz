@@ -6,7 +6,6 @@ import sharp from "sharp";
 import {
   type AspectRatio,
   calculateDimensionsForMegapixels,
-  findClosestAspectRatio,
 } from "./aspect-ratio";
 import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";

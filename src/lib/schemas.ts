@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ASPECT_RATIOS } from "./aspect-ratio";
+import { DEFAULT_MODEL_PROVIDER } from "./constants";
 
 // Model schema
 export const modelSchema = z.enum([
@@ -34,12 +35,16 @@ export type IndoorLight = z.infer<typeof indoorLightSchema>;
 // Shared validation: aspect_ratio is required when reference images are provided
 function validateAspectRatioWithReferences<
   T extends {
+    model?: Model;
     reference_image_urls?: string[] | null;
     aspect_ratio?: AspectRatioType | null;
   },
 >(data: T, ctx: z.RefinementCtx) {
   // If reference images are provided, aspect_ratio is required
   if (
+    (data.model
+      ? data.model.startsWith("google/")
+      : DEFAULT_MODEL_PROVIDER === "google") &&
     data.reference_image_urls &&
     data.reference_image_urls.length > 0 &&
     !data.aspect_ratio
@@ -47,7 +52,7 @@ function validateAspectRatioWithReferences<
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Aspect ratio is required when reference images are provided, due to Gemini limitations.",
+        "Aspect ratio is required when using a Google model and providing reference images.",
       path: ["aspect_ratio"],
     });
   }

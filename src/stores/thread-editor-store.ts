@@ -118,6 +118,31 @@ interface ThreadEditorState {
   startNewThread: (options?: StartNewThreadOptions) => string;
 }
 
+/**
+ * Returns a valid aspect ratio given constraints.
+ * When using a Google model with reference images, aspectRatio cannot be null.
+ */
+function getConstrainedAspectRatio(
+  desiredRatio: AspectRatio | null,
+  model: Model,
+  referenceImages: ReferenceImage[],
+  inputImageDimensions: { width: number; height: number } | null,
+): AspectRatio | null {
+  if (
+    desiredRatio === null &&
+    model.startsWith("google/") &&
+    referenceImages.length > 0
+  ) {
+    if (inputImageDimensions) {
+      const imageRatio =
+        inputImageDimensions.width / inputImageDimensions.height;
+      return findClosestAspectRatio(imageRatio);
+    }
+    return "4:3";
+  }
+  return desiredRatio;
+}
+
 const initialState = {
   thread: null as Thread | null,
   activeLayerIndex: 0,
@@ -185,7 +210,7 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
 
       // Actions
       setThread: (thread) => {
-        const { thread: currentThread } = get();
+        const { thread: currentThread, referenceImages } = get();
         const isSameThread = currentThread?.id === thread.id;
 
         if (isSameThread) {
@@ -195,27 +220,44 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
           // New thread: Navigate to the latest layer when setting thread
           // Latest layer gets fresh/default params (ready for next generation)
           const latestIndex = thread.generations.length;
+          const newModel =
+            `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}` as Model;
+          // inputImageDimensions will be null for new thread, so use default if constrained
+          const constrainedRatio = getConstrainedAspectRatio(
+            null,
+            newModel,
+            referenceImages,
+            null,
+          );
           set({
             thread,
             activeLayerIndex: latestIndex,
             outdoorLight: null,
             indoorLight: null,
             editDescription: null,
-            model: `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
-            aspectRatio: null,
+            model: newModel,
+            aspectRatio: constrainedRatio,
             inputImageDimensions: null, // Clear stale dimensions from previous thread
           });
         }
       },
 
       addGeneration: (generation) => {
-        const { thread } = get();
+        const { thread, referenceImages, inputImageDimensions } = get();
         if (!thread) return;
 
         const updatedThread = {
           ...thread,
           generations: [...thread.generations, generation],
         };
+        const newModel =
+          `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}` as Model;
+        const constrainedRatio = getConstrainedAspectRatio(
+          null,
+          newModel,
+          referenceImages,
+          inputImageDimensions,
+        );
         // Navigate to the new layer (latest) with fresh params
         set({
           thread: updatedThread,
@@ -223,8 +265,8 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
           outdoorLight: null,
           indoorLight: null,
           editDescription: null,
-          model: `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
-          aspectRatio: null,
+          model: newModel,
+          aspectRatio: constrainedRatio,
         });
       },
 
@@ -241,7 +283,7 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
       },
 
       navigateToLayer: (index) => {
-        const { thread } = get();
+        const { thread, referenceImages, inputImageDimensions } = get();
         if (!thread) return;
 
         const maxIndex = thread.generations.length;
@@ -250,13 +292,21 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
 
         if (isLatestLayer) {
           // Latest layer: reset to defaults (ready to configure next generation)
+          const newModel =
+            `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}` as Model;
+          const constrainedRatio = getConstrainedAspectRatio(
+            null,
+            newModel,
+            referenceImages,
+            inputImageDimensions,
+          );
           set({
             activeLayerIndex: clampedIndex,
             outdoorLight: null,
             indoorLight: null,
             editDescription: null,
-            model: `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
-            aspectRatio: null,
+            model: newModel,
+            aspectRatio: constrainedRatio,
           });
         } else {
           // Past layers: load the historical params from that generation
@@ -267,15 +317,22 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
 
           if (generation?.user_params) {
             const params = generation.user_params;
+            const newModel =
+              params.model ??
+              (`${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}` as Model);
+            const constrainedRatio = getConstrainedAspectRatio(
+              params.aspect_ratio ?? null,
+              newModel,
+              referenceImages,
+              inputImageDimensions,
+            );
             set({
               activeLayerIndex: clampedIndex,
               outdoorLight: params.outdoor_light ?? null,
               indoorLight: params.indoor_light ?? null,
               editDescription: params.edit_description ?? null,
-              model:
-                params.model ??
-                `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`,
-              aspectRatio: params.aspect_ratio ?? null,
+              model: newModel,
+              aspectRatio: constrainedRatio,
             });
           } else {
             set({ activeLayerIndex: clampedIndex });
@@ -326,26 +383,46 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
       setIndoorLight: (light) => set({ indoorLight: light }),
       setEditDescription: (description) =>
         set({ editDescription: description }),
-      setModel: (model) => set({ model }),
-      setAspectRatio: (ratio) => set({ aspectRatio: ratio }),
+      setModel: (model) => {
+        const { aspectRatio, referenceImages, inputImageDimensions } = get();
+        const constrainedRatio = getConstrainedAspectRatio(
+          aspectRatio,
+          model,
+          referenceImages,
+          inputImageDimensions,
+        );
+        set({ model, aspectRatio: constrainedRatio });
+      },
+      setAspectRatio: (ratio) => {
+        const { model, referenceImages, inputImageDimensions } = get();
+        const constrainedRatio = getConstrainedAspectRatio(
+          ratio,
+          model,
+          referenceImages,
+          inputImageDimensions,
+        );
+        set({ aspectRatio: constrainedRatio });
+      },
 
       addReferenceImage: (localSrc, blobUrl) => {
-        const { referenceImages, inputImageDimensions, aspectRatio } = get();
+        const { referenceImages, inputImageDimensions, aspectRatio, model } =
+          get();
         if (referenceImages.length < 3) {
-          set({ referenceImages: [...referenceImages, { localSrc, blobUrl }] });
-
-          // If this is the first reference image and we have input dimensions,
-          // auto-select the closest aspect ratio
-          if (
-            referenceImages.length === 0 &&
-            inputImageDimensions &&
-            !aspectRatio
-          ) {
-            const imageRatio =
-              inputImageDimensions.width / inputImageDimensions.height;
-            const closestRatio = findClosestAspectRatio(imageRatio);
-            set({ aspectRatio: closestRatio });
-          }
+          const newReferenceImages = [
+            ...referenceImages,
+            { localSrc, blobUrl },
+          ];
+          // If using Google model and aspectRatio is null, auto-select
+          const constrainedRatio = getConstrainedAspectRatio(
+            aspectRatio,
+            model,
+            newReferenceImages,
+            inputImageDimensions,
+          );
+          set({
+            referenceImages: newReferenceImages,
+            aspectRatio: constrainedRatio,
+          });
         }
       },
 
