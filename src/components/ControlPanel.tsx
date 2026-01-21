@@ -146,12 +146,26 @@ export function ControlPanel(props: ControlPanelProps) {
             isDraggingOver ? "border-black/60 bg-black/5" : "border-black/20",
           ])}
         />
-        <ReferenceImageUpload
-          disabled={isDisabled}
-          referenceImages={props.referenceImages}
-          onFileDrop={props.onReferenceImageDrop}
-          onRemove={props.onReferenceImageRemove}
-        />
+        {/* Reference images bar */}
+        <div
+          className={clsx(
+            "absolute bottom-2 left-0 right-0 flex items-center gap-2 flex-wrap",
+            props.referenceImages.length > 0 ? "px-3 pb-1" : "px-2",
+          )}
+        >
+          <ReferenceImageUpload
+            disabled={isDisabled}
+            referenceImages={props.referenceImages}
+            onFileDrop={props.onReferenceImageDrop}
+            onRemove={props.onReferenceImageRemove}
+          />
+          {!props.model.startsWith("google/gemini-3-pro-image-preview") &&
+            (props.editDescription || props.referenceImages.length > 0) && (
+              <span className="grow text-right text-xs text-black/50 select-none pointer-events-none">
+                Hint: For targeted changes, Pro quality is more reliable
+              </span>
+            )}
+        </div>
       </div>
     </div>
   );

@@ -96,12 +96,7 @@ export function ReferenceImageUpload(props: ReferenceImageUploadProps) {
 
   return (
     <>
-      <div
-        className={clsx(
-          "absolute bottom-2 left-0 mx-2 flex items-center gap-2 flex-wrap",
-          referenceImages.length > 0 && "px-1 pb-1",
-        )}
-      >
+      <div className="flex items-center gap-2 flex-wrap">
         {referenceImages.map((refImage, index) => (
           <ReferenceImagePreview
             key={refImage.localSrc}
