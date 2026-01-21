@@ -11,7 +11,7 @@ const FEATURES = [
   },
   {
     label: "Speed",
-    value: "Done in 30 s",
+    value: "Seconds, not hours",
     detail:
       "Too quick to get a cup of coffee – iterate on visualizations rapidly",
   },
