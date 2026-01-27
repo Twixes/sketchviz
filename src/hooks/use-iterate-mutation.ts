@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import type { AspectRatio } from "@/lib/aspect-ratio";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";

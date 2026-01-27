@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import posthog from "posthog-js";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {
   ACCEPTED_MIME_TYPES,
   getAcceptedFormatsString,

@@ -2,7 +2,7 @@
 
 import { Share1Icon } from "@radix-ui/react-icons";
 import posthog from "posthog-js";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Button } from "@/lib/components/ui/Button";
 
 interface ShareButtonProps {

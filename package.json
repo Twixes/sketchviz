@@ -37,7 +37,7 @@
     "react": "19.2.3",
     "react-confetti": "^6.4.0",
     "react-dom": "19.2.3",
-    "react-hot-toast": "^2.6.0",
+    "sonner": "^1.7.1",
     "react-markdown": "^10.1.0",
     "react-textarea-autosize": "^8.5.9",
     "sharp": "^0.34.5",
