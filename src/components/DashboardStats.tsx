@@ -7,6 +7,10 @@ import { useMemo } from "react";
 import { useDashboardStats } from "@/hooks/use-dashboard-stats";
 import { usePlanQuery } from "@/hooks/use-plan-query";
 import { Button } from "@/lib/components/ui/Button";
+import {
+  DEFAULT_FREE_PLAN_CREDITS,
+  DEFAULT_PRO_PLAN_CREDITS,
+} from "@/lib/constants";
 import { Sparkline } from "./Sparkline";
 
 export function DashboardStats() {
@@ -69,7 +73,9 @@ export function DashboardStats() {
               <span className="text-3xl font-semibold text-black tabular-nums">
                 {Math.max(0, planData?.credits ?? 0)}
               </span>
-              <span className="text-sm text-black/40">left in plan</span>
+              <span className="text-sm text-black/40">
+                left of {DEFAULT_PRO_PLAN_CREDITS}
+              </span>
             </p>
             <p className="flex items-baseline gap-1.5">
               {(planData?.credits ?? 0) <= 0 ? (
@@ -95,7 +101,9 @@ export function DashboardStats() {
               <span className="text-3xl font-semibold text-black tabular-nums">
                 {planData?.credits ?? 0}
               </span>
-              <span className="text-sm text-black/40">left</span>
+              <span className="text-sm text-black/40">
+                left of {DEFAULT_FREE_PLAN_CREDITS}
+              </span>
             </p>
             <span className="text-xs text-black/40">
               Credits reset 1st of every month.{" "}

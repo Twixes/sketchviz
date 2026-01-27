@@ -1,10 +1,12 @@
 import "server-only";
 
 import { Polar } from "@polar-sh/sdk";
-import { CREDIT_METER_ID, PRO_PLAN_PRODUCT_ID } from "./constants";
+import {
+  CREDIT_METER_ID,
+  DEFAULT_FREE_PLAN_CREDITS,
+  PRO_PLAN_PRODUCT_ID,
+} from "./constants";
 import { posthogNode } from "./posthog/server";
-
-export const DEFAULT_FREE_PLAN_CREDITS = 100;
 
 export const polar = new Polar({
   accessToken: process.env.POLAR_ACCESS_TOKEN,

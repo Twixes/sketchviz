@@ -1,10 +1,6 @@
 import { geolocation } from "@vercel/functions";
 import { NextResponse } from "next/server";
-import {
-  DEFAULT_FREE_PLAN_CREDITS,
-  getCreditsForUser,
-  getPlanForUser,
-} from "@/lib/polar";
+import { getCreditsForUser, getPlanForUser } from "@/lib/polar";
 import { createClient } from "@/lib/supabase/server";
 import type { PlanResponse } from "./types";
 

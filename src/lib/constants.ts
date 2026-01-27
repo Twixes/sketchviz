@@ -54,3 +54,6 @@ export const CREDIT_METER_ID =
   process.env.NODE_ENV === "production"
     ? "37470072-5831-4972-a30f-3e96e8e02f9f"
     : "f739cf55-659b-466f-8d1f-0e1c9db29085";
+
+export const DEFAULT_FREE_PLAN_CREDITS = 100;
+export const DEFAULT_PRO_PLAN_CREDITS = 1000;
