@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { BillingIssueBanner } from "@/components/BillingIssueBanner";
 import { DashboardStats } from "@/components/DashboardStats";
 import { Examples } from "@/components/Examples";
 import { NeonShapesDashboard } from "@/components/NeonShapesDashboard";
@@ -24,6 +25,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
   const { data: planData } = usePlanQuery();
 
   const isFreeUser = planData?.planType === "free";
+  const hasBillingIssue = planData?.hasBillingIssue ?? false;
 
   // Check if user has any threads (to determine empty state)
   const { data: hasThreads, isLoading: isLoadingThreads } = useQuery({
@@ -74,6 +76,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
       >
         <NeonShapesDashboard>
           <section className="space-y-6">
+            {hasBillingIssue && <BillingIssueBanner />}
             <div className="relative">
               <NeonShapesHero />
               <UploadDropzone
@@ -102,6 +105,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
     >
       <NeonShapesDashboard>
         <section className="space-y-6">
+          {hasBillingIssue && <BillingIssueBanner />}
           <DashboardStats />
           <section className="space-y-4">
             <h2 className="text-lg font-semibold text-black">New render</h2>
@@ -112,7 +116,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
               />
             </div>
           </section>
-          {isFreeUser && <UpgradeBanner />}
+          {isFreeUser && !hasBillingIssue && <UpgradeBanner />}
           <RecentThreads />
         </section>
       </NeonShapesDashboard>

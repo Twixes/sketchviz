@@ -15,9 +15,9 @@ export async function GET(): Promise<
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [planType, subscriptionId] = await getPlanForUser(userId);
+  const planInfo = await getPlanForUser(userId);
 
-  if (planType === "pro") {
+  if (planInfo.type === "pro" && !planInfo.hasBillingIssue) {
     return NextResponse.json(
       { error: "You already are on the Pro plan" },
       { status: 400 },
@@ -28,13 +28,13 @@ export async function GET(): Promise<
     distinctId: userId,
     event: "upgrade_initiated",
     properties: {
-      current_plan: planType,
+      current_plan: planInfo.type,
     },
   });
 
   const checkout = await polar.checkouts.create({
     products: [PRO_PLAN_PRODUCT_ID],
-    subscriptionId: subscriptionId ?? undefined,
+    subscriptionId: planInfo.subscriptionId ?? undefined,
     successUrl: "https://sketchviz.app/billing/success",
   });
 

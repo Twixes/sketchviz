@@ -44,13 +44,18 @@ export async function GET(
 
   const userId = data?.claims?.sub;
 
-  const [credits, [planType]] = userId
+  const [credits, planInfo] = userId
     ? await Promise.all([getCreditsForUser(userId), getPlanForUser(userId)])
-    : ([null, [null]] as const);
+    : ([null, null] as const);
 
   const isVatApplicable =
     (!!geo.country && COUNTRIES_WITH_VAT.includes(geo.country)) ||
     process.env.NODE_ENV === "development";
 
-  return NextResponse.json({ credits, planType, isVatApplicable });
+  return NextResponse.json({
+    credits,
+    planType: planInfo?.type ?? null,
+    isVatApplicable,
+    hasBillingIssue: planInfo?.hasBillingIssue ?? false,
+  });
 }

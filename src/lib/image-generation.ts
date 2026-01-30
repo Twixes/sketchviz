@@ -229,15 +229,16 @@ export async function generateAndUploadImage({
 }): Promise<ProcessImageGenerationResult> {
   const creditCost = determineCreditCostOfImageGeneration({ model });
 
-  const [creditsAvailable, [planType]] = await Promise.all([
+  const [creditsAvailable, planInfo] = await Promise.all([
     getCreditsForUser(userId),
     getPlanForUser(userId),
   ]);
   if (creditsAvailable === null) {
     throw new Error("Failed to fetch available credits");
   }
-  // Only block free users - Pro users are billed for overages
-  if (planType === "free" && creditsAvailable < creditCost) {
+  // Only block free users (or users with billing issues) - Pro users in good standing are billed for overages
+  const effectivePlanType = planInfo.hasBillingIssue ? "free" : planInfo.type;
+  if (effectivePlanType === "free" && creditsAvailable < creditCost) {
     throw new Error("Insufficient credits");
   }
 
