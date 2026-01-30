@@ -83,7 +83,11 @@ export function DashboardStats() {
                   <span className="text-3xl font-semibold text-black tabular-nums">
                     {Math.abs(planData?.credits ?? 0)}
                   </span>
-                  <span className="text-sm text-black/40">pay-as-you-go</span>
+                  <span className="text-sm text-black/40">
+                    pay-as-you-go this month ($
+                    {(-(planData?.credits ?? 0) * 0.015).toFixed(2)}
+                    {planData?.isVatApplicable ? " + VAT" : ""})
+                  </span>
                 </>
               ) : (
                 <span className="text-xs text-black/40">
