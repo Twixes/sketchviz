@@ -55,11 +55,14 @@ export function PageWrapper({
       <section className={`flex grow flex-col ${gapClasses[gap]}`}>
         {(title || description) && (
           <div>
-            {title && (
-              <h1 className="text-2xl lg:text-3xl font-semibold text-black">
-                {title}
-              </h1>
-            )}
+            {title &&
+              (typeof title === "string" ? (
+                <h1 className="text-2xl lg:text-3xl font-semibold text-black">
+                  {title}
+                </h1>
+              ) : (
+                title
+              ))}
             {description && (
               <p className="mt-2 text-lg text-black/70">{description}</p>
             )}

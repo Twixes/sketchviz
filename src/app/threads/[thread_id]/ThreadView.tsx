@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
 import { ControlPanel } from "@/components/ControlPanel";
+import { EditableTitle } from "@/components/EditableTitle";
 import { GenerateButton } from "@/components/GenerateButton";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
@@ -383,12 +384,28 @@ export function ThreadView({ threadId }: { threadId: string }) {
       })
     : undefined;
 
+  // Editable title for thread owners, plain text for others
+  const titleElement =
+    thread?.title && isOwner ? (
+      <EditableTitle
+        threadId={threadId}
+        title={thread.title}
+        onTitleChange={(newTitle) => {
+          if (thread) {
+            threadEditorStore.setThread({ ...thread, title: newTitle });
+          }
+        }}
+      />
+    ) : (
+      thread?.title
+    );
+
   // Unified view for both new and existing threads
   return (
     <PageWrapper
       user={user}
       gap="small"
-      title={thread?.title}
+      title={titleElement}
       description={formattedDate}
     >
       <motion.section className="space-y-6">
