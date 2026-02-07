@@ -24,7 +24,7 @@ export async function GET(): Promise<
     );
   }
 
-  posthogNode.capture({
+  posthogNode?.capture({
     distinctId: userId,
     event: "upgrade_initiated",
     properties: {

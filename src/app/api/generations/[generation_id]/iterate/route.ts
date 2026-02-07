@@ -148,7 +148,7 @@ export async function POST(
     }
 
     // Track successful iteration
-    posthogNode.capture({
+    posthogNode?.capture({
       distinctId: userId,
       event: "iteration_succeeded",
       properties: {
@@ -179,7 +179,7 @@ export async function POST(
       error instanceof Error ? error.message : "Failed to iterate on image.";
 
     // Track failed iteration
-    posthogNode.capture({
+    posthogNode?.capture({
       distinctId: userId,
       event: "iteration_failed",
       properties: {

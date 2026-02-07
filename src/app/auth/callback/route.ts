@@ -41,7 +41,7 @@ export async function GET(request: Request) {
                 "A customer with this email address already exists.",
               )
             ) {
-              posthogNode.captureException(error, userId);
+              posthogNode?.captureException(error, userId);
               console.error(
                 "A Polar customer with this email address already exists, skipping creation",
               );
@@ -49,7 +49,7 @@ export async function GET(request: Request) {
               throw error;
             }
           }
-          posthogNode.capture({
+          posthogNode?.capture({
             distinctId: userId,
             event: "signed_up",
             properties: {

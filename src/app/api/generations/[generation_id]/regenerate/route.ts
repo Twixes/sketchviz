@@ -141,7 +141,7 @@ export async function POST(
     }
 
     // Track successful regeneration
-    posthogNode.capture({
+    posthogNode?.capture({
       distinctId: userId,
       event: "regeneration_succeeded",
       properties: {
@@ -171,7 +171,7 @@ export async function POST(
       error instanceof Error ? error.message : "Failed to regenerate image.";
 
     // Track failed regeneration
-    posthogNode.capture({
+    posthogNode?.capture({
       distinctId: userId,
       event: "regeneration_failed",
       properties: {
