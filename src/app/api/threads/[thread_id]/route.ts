@@ -69,7 +69,7 @@ export async function PATCH(
     );
   }
 
-  posthogNode.capture({
+  posthogNode?.capture({
     distinctId: userId,
     event: "thread_title_updated",
     properties: {
