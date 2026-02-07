@@ -1,13 +1,7 @@
 "use client";
 
 import { CheckIcon, Cross2Icon, Pencil1Icon } from "@radix-ui/react-icons";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Button } from "@/lib/components/ui/Button";
 
 interface EditableTitleProps {
@@ -29,14 +23,22 @@ export function EditableTitle({ title, onSave }: EditableTitleProps) {
     }
   }, [editValue]);
 
-  const startEditing = useCallback(() => {
-    setEditValue(title);
-    // Focus input after render
-    requestAnimationFrame(() => {
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    });
-  }, [title]);
+  const startEditing = useCallback(
+    (selection?: { start: number; end: number }) => {
+      setEditValue(title);
+      requestAnimationFrame(() => {
+        const input = inputRef.current;
+        if (!input) return;
+        input.focus();
+        if (selection !== undefined) {
+          input.setSelectionRange(selection.start, selection.end);
+        } else {
+          input.select();
+        }
+      });
+    },
+    [title],
+  );
 
   const saveTitle = useCallback(() => {
     if (editValue === null) return;
@@ -124,7 +126,19 @@ export function EditableTitle({ title, onSave }: EditableTitleProps) {
     // biome-ignore lint/a11y/useKeyWithClickEvents: it's okay
     <div
       className="group flex w-fit items-center gap-2 border-b-2 -mb-0.5 border-transparent hover:border-black/30 cursor-text"
-      onClick={startEditing}
+      onClick={() => {
+        // Use the current text selection if the user dragged across the title
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+          const range = sel.getRangeAt(0);
+          startEditing({ start: range.startOffset, end: range.endOffset });
+        } else if (sel && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          startEditing({ start: range.startOffset, end: range.startOffset });
+        } else {
+          startEditing();
+        }
+      }}
     >
       <h1 className="text-2xl lg:text-3xl font-semibold text-black">{title}</h1>
       <Button
@@ -132,7 +146,7 @@ export function EditableTitle({ title, onSave }: EditableTitleProps) {
         size="sm"
         colorScheme="light"
         tooltip="Edit title"
-        onClick={startEditing}
+        onClick={() => startEditing()}
         className="opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <Pencil1Icon className="w-4 h-4" />
