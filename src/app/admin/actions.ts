@@ -59,7 +59,7 @@ export async function grantCreditsAction(
     });
 
     // Track in PostHog
-    posthogNode.capture({
+    posthogNode?.capture({
       distinctId: adminEmail ?? "unknown_admin",
       event: "admin_credits_granted",
       properties: {

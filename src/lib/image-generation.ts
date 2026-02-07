@@ -268,7 +268,7 @@ export async function generateAndUploadImage({
       ],
     }),
   ]);
-  posthogNode.capture({
+  posthogNode?.capture({
     distinctId: userId,
     event: "image_generation_started",
     properties: analyticsMetadata,

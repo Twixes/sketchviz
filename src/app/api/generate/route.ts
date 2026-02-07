@@ -134,7 +134,7 @@ export async function POST(request: Request) {
     }
 
     // Track successful generation
-    posthogNode.capture({
+    posthogNode?.capture({
       distinctId: userId,
       event: "generation_succeeded",
       properties: {
@@ -163,7 +163,7 @@ export async function POST(request: Request) {
       error instanceof Error ? error.message : "Failed to generate image.";
 
     // Track failed generation
-    posthogNode.capture({
+    posthogNode?.capture({
       distinctId: userId,
       event: "generation_failed",
       properties: {

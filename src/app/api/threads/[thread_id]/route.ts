@@ -56,7 +56,7 @@ export async function DELETE(
   }
 
   // Track successful deletion
-  posthogNode.capture({
+  posthogNode?.capture({
     distinctId: userId,
     event: "thread_deleted",
     properties: {
