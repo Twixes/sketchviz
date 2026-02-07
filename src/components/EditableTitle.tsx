@@ -94,7 +94,7 @@ export function EditableTitle({ title, onSave }: EditableTitleProps) {
           <Button
             variant="icon"
             size="sm"
-            colorScheme="light"
+            colorScheme="dark"
             tooltip="Save"
             onMouseDown={(e) => {
               // Prevent blur from firing before click
