@@ -80,16 +80,15 @@ async function generateImageFromPrompt(
   // Google Gemini models
   let imageEditingModel: LanguageModel;
   if (modelProvider === "google") {
-    imageEditingModel = withTracing(
-      googleClient.languageModel(modelName),
-      posthogNode,
-      {
-        posthogDistinctId: params.userId,
-        posthogTraceId: params.traceId,
-      },
-    );
+    imageEditingModel = googleClient.languageModel(modelName);
   } else {
     throw new Error(`Unsupported model provider: ${modelProvider}`);
+  }
+  if (posthogNode) {
+    imageEditingModel = withTracing(imageEditingModel, posthogNode, {
+      posthogDistinctId: params.userId,
+      posthogTraceId: params.traceId,
+    });
   }
 
   // Build content array with main image and reference images
@@ -338,14 +337,13 @@ export async function cleanUpEditDescription(params: {
   if (process.env.SKIP_AI === "1") {
     return params.editDescription;
   }
-  const model = withTracing(
-    googleClient.languageModel("gemini-2.5-flash-lite"),
-    posthogNode,
-    {
+  let model = googleClient.languageModel("gemini-2.5-flash-lite");
+  if (posthogNode) {
+    model = withTracing(model, posthogNode, {
       posthogDistinctId: params.userId,
       posthogTraceId: params.traceId,
-    },
-  );
+    });
+  }
   const prompt = `
 Polish the following description of changes to an image that were requested by the user, so that we have a clear list of bullet points in English:
 <user_request>
@@ -376,13 +374,12 @@ export async function titleVisualizationImage(params: {
   if (process.env.SKIP_AI === "1") {
     return "Octocat Test";
   }
-  const model = withTracing(
-    googleClient.languageModel("gemini-flash-lite-latest"),
-    posthogNode,
-    {
+  let model = googleClient.languageModel("gemini-flash-lite-latest");
+  if (posthogNode) {
+    model = withTracing(model, posthogNode, {
       posthogDistinctId: params.userId,
-    },
-  );
+    });
+  }
   const result = await generateText({
     model,
     prompt: [
