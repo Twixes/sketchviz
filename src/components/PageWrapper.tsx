@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
+import { EditableTitle } from "./EditableTitle";
 import { Header } from "./Header";
 import { NeonBackground } from "./NeonBackground";
 import type { SessionUser } from "./SessionProvider";
@@ -20,6 +21,8 @@ interface PageWrapperProps {
   description?: ReactNode;
   /** Document title for the browser tab. If provided, renders as "{documentTitle} • SketchViz". */
   documentTitle?: string;
+  /** If provided (and title is a string), renders the title as an EditableTitle. Called when the user saves a new title. */
+  onTitleSave?: (newTitle: string) => void;
 }
 
 const gapClasses = {
@@ -41,6 +44,7 @@ export function PageWrapper({
   title,
   description,
   documentTitle,
+  onTitleSave,
 }: PageWrapperProps) {
   // documentTitle is used for type-safety; actual title is set via layout metadata
   void documentTitle;
@@ -55,11 +59,16 @@ export function PageWrapper({
       <section className={`flex grow flex-col ${gapClasses[gap]}`}>
         {(title || description) && (
           <div>
-            {title && (
-              <h1 className="text-2xl lg:text-3xl font-semibold text-black">
-                {title}
-              </h1>
-            )}
+            {title &&
+              (onTitleSave && typeof title === "string" ? (
+                <EditableTitle title={title} onSave={onTitleSave} />
+              ) : typeof title === "string" ? (
+                <h1 className="text-2xl lg:text-3xl font-semibold text-black">
+                  {title}
+                </h1>
+              ) : (
+                title
+              ))}
             {description && (
               <p className="mt-2 text-lg text-black/70">{description}</p>
             )}

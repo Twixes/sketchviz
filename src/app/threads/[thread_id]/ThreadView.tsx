@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect } from "react";
@@ -46,6 +46,42 @@ export function ThreadView({ threadId }: { threadId: string }) {
   const iterateMutation = useIterateMutation();
   const regenerateMutation = useRegenerateMutation();
   const referenceUploadMutation = useReferenceUploadMutation();
+  const titleUpdateMutation = useMutation({
+    mutationFn: async (newTitle: string) => {
+      const response = await fetch(`/api/threads/${threadId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTitle }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update title");
+      }
+      return response.json();
+    },
+    onMutate: (newTitle) => {
+      const thread = threadEditorStore.thread;
+      const previousTitle = thread?.title;
+      if (thread) {
+        threadEditorStore.setThread({ ...thread, title: newTitle });
+      }
+      return { previousTitle };
+    },
+    onError: (_error, _newTitle, context) => {
+      const thread = threadEditorStore.thread;
+      if (thread && context?.previousTitle) {
+        threadEditorStore.setThread({
+          ...thread,
+          title: context.previousTitle,
+        });
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
+      queryClient.invalidateQueries({ queryKey: ["threads"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-threads"] });
+    },
+  });
 
   // Redirect to home if new thread with no image (nothing to show)
   useEffect(() => {
@@ -389,6 +425,9 @@ export function ThreadView({ threadId }: { threadId: string }) {
       user={user}
       gap="small"
       title={thread?.title}
+      onTitleSave={
+        isOwner ? (newTitle) => titleUpdateMutation.mutate(newTitle) : undefined
+      }
       description={formattedDate}
     >
       <motion.section className="space-y-6">

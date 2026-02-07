@@ -116,12 +116,12 @@ export const Button = ({
     icon: cn([
       colorScheme === "dark"
         ? "bg-black/80 text-white"
-        : "bg-white/80 text-black",
+        : "border border-black/20 bg-white/80 text-black",
       loading || disabled
         ? "cursor-not-allowed opacity-50"
         : colorScheme === "dark"
           ? "hover:bg-black/90"
-          : "hover:bg-white/90",
+          : "hover:border-black/40 hover:bg-white/90",
     ]),
     "list-item": cn([
       "text-left",
