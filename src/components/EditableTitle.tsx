@@ -1,79 +1,56 @@
 "use client";
 
-import { CheckIcon, Pencil1Icon } from "@radix-ui/react-icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { CheckIcon, Cross2Icon, Pencil1Icon } from "@radix-ui/react-icons";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/lib/components/ui/Button";
 
 interface EditableTitleProps {
-  threadId: string;
   title: string;
-  onTitleChange?: (newTitle: string) => void;
+  onSave: (newTitle: string) => void;
 }
 
-export function EditableTitle({
-  threadId,
-  title,
-  onTitleChange,
-}: EditableTitleProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editValue, setEditValue] = useState(title);
+export function EditableTitle({ title, onSave }: EditableTitleProps) {
+  const [editValue, setEditValue] = useState<string | null>(null);
+  const [inputWidth, setInputWidth] = useState<number>();
   const inputRef = useRef<HTMLInputElement>(null);
-  const queryClient = useQueryClient();
+  const sizerRef = useRef<HTMLSpanElement>(null);
 
-  // Sync editValue when title changes externally (e.g. auto-generated title arrives)
-  useEffect(() => {
-    if (!isEditing) {
-      setEditValue(title);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: here, we want to recalc on edit state change
+  useLayoutEffect(() => {
+    // Measure sizer span and update input width before paint
+    if (sizerRef.current) {
+      setInputWidth(sizerRef.current.scrollWidth);
     }
-  }, [title, isEditing]);
-
-  const updateMutation = useMutation({
-    mutationFn: async (newTitle: string) => {
-      const response = await fetch(`/api/threads/${threadId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle }),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to update title");
-      }
-      return response.json();
-    },
-    onSuccess: (_data, newTitle) => {
-      onTitleChange?.(newTitle);
-      queryClient.invalidateQueries({ queryKey: ["thread", threadId] });
-      queryClient.invalidateQueries({ queryKey: ["threads"] });
-      queryClient.invalidateQueries({ queryKey: ["recent-threads"] });
-    },
-  });
+  }, [editValue]);
 
   const startEditing = useCallback(() => {
-    setIsEditing(true);
+    setEditValue(title);
     // Focus input after render
     requestAnimationFrame(() => {
       inputRef.current?.focus();
       inputRef.current?.select();
     });
-  }, []);
+  }, [title]);
 
   const saveTitle = useCallback(() => {
+    if (editValue === null) return;
     const trimmed = editValue.trim();
     if (trimmed.length === 0 || trimmed === title) {
       // Revert if empty or unchanged
-      setEditValue(title);
-      setIsEditing(false);
+      setEditValue(null);
       return;
     }
-    updateMutation.mutate(trimmed);
-    setIsEditing(false);
-  }, [editValue, title, updateMutation]);
+    onSave(trimmed);
+    setEditValue(null);
+  }, [editValue, title, onSave]);
 
-  const cancelEditing = useCallback(() => {
-    setEditValue(title);
-    setIsEditing(false);
-  }, [title]);
+  const cancelEditing = useCallback(() => setEditValue(null), []);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -88,38 +65,67 @@ export function EditableTitle({
     [saveTitle, cancelEditing],
   );
 
-  if (isEditing) {
+  if (editValue !== null) {
     return (
-      <div className="flex items-center gap-2">
-        <input
-          ref={inputRef}
-          type="text"
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={saveTitle}
-          maxLength={255}
-          className="text-2xl lg:text-3xl font-semibold text-black bg-transparent border-b-2 border-black/30 focus:border-black outline-none w-full transition-colors"
-        />
-        <Button
-          variant="icon"
-          size="sm"
-          colorScheme="light"
-          tooltip="Save title"
-          onMouseDown={(e) => {
-            // Prevent blur from firing before click
-            e.preventDefault();
-          }}
-          onClick={saveTitle}
-        >
-          <CheckIcon className="w-4 h-4" />
-        </Button>
+      <div className="flex w-fit max-w-full items-center gap-2 border-b-2 -mb-0.5 border-black/30 focus-within:border-black">
+        <div className="relative flex min-w-0">
+          <input
+            ref={inputRef}
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={saveTitle}
+            maxLength={255}
+            className="text-2xl lg:text-3xl font-semibold text-black bg-transparent outline-none"
+            style={{ width: inputWidth }}
+          />
+          {/* Hidden sizer span to measure text width */}
+          <span
+            ref={sizerRef}
+            className="text-2xl lg:text-3xl font-semibold invisible absolute left-0 top-0 whitespace-pre"
+          >
+            {editValue || " "}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="icon"
+            size="sm"
+            colorScheme="light"
+            tooltip="Save"
+            onMouseDown={(e) => {
+              // Prevent blur from firing before click
+              e.preventDefault();
+            }}
+            onClick={saveTitle}
+          >
+            <CheckIcon className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="icon"
+            size="sm"
+            colorScheme="light"
+            tooltip="Discard changes"
+            onMouseDown={(e) => {
+              e.preventDefault();
+            }}
+            onClick={cancelEditing}
+          >
+            <Cross2Icon className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="group flex items-center gap-2">
+    // biome-ignore lint/a11y/noStaticElementInteractions: we want to allow clicking to start editing
+    // biome-ignore lint/a11y/useKeyWithClickEvents: it's okay
+    <div
+      className="group flex w-fit items-center gap-2 border-b-2 -mb-0.5 border-transparent hover:border-black/30 cursor-text"
+      onClick={startEditing}
+    >
       <h1 className="text-2xl lg:text-3xl font-semibold text-black">{title}</h1>
       <Button
         variant="icon"
