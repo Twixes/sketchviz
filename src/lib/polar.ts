@@ -28,7 +28,7 @@ export async function getCreditsForUser(
     const creditMeter = customerMetersPage.result.items[0];
     return creditMeter?.balance ?? null;
   } catch (error) {
-    posthogNode.captureException(error, userId);
+    posthogNode?.captureException(error, userId);
     console.error("Error fetching credits:", error);
     return null;
   }
