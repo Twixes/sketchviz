@@ -6,6 +6,7 @@ import { DashboardStats } from "@/components/DashboardStats";
 import { Examples } from "@/components/Examples";
 import { NeonShapesDashboard } from "@/components/NeonShapesDashboard";
 import { NeonShapesHero } from "@/components/NeonShapesHero";
+import { NewProjectModal } from "@/components/NewProjectModal";
 import { PageWrapper } from "@/components/PageWrapper";
 import { RecentProjects } from "@/components/ProjectsSection";
 import { RecentThreads } from "@/components/RecentThreadsSection";
@@ -92,6 +93,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
             </div>
             <Examples />
           </section>
+          <NewProjectModal />
         </NeonShapesDashboard>
       </PageWrapper>
     );
@@ -121,6 +123,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
           <RecentProjects />
           <RecentThreads />
         </section>
+        <NewProjectModal />
       </NeonShapesDashboard>
     </PageWrapper>
   );

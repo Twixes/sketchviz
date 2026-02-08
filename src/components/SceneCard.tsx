@@ -15,9 +15,10 @@ import {
 interface SceneCardProps {
   thread: ProjectThread;
   projectId: string;
+  isGenerating?: boolean;
 }
 
-export function SceneCard({ thread, projectId }: SceneCardProps) {
+export function SceneCard({ thread, projectId, isGenerating }: SceneCardProps) {
   const queryClient = useQueryClient();
 
   // Get the best image: latest output, or thread input
@@ -58,21 +59,28 @@ export function SceneCard({ thread, projectId }: SceneCardProps) {
         href={`/projects/${projectId}/scenes/${thread.id}`}
         className="block"
       >
-        {signedUrl ? (
-          <div className="aspect-video w-full overflow-hidden bg-black/5">
-            <img
-              src={signedUrl}
-              alt={thread.title}
-              width={400}
-              height={225}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="flex aspect-video w-full items-center justify-center bg-black/5">
-            <p className="text-sm text-black/40">No preview</p>
-          </div>
-        )}
+        <div className="relative">
+          {signedUrl ? (
+            <div className="aspect-video w-full overflow-hidden bg-black/5">
+              <img
+                src={signedUrl}
+                alt={thread.title}
+                width={400}
+                height={225}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex aspect-video w-full items-center justify-center bg-black/5">
+              <p className="text-sm text-black/40">No preview</p>
+            </div>
+          )}
+          {isGenerating && (
+            <div className="absolute inset-1.5 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+              <div className="loading-ring" aria-hidden />
+            </div>
+          )}
+        </div>
       </Link>
 
       <div className="p-4">

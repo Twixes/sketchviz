@@ -8,15 +8,22 @@ export interface ProjectSceneFile {
 }
 
 export type WizardStep =
-  | "upload"
+  | "name"
   | "select"
   | "visualize"
+  | "extracting-style"
   | "review-style"
   | "auto-generating";
 
 interface ProjectState {
+  // Modal state
+  isModalOpen: boolean;
+
   // Creation wizard state
   wizardStep: WizardStep;
+  projectTitle: string;
+  projectId: string | null;
+  startingSceneThreadId: string | null;
   sceneFiles: ProjectSceneFile[];
   selectedStartingSceneIndex: number | null;
   extractedStyleNotes: string | null;
@@ -25,7 +32,12 @@ interface ProjectState {
   autoGenProgress: { completed: number; total: number; failed: string[] };
 
   // Actions
+  openModal: () => void;
+  closeModal: () => void;
   setWizardStep: (step: WizardStep) => void;
+  setProjectTitle: (title: string) => void;
+  setProjectId: (id: string) => void;
+  setStartingSceneThreadId: (threadId: string) => void;
   addSceneFiles: (files: File[]) => void;
   removeSceneFile: (index: number) => void;
   updateSceneFileBlobUrl: (index: number, blobUrl: string) => void;
@@ -38,7 +50,11 @@ interface ProjectState {
 }
 
 const initialState = {
-  wizardStep: "upload" as WizardStep,
+  isModalOpen: false,
+  wizardStep: "name" as WizardStep,
+  projectTitle: "",
+  projectId: null as string | null,
+  startingSceneThreadId: null as string | null,
   sceneFiles: [] as ProjectSceneFile[],
   selectedStartingSceneIndex: null as number | null,
   extractedStyleNotes: null as string | null,
@@ -48,7 +64,21 @@ const initialState = {
 export const useProjectStore = create<ProjectState>()((set, get) => ({
   ...initialState,
 
+  openModal: () => {
+    get().reset();
+    set({ isModalOpen: true });
+  },
+
+  closeModal: () => set({ isModalOpen: false }),
+
   setWizardStep: (step) => set({ wizardStep: step }),
+
+  setProjectTitle: (title) => set({ projectTitle: title }),
+
+  setProjectId: (id) => set({ projectId: id }),
+
+  setStartingSceneThreadId: (threadId) =>
+    set({ startingSceneThreadId: threadId }),
 
   addSceneFiles: (files) => {
     const newSceneFiles = files.map((file) => ({

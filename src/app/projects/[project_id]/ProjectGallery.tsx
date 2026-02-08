@@ -3,7 +3,8 @@
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "motion/react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { PageWrapper } from "@/components/PageWrapper";
@@ -12,7 +13,11 @@ import type { SessionUser } from "@/components/SessionProvider";
 import { StyleNotesPanel } from "@/components/StyleNotesPanel";
 import { useProjectQuery } from "@/hooks/use-project-query";
 import { Button } from "@/lib/components/ui/Button";
-import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
+import {
+  ACCEPTED_MIME_TYPES,
+  DEFAULT_IMAGE_EDITING_MODEL,
+  DEFAULT_MODEL_PROVIDER,
+} from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 
 interface ProjectGalleryProps {
@@ -23,9 +28,79 @@ interface ProjectGalleryProps {
 export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
   const { data: project, isLoading } = useProjectQuery(projectId);
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const shouldAutoGenerate = searchParams.get("autoGenerate") === "true";
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const accept = useMemo(() => ACCEPTED_MIME_TYPES.join(","), []);
   const [isUploadingScenes, setIsUploadingScenes] = useState(false);
+
+  // Auto-generation state
+  const autoGenStartedRef = useRef(false);
+  const [autoGenState, setAutoGenState] = useState<{
+    isRunning: boolean;
+    completed: number;
+    total: number;
+    generatingThreadIds: Set<string>;
+  }>({
+    isRunning: false,
+    completed: 0,
+    total: 0,
+    generatingThreadIds: new Set(),
+  });
+
+  // Auto-generate remaining scenes when redirected with ?autoGenerate=true
+  useEffect(() => {
+    if (!shouldAutoGenerate || !project || autoGenStartedRef.current) return;
+
+    const threadsToGenerate = project.threads.filter(
+      (t) => t.generations.length === 0,
+    );
+    if (threadsToGenerate.length === 0) {
+      window.history.replaceState({}, "", `/projects/${projectId}`);
+      return;
+    }
+
+    autoGenStartedRef.current = true;
+    const threadIds = new Set(threadsToGenerate.map((t) => t.id));
+    setAutoGenState({
+      isRunning: true,
+      completed: 0,
+      total: threadsToGenerate.length,
+      generatingThreadIds: threadIds,
+    });
+
+    const defaultModel = `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}`;
+
+    Promise.allSettled(
+      threadsToGenerate.map(async (scene) => {
+        try {
+          await fetch("/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              input_url: scene.input_url,
+              thread_id: scene.id,
+              model: defaultModel,
+            }),
+          });
+        } finally {
+          setAutoGenState((prev) => {
+            const newIds = new Set(prev.generatingThreadIds);
+            newIds.delete(scene.id);
+            return {
+              ...prev,
+              completed: prev.completed + 1,
+              generatingThreadIds: newIds,
+            };
+          });
+        }
+      }),
+    ).then(() => {
+      setAutoGenState((prev) => ({ ...prev, isRunning: false }));
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      window.history.replaceState({}, "", `/projects/${projectId}`);
+    });
+  }, [shouldAutoGenerate, project, projectId, queryClient]);
 
   const titleMutation = useMutation({
     mutationFn: async (newTitle: string) => {
@@ -137,6 +212,23 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
       documentTitle={project.title || "Project"}
     >
       <motion.section className="space-y-8">
+        {/* Auto-generation progress */}
+        {autoGenState.isRunning && (
+          <div className="rounded-xl border border-black/10 bg-white/75 p-4 space-y-3">
+            <p className="text-sm font-medium text-black">
+              Generating {autoGenState.completed}/{autoGenState.total} scenes...
+            </p>
+            <div className="w-full bg-black/10 rounded-full h-2">
+              <div
+                className="bg-black h-2 rounded-full transition-all"
+                style={{
+                  width: `${autoGenState.total > 0 ? (autoGenState.completed / autoGenState.total) * 100 : 0}%`,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
         {/* Setup Banner */}
         {isInSetup && (
           <div className="rounded-xl border border-amber-300 bg-amber-50/80 p-4">
@@ -157,9 +249,7 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
         {/* Scenes */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-black">
-              Scenes ({project.threads.length})
-            </h2>
+            <h2 className="text-lg font-semibold text-black">Scenes</h2>
             <Button
               variant="secondary"
               leftIcon={<PlusIcon />}
@@ -184,12 +274,13 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
           </div>
 
           {project.threads.length > 0 ? (
-            <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid gap-6 grid-cols-2">
               {project.threads.map((thread) => (
                 <SceneCard
                   key={thread.id}
                   thread={thread}
                   projectId={projectId}
+                  isGenerating={autoGenState.generatingThreadIds.has(thread.id)}
                 />
               ))}
             </div>

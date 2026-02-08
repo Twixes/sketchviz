@@ -26,7 +26,13 @@ import {
   useThreadEditorStore,
 } from "@/stores/thread-editor-store";
 
-export function ThreadView({ threadId }: { threadId: string }) {
+export function ThreadView({
+  threadId,
+  embedded = false,
+}: {
+  threadId: string;
+  embedded?: boolean;
+}) {
   const threadEditorStore = useThreadEditorStore();
   const tentativeThreadId = threadEditorStore.tentativeThreadId;
   const isNewThread = threadId === tentativeThreadId;
@@ -85,6 +91,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
 
   // Redirect to home if new thread with no image (nothing to show)
   useEffect(() => {
+    if (embedded) return;
     if (
       isNewThread &&
       !threadEditorStore.inputSrc &&
@@ -93,6 +100,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
       router.push("/");
     }
   }, [
+    embedded,
     isNewThread,
     threadEditorStore.inputSrc,
     uploadMutation.isPending,
@@ -207,7 +215,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
     threadEditorStore.setAspectRatio,
   ]);
 
-  // Handle initial generation (new thread)
+  // Handle initial generation (new thread or existing thread without generations)
   const handleInitialGenerate = useCallback(async () => {
     threadEditorStore.setIsBusyForUser(true);
     try {
@@ -218,6 +226,11 @@ export function ThreadView({ threadId }: { threadId: string }) {
           uploadMutation.variables,
         );
         currentBlobUrl = uploadedUrl;
+      }
+
+      // Fall back to thread's input_url for existing threads (e.g. embedded in project modal)
+      if (!currentBlobUrl) {
+        currentBlobUrl = threadEditorStore.thread?.input_url ?? null;
       }
 
       if (!currentBlobUrl) return;
@@ -384,24 +397,32 @@ export function ThreadView({ threadId }: { threadId: string }) {
 
   // Loading state for existing threads
   if (!isNewThread && isLoading) {
+    const loadingContent = (
+      <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+        <p className="text-black/50">Loading thread...</p>
+      </div>
+    );
+    if (embedded) return loadingContent;
     return (
       <PageWrapper user={user} gap="small">
-        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-          <p className="text-black/50">Loading thread...</p>
-        </div>
+        {loadingContent}
       </PageWrapper>
     );
   }
 
   // Thread not found (only for existing threads that failed to load)
   if (!isNewThread && !thread) {
+    const notFoundContent = (
+      <motion.section className="space-y-6">
+        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+          <p className="text-black/50">Thread not found</p>
+        </div>
+      </motion.section>
+    );
+    if (embedded) return notFoundContent;
     return (
       <PageWrapper user={user} gap="small">
-        <motion.section className="space-y-6">
-          <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
-            <p className="text-black/50">Thread not found</p>
-          </div>
-        </motion.section>
+        {notFoundContent}
       </PageWrapper>
     );
   }
@@ -418,6 +439,69 @@ export function ThreadView({ threadId }: { threadId: string }) {
       })
     : undefined;
 
+  const mainContent = (
+    <motion.section className="space-y-6">
+      <div className="relative space-y-6">
+        <TimeMachineViewer
+          threadId={threadId}
+          inputImageUrl={thread?.input_url ?? threadEditorStore.inputSrc}
+          generations={generations}
+          activeLayerIndex={threadEditorStore.activeLayerIndex}
+          onLayerClick={threadEditorStore.navigateToLayer}
+          isGenerating={isGenerating}
+          aspectRatio={aspectRatio}
+          threadTitle={thread?.title}
+          onNavigatePrevious={threadEditorStore.navigatePrevious}
+          onNavigateNext={threadEditorStore.navigateNext}
+          isOwner={embedded || isOwner}
+        />
+
+        <ControlPanel
+          variant="editor"
+          outdoorLight={outdoorLight}
+          indoorLight={indoorLight}
+          editDescription={editDescription}
+          model={model}
+          aspectRatio={aspectRatio}
+          referenceImages={referenceImages}
+          isLoading={isGenerating}
+          disabled={!embedded && isReadOnly}
+          onOutdoorLightChange={setOutdoorLight}
+          onIndoorLightChange={setIndoorLight}
+          onEditDescriptionChange={setEditDescription}
+          onModelChange={setModel}
+          onAspectRatioChange={setAspectRatio}
+          onReferenceImageDrop={handleReferenceImageDrop}
+          onReferenceImageRemove={removeReferenceImage}
+          onGenerate={handleGenerate}
+        />
+
+        {!embedded && isReadOnly ? (
+          <div className="rounded-2xl border border-black/10 bg-white/75 p-4 text-center">
+            <p className="text-sm text-black/60 cursor-default">
+              You're viewing a shared thread. Sign in as the owner to iterate.
+            </p>
+          </div>
+        ) : (
+          <GenerateButton
+            user={user}
+            model={model}
+            credits={creditsData?.credits}
+            planType={creditsData?.planType}
+            isGenerating={isGenerating}
+            isIteration={canIterate}
+            hasGenerations={hasGenerations}
+            referenceImageCount={referenceImages.length}
+            onGenerate={handleGenerate}
+            onSignIn={handleSignIn}
+          />
+        )}
+      </div>
+    </motion.section>
+  );
+
+  if (embedded) return mainContent;
+
   // Unified view for both new and existing threads
   return (
     <PageWrapper
@@ -429,64 +513,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
       }
       description={formattedDate}
     >
-      <motion.section className="space-y-6">
-        <div className="relative space-y-6">
-          <TimeMachineViewer
-            threadId={threadId}
-            inputImageUrl={thread?.input_url ?? threadEditorStore.inputSrc}
-            generations={generations}
-            activeLayerIndex={threadEditorStore.activeLayerIndex}
-            onLayerClick={threadEditorStore.navigateToLayer}
-            isGenerating={isGenerating}
-            aspectRatio={aspectRatio}
-            threadTitle={thread?.title}
-            onNavigatePrevious={threadEditorStore.navigatePrevious}
-            onNavigateNext={threadEditorStore.navigateNext}
-            isOwner={isOwner}
-          />
-
-          <ControlPanel
-            variant="editor"
-            outdoorLight={outdoorLight}
-            indoorLight={indoorLight}
-            editDescription={editDescription}
-            model={model}
-            aspectRatio={aspectRatio}
-            referenceImages={referenceImages}
-            isLoading={isGenerating}
-            disabled={isReadOnly}
-            onOutdoorLightChange={setOutdoorLight}
-            onIndoorLightChange={setIndoorLight}
-            onEditDescriptionChange={setEditDescription}
-            onModelChange={setModel}
-            onAspectRatioChange={setAspectRatio}
-            onReferenceImageDrop={handleReferenceImageDrop}
-            onReferenceImageRemove={removeReferenceImage}
-            onGenerate={handleGenerate}
-          />
-
-          {isReadOnly ? (
-            <div className="rounded-2xl border border-black/10 bg-white/75 p-4 text-center">
-              <p className="text-sm text-black/60 cursor-default">
-                You're viewing a shared thread. Sign in as the owner to iterate.
-              </p>
-            </div>
-          ) : (
-            <GenerateButton
-              user={user}
-              model={model}
-              credits={creditsData?.credits}
-              planType={creditsData?.planType}
-              isGenerating={isGenerating}
-              isIteration={canIterate}
-              hasGenerations={hasGenerations}
-              referenceImageCount={referenceImages.length}
-              onGenerate={handleGenerate}
-              onSignIn={handleSignIn}
-            />
-          )}
-        </div>
-      </motion.section>
+      {mainContent}
     </PageWrapper>
   );
 }

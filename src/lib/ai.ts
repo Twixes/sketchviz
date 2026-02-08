@@ -382,7 +382,7 @@ Analyze this photorealistic architectural visualization. Write a detailed style 
 
 Describe in clear, instructive language (as if directing an AI image generator):
 
-MATERIALS & SURFACES: Every distinct material visible - wood grain direction/tone, stone texture/finish, metal treatment (brushed/polished/matte), fabric weave, paint finish, floor/wall/ceiling materials.
+MATERIALS & SURFACES: Every distinct material visible - wood grain direction/tone, stone texture/finish, metal treatment (brushed/polished/matte), fabric weave, paint finish, floor/wall/ceiling materials. Specify how exactly to map the raw SketchUp image's materials to the photorealistic visualization's materials.
 
 LIGHTING QUALITY: Overall light character - color temperature, contrast level, shadow softness, ambient fill, any color cast or atmospheric haze. Where the light is coming from, and how it's distributed.
 
@@ -392,12 +392,14 @@ RENDERING STYLE: Photographic quality - depth of field, contrast curve, saturati
 
 MOOD: One sentence capturing the overall feeling and design style.
 
-Write concisely but precisely. Focus on reproducible visual details.
+Write concisely but precisely. Do not specify "left" or "right", as other scenes might be from different perspectives or rooms. Focus on reproducible visual details and be specific.
 `.trim();
 
 export async function extractStyleNotes(params: {
-  imageBuffer: Buffer;
-  mediaType: string;
+  preImageBuffer: Buffer;
+  postImageBuffer: Buffer;
+  preMediaType: string;
+  postMediaType: string;
   userId: string;
   traceId: string;
 }): Promise<string> {
@@ -420,8 +422,13 @@ export async function extractStyleNotes(params: {
           { type: "text", text: STYLE_EXTRACTION_PROMPT },
           {
             type: "file",
-            data: params.imageBuffer,
-            mediaType: params.mediaType,
+            data: params.preImageBuffer,
+            mediaType: params.preMediaType,
+          },
+          {
+            type: "file",
+            data: params.postImageBuffer,
+            mediaType: params.postMediaType,
           },
         ],
       },

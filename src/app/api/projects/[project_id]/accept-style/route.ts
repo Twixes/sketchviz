@@ -62,7 +62,8 @@ export async function POST(
       thread_id,
       threads!inner (
         id,
-        project_id
+        project_id,
+        input_url
       )
     `,
     )
@@ -94,26 +95,41 @@ export async function POST(
   }
 
   // Download the generation's output image
-  const parsed = parseStorageUrl(generation.output_url);
-  if (!parsed) {
+  const postParsed = parseStorageUrl(generation.output_url);
+  if (!postParsed) {
     return NextResponse.json(
       { error: "Could not parse output image URL" },
       { status: 500 },
     );
   }
-
-  const blob = await downloadFile({
+  const preParsed = parseStorageUrl(thread.input_url);
+  if (!preParsed) {
+    return NextResponse.json(
+      { error: "Could not parse input image URL" },
+      { status: 500 },
+    );
+  }
+  const postBlob = await downloadFile({
     supabase,
-    bucket: parsed.bucket as "output-images",
-    path: parsed.path,
+    bucket: postParsed.bucket as "output-images",
+    path: postParsed.path,
   });
-  const buffer = Buffer.from(await blob.arrayBuffer());
+  const postBuffer = Buffer.from(await postBlob.arrayBuffer());
+
+  const preBlob = await downloadFile({
+    supabase,
+    bucket: preParsed.bucket as "input-images",
+    path: preParsed.path,
+  });
+  const preBuffer = Buffer.from(await preBlob.arrayBuffer());
 
   // Extract style notes using AI
   const traceId = crypto.randomUUID();
   const styleNotes = await extractStyleNotes({
-    imageBuffer: buffer,
-    mediaType: blob.type,
+    preImageBuffer: preBuffer,
+    postImageBuffer: postBuffer,
+    preMediaType: preBlob.type,
+    postMediaType: postBlob.type,
     userId,
     traceId,
   });
