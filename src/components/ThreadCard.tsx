@@ -15,11 +15,11 @@ import {
 export interface ThreadData {
   id: string;
   title: string;
+  input_url: string;
   created_at: string;
   generation_count: number;
   latest_generation: {
     output_url: string | null;
-    input_url: string;
   } | null;
 }
 
@@ -35,11 +35,9 @@ export function ThreadCard({ thread }: ThreadCardProps) {
   const threadsQueryKey = ["threads", user?.id];
   const recentThreadsQueryKey = ["recent-threads", user?.id];
 
-  // Get the image URL (prefer output, fallback to input)
+  // Get the image URL (prefer latest output, fallback to thread input)
   const imageUrl =
-    thread.latest_generation?.output_url ||
-    thread.latest_generation?.input_url ||
-    null;
+    thread.latest_generation?.output_url || thread.input_url || null;
 
   // Get signed URL for authenticated access
   const signedUrl = useSignedUrl(imageUrl);

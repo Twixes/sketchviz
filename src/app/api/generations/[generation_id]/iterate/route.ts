@@ -53,7 +53,6 @@ export async function POST(
       `
       id,
       thread_id,
-      input_url,
       output_url,
       threads!inner (
         id,
@@ -96,7 +95,6 @@ export async function POST(
     .from("generations")
     .insert({
       thread_id: threadId,
-      input_url: inputUrl,
       output_url: null,
       user_params: {
         outdoor_light,

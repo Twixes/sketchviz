@@ -23,10 +23,10 @@ export function RecentThreads() {
           `
           id,
           title,
+          input_url,
           created_at,
           generations (
             output_url,
-            input_url,
             created_at
           )
         `,
@@ -51,11 +51,10 @@ export function RecentThreads() {
         return {
           id: thread.id,
           title: thread.title,
+          input_url: thread.input_url,
           created_at: thread.created_at,
           generation_count: generations.length,
-          latest_generation: latest
-            ? { output_url: latest.output_url, input_url: latest.input_url }
-            : null,
+          latest_generation: latest ? { output_url: latest.output_url } : null,
         };
       });
     },

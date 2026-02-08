@@ -112,10 +112,10 @@ export function ThreadView({ threadId }: { threadId: string }) {
           id,
           user_id,
           title,
+          input_url,
           created_at,
           generations (
             id,
-            input_url,
             output_url,
             user_params,
             created_at,
@@ -238,11 +238,11 @@ export function ThreadView({ threadId }: { threadId: string }) {
           id: result.threadId,
           user_id: user.id,
           title: null, // Will be generated async by the backend
+          input_url: currentBlobUrl,
           created_at: new Date().toISOString(),
           generations: [
             {
               id: result.generationId,
-              input_url: currentBlobUrl,
               output_url: result.outputImage,
               user_params: {
                 thread_id: result.threadId,
@@ -292,7 +292,6 @@ export function ThreadView({ threadId }: { threadId: string }) {
 
       const newGeneration: Generation = {
         id: result.generationId,
-        input_url: activeGen.output_url!,
         output_url: result.outputImage,
         user_params: {
           thread_id: threadId,
@@ -435,6 +434,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
           <TimeMachineViewer
             threadId={threadId}
             inputSrc={threadEditorStore.inputSrc}
+            threadInputUrl={thread?.input_url}
             generations={generations}
             activeLayerIndex={threadEditorStore.activeLayerIndex}
             onLayerClick={threadEditorStore.navigateToLayer}

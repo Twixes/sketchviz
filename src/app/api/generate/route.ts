@@ -49,15 +49,45 @@ export async function POST(request: Request) {
     );
   }
 
-  // Create a new thread (use client-provided ID if available)
-  const { error: threadError } = await supabase.from("threads").insert({
-    id: threadId,
-    user_id: userId,
-    title: "",
-  });
+  // Create or reuse a thread
+  // If a thread with this ID already exists (and has no generations), reuse it
+  const { data: existingThread } = await supabase
+    .from("threads")
+    .select("id, user_id, generations(id)")
+    .eq("id", threadId)
+    .single();
 
-  if (threadError) {
-    throw threadError;
+  if (existingThread) {
+    if (existingThread.user_id !== userId) {
+      return NextResponse.json(
+        { error: "You don't have permission to use this thread" },
+        { status: 403 },
+      );
+    }
+    if (existingThread.generations.length > 0) {
+      return NextResponse.json(
+        { error: "Thread already has generations, use iterate instead" },
+        { status: 400 },
+      );
+    }
+    // Update existing thread with input_url
+    const { error: updateError } = await supabase
+      .from("threads")
+      .update({ input_url: blobUrl })
+      .eq("id", threadId);
+    if (updateError) {
+      throw updateError;
+    }
+  } else {
+    const { error: threadError } = await supabase.from("threads").insert({
+      id: threadId,
+      user_id: userId,
+      title: "",
+      input_url: blobUrl,
+    });
+    if (threadError) {
+      throw threadError;
+    }
   }
 
   // Create a new generation record
@@ -65,7 +95,6 @@ export async function POST(request: Request) {
     .from("generations")
     .insert({
       thread_id: threadId,
-      input_url: blobUrl,
       output_url: null,
       user_params: {
         outdoor_light,

@@ -19,7 +19,6 @@ export interface ReferenceImage {
 
 export interface Generation {
   id: string;
-  input_url: string;
   output_url: string | null;
   user_params: UserParams;
   created_at: string;
@@ -31,6 +30,7 @@ export interface Thread {
   id: string;
   user_id: string;
   title: string | null;
+  input_url: string;
   created_at: string;
   generations: Generation[];
 }
@@ -174,8 +174,8 @@ export const useThreadEditorStore = create<ThreadEditorState>()(
         if (!thread || thread.generations.length === 0) return null;
 
         if (activeLayerIndex === 0) {
-          // Return the original input image (first generation's input)
-          return thread.generations[0]?.input_url ?? null;
+          // Return the original input image (stored on thread)
+          return thread.input_url ?? null;
         }
 
         // Return the output of the generation at activeLayerIndex - 1

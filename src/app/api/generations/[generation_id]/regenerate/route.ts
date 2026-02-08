@@ -52,11 +52,11 @@ export async function POST(
       `
       id,
       thread_id,
-      input_url,
       output_url,
       threads!inner (
         id,
-        user_id
+        user_id,
+        input_url
       )
     `,
     )
@@ -71,7 +71,10 @@ export async function POST(
   }
 
   // Verify ownership (RLS SELECT is public, so we must check explicitly)
-  const thread = currentGeneration.threads as unknown as { user_id: string };
+  const thread = currentGeneration.threads as unknown as {
+    user_id: string;
+    input_url: string;
+  };
   if (thread.user_id !== userId) {
     return NextResponse.json(
       { error: "You don't have permission to regenerate this thread" },
@@ -81,16 +84,10 @@ export async function POST(
 
   const threadId = currentGeneration.thread_id;
 
-  // For regeneration, we need to find the input that was originally used for this generation
-  // This is stored in the current generation's input_url
-  const inputUrl = decodeURI(currentGeneration.input_url);
-
   // Determine if this is the first generation in the thread
-  // If it's the first generation, we should use the base prompt
-  // If it's a later iteration, we should NOT use the base prompt
   const { data: allGenerations } = await supabase
     .from("generations")
-    .select("id")
+    .select("id, output_url")
     .eq("thread_id", threadId)
     .order("created_at", { ascending: true });
 
@@ -98,6 +95,26 @@ export async function POST(
     allGenerations && allGenerations.length > 0
       ? allGenerations[0].id === generationId
       : true; // Default to true if we can't determine
+
+  // Derive input URL: first generation uses thread's input_url,
+  // later generations use the previous generation's output_url
+  let inputUrl: string;
+  if (isFirstGeneration) {
+    inputUrl = decodeURI(thread.input_url);
+  } else if (allGenerations) {
+    const currentIndex = allGenerations.findIndex((g) => g.id === generationId);
+    const previousGeneration = allGenerations[currentIndex - 1];
+    if (!previousGeneration?.output_url) {
+      return NextResponse.json(
+        { error: "Previous generation has no output to use as input" },
+        { status: 400 },
+      );
+    }
+    inputUrl = decodeURI(previousGeneration.output_url);
+  } else {
+    // Fallback to thread input (shouldn't reach here in practice)
+    inputUrl = decodeURI(thread.input_url);
+  }
 
   const traceId = crypto.randomUUID();
 
