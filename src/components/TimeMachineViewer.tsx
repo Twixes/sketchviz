@@ -39,10 +39,8 @@ interface Layer {
 }
 
 interface TimeMachineViewerProps {
-  /** For new threads without generations yet */
-  inputSrc?: string | null;
-  /** Original input image URL stored on the thread */
-  threadInputUrl?: string | null;
+  /** Original input image URL (local blob for new threads, or thread.input_url for existing) */
+  inputImageUrl?: string | null;
   /** For existing threads with generations */
   generations?: Generation[];
   activeLayerIndex?: number;
@@ -277,8 +275,7 @@ function LayerImage({
 }
 
 export function TimeMachineViewer({
-  inputSrc,
-  threadInputUrl,
+  inputImageUrl,
   generations = [],
   activeLayerIndex = 0,
   onLayerClick,
@@ -300,26 +297,14 @@ export function TimeMachineViewer({
 
   // Build layers array: original input (index 0) + generation outputs (index 1+)
   const layers = useMemo<Layer[]>(() => {
-    // New thread mode: just show input image as "Original"
-    if (generations.length === 0) {
-      if (!inputSrc) return [];
-      return [
-        {
-          id: "original",
-          imageUrl: inputSrc,
-          label: "Original",
-          index: 0,
-        },
-      ];
-    }
+    if (!inputImageUrl && generations.length === 0) return [];
 
-    // Existing thread mode: build from generations
     const result: Layer[] = [];
 
-    // Layer 0: Original input (stored on thread)
+    // Layer 0: Original input
     result.push({
       id: "original",
-      imageUrl: threadInputUrl ?? null,
+      imageUrl: inputImageUrl ?? null,
       label: "Original",
       index: 0,
     });
@@ -335,7 +320,7 @@ export function TimeMachineViewer({
     });
 
     return result;
-  }, [inputSrc, threadInputUrl, generations]);
+  }, [inputImageUrl, generations]);
 
   // Calculate CSS aspect ratio for the viewer
   const cssAspectRatio = useMemo(() => {

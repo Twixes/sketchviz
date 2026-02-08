@@ -433,8 +433,7 @@ export function ThreadView({ threadId }: { threadId: string }) {
         <div className="relative space-y-6">
           <TimeMachineViewer
             threadId={threadId}
-            inputSrc={threadEditorStore.inputSrc}
-            threadInputUrl={thread?.input_url}
+            inputImageUrl={thread?.input_url ?? threadEditorStore.inputSrc}
             generations={generations}
             activeLayerIndex={threadEditorStore.activeLayerIndex}
             onLayerClick={threadEditorStore.navigateToLayer}
