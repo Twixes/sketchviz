@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useCallback } from "react";
 import { useSession } from "@/components/SessionProvider";
 import type { ProjectListItem } from "@/hooks/use-projects-query";
-import { useSignedUrl } from "@/hooks/use-signed-url";
+import { useSignedUrls } from "@/hooks/use-signed-url";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -17,10 +17,29 @@ interface ProjectCardProps {
   project: ProjectListItem;
 }
 
+/** Column span for each image in a 6-column grid, based on total scene count. */
+function getColSpan(count: number, index: number): string {
+  switch (count) {
+    case 1:
+      return "col-span-6";
+    case 2:
+      return "col-span-3";
+    case 3:
+      return "col-span-2";
+    case 4:
+      return "col-span-3";
+    case 5:
+      // Top row: 3 items spanning 2 each, bottom row: 2 items spanning 3 each
+      return index < 3 ? "col-span-2" : "col-span-3";
+    default:
+      return "col-span-2";
+  }
+}
+
 export function ProjectCard({ project }: ProjectCardProps) {
   const { user } = useSession();
   const queryClient = useQueryClient();
-  const signedUrl = useSignedUrl(project.latest_output_url);
+  const signedUrls = useSignedUrls(project.scene_urls);
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -68,19 +87,23 @@ export function ProjectCard({ project }: ProjectCardProps) {
       className="group relative overflow-hidden rounded-xl border border-black/20 bg-white/75 p-0 text-left transition-all hover:border-black/40 hover:bg-white/90"
     >
       <Link href={`/projects/${project.id}`} className="block">
-        {signedUrl ? (
-          <div className="aspect-video w-full overflow-hidden bg-black/5">
-            <img
-              src={signedUrl}
-              alt={project.title}
-              width={400}
-              height={225}
-              className="h-full w-full object-cover"
-            />
+        {signedUrls.length > 0 ? (
+          <div className="grid aspect-video w-full grid-cols-6 overflow-hidden bg-black/5">
+            {signedUrls.map(
+              (url, i) =>
+                url && (
+                  <img
+                    key={url}
+                    src={url}
+                    alt={`${project.title} scene ${i + 1}`}
+                    className={`h-full w-full object-cover ${getColSpan(signedUrls.length, i)}`}
+                  />
+                ),
+            )}
           </div>
         ) : (
           <div className="flex aspect-video w-full items-center justify-center bg-black/5">
-            <p className="text-sm text-black/40">No preview</p>
+            <p className="text-sm text-black/40">No scenes yet</p>
           </div>
         )}
       </Link>

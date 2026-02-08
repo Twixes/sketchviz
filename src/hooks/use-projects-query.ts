@@ -7,7 +7,7 @@ export interface ProjectListItem {
   style_notes: string | null;
   created_at: string;
   thread_count: number;
-  latest_output_url: string | null;
+  scene_urls: string[];
 }
 
 export function useProjectsQuery() {

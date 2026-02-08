@@ -142,6 +142,7 @@ export async function GET() {
       created_at,
       threads (
         id,
+        input_url,
         generations (
           output_url,
           created_at
@@ -162,16 +163,21 @@ export async function GET() {
 
   const result = projects.map((project) => {
     const threads = project.threads || [];
-    // Find the latest output URL across all threads/generations
-    let latestOutputUrl: string | null = null;
-    let latestDate: string | null = null;
+    // For each thread, pick the latest generation output_url or fall back to input_url
+    const sceneUrls: string[] = [];
     for (const thread of threads) {
-      for (const gen of thread.generations || []) {
+      if (sceneUrls.length >= 6) break;
+      const generations = thread.generations || [];
+      let latestOutput: string | null = null;
+      let latestDate: string | null = null;
+      for (const gen of generations) {
         if (gen.output_url && (!latestDate || gen.created_at > latestDate)) {
-          latestOutputUrl = gen.output_url;
+          latestOutput = gen.output_url;
           latestDate = gen.created_at;
         }
       }
+      const url = latestOutput || thread.input_url;
+      if (url) sceneUrls.push(url);
     }
 
     return {
@@ -180,7 +186,7 @@ export async function GET() {
       style_notes: project.style_notes,
       created_at: project.created_at,
       thread_count: threads.length,
-      latest_output_url: latestOutputUrl,
+      scene_urls: sceneUrls,
     };
   });
 
