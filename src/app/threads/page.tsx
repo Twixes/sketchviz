@@ -36,6 +36,7 @@ export default function ThreadsPage() {
         `,
         )
         .eq("user_id", user.id)
+        .is("project_id", null)
         .order("created_at", { ascending: false })
         .order("created_at", {
           referencedTable: "generations",
@@ -79,9 +80,8 @@ export default function ThreadsPage() {
     <PageWrapper
       user={user}
       gap="small"
-      title="History"
-      description="Your past visualizations"
-      documentTitle="History"
+      title="All sketches"
+      description="This is your full history of visualizations that aren't associated with any project."
     >
       <motion.section className="space-y-8">
         {isLoading ? (

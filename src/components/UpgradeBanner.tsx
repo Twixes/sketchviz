@@ -25,7 +25,7 @@ export function UpgradeBanner() {
             </div>
             <span>
               <h3 className="inline-block font-semibold text-white mr-1">
-                Render without limits
+                Visualize without limits
               </h3>{" "}
               <span className="text-sm text-white/50 whitespace-nowrap">
                 SketchViz Pro starts at $15/month

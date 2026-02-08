@@ -37,6 +37,7 @@ type GenerateImageParams = {
   outdoorLight?: OutdoorLight;
   indoorLight?: IndoorLight;
   editDescription?: string | null;
+  styleNotes?: string | null;
   model: Model;
   referenceImages?: Array<{ buffer: Buffer; mediaType: string }>;
   aspectRatio?: AspectRatio | null;
@@ -245,6 +246,12 @@ export async function generateVisualizationImage(
   // Build the prompt based on light conditions and edit description
   let prompt =
     "Turn this Sketchup render into a realistic 3D visualization with full lighting";
+
+  // Inject project style notes for visual consistency across scenes
+  if (params.styleNotes) {
+    prompt += `\n\nIMPORTANT - Match this project style precisely:\n${params.styleNotes}`;
+  }
+
   // Handle outdoor lighting
   if (params.outdoorLight === "sunny") {
     prompt += ", with sunny outdoor light";
@@ -294,6 +301,11 @@ export async function generateIterationImage(
   // Build the prompt for iteration - no "Turn this SketchUp render" prefix
   let prompt =
     "Refine this visualization based on the user's feedback. Preserve the overall style, perspective, and composition unless specifically asked to change them.";
+
+  // Inject project style notes for visual consistency across scenes
+  if (params.styleNotes) {
+    prompt += `\n\nIMPORTANT - Match this project style precisely:\n${params.styleNotes}`;
+  }
 
   // Handle outdoor lighting
   if (params.outdoorLight === "sunny") {
@@ -359,6 +371,59 @@ Output ONLY the final list of clear and actionable bullet points.
       {
         role: "user",
         content: [{ type: "text", text: prompt }],
+      },
+    ],
+  });
+  return result.text;
+}
+
+const STYLE_EXTRACTION_PROMPT = `
+Analyze this photorealistic architectural visualization. Write a detailed style guide that will be used to ensure visual consistency when generating visualizations of OTHER rooms/spaces in the same project.
+
+Describe in clear, instructive language (as if directing an AI image generator):
+
+MATERIALS & SURFACES: Every distinct material visible - wood grain direction/tone, stone texture/finish, metal treatment (brushed/polished/matte), fabric weave, paint finish, floor/wall/ceiling materials.
+
+LIGHTING QUALITY: Overall light character - color temperature, contrast level, shadow softness, ambient fill, any color cast or atmospheric haze. Where the light is coming from, and how it's distributed.
+
+COLOR PALETTE: Dominant and accent colors. Overall warmth/coolness.
+
+RENDERING STYLE: Photographic quality - depth of field, contrast curve, saturation level, any post-processing aesthetic.
+
+MOOD: One sentence capturing the overall feeling and design style.
+
+Write concisely but precisely. Focus on reproducible visual details.
+`.trim();
+
+export async function extractStyleNotes(params: {
+  imageBuffer: Buffer;
+  mediaType: string;
+  userId: string;
+  traceId: string;
+}): Promise<string> {
+  if (process.env.SKIP_AI === "1") {
+    return "Test style notes: warm wood tones, soft ambient lighting, modern minimalist aesthetic.";
+  }
+  let model = googleClient.languageModel("gemini-3-pro-preview");
+  if (posthogNode) {
+    model = withTracing(model, posthogNode, {
+      posthogDistinctId: params.userId,
+      posthogTraceId: params.traceId,
+    });
+  }
+  const result = await generateText({
+    model,
+    prompt: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: STYLE_EXTRACTION_PROMPT },
+          {
+            type: "file",
+            data: params.imageBuffer,
+            mediaType: params.mediaType,
+          },
+        ],
       },
     ],
   });

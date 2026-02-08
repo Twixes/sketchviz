@@ -96,3 +96,36 @@ export const iterateRequestSchema = iterateRequestSchemaBase.superRefine(
 );
 
 export type IterateRequest = z.infer<typeof iterateRequestSchema>;
+
+// Project schemas
+
+export const createProjectSchema = z.object({
+  title: z.string().min(1, "Title is required").max(255),
+  scene_input_urls: z
+    .array(z.string().url())
+    .min(1, "At least one scene is required"),
+});
+
+export type CreateProjectRequest = z.infer<typeof createProjectSchema>;
+
+export const updateProjectSchema = z.object({
+  title: z.string().min(1).max(255).optional(),
+  style_notes: z.string().nullable().optional(),
+  reference_image_urls: z.array(z.string().url()).max(3).optional(),
+});
+
+export type UpdateProjectRequest = z.infer<typeof updateProjectSchema>;
+
+export const addScenesSchema = z.object({
+  input_urls: z
+    .array(z.string().url())
+    .min(1, "At least one scene URL is required"),
+});
+
+export type AddScenesRequest = z.infer<typeof addScenesSchema>;
+
+export const acceptStyleSchema = z.object({
+  generation_id: z.string().uuid(),
+});
+
+export type AcceptStyleRequest = z.infer<typeof acceptStyleSchema>;

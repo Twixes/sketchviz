@@ -32,6 +32,7 @@ export function RecentThreads() {
         `,
         )
         .eq("user_id", user.id)
+        .is("project_id", null)
         .order("created_at", { ascending: false })
         .order("created_at", {
           referencedTable: "generations",
@@ -66,9 +67,7 @@ export function RecentThreads() {
     return (
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-black">
-            Recent visualizations
-          </h2>
+          <h2 className="text-lg font-semibold text-black">Recent sketches</h2>
         </div>
         <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Loading...</p>
@@ -84,9 +83,7 @@ export function RecentThreads() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-black">
-          Recent visualizations
-        </h2>
+        <h2 className="text-lg font-semibold text-black">Recent sketches</h2>
         <Link
           href="/threads"
           className="flex items-center gap-1 text-sm text-black/60 transition-colors hover:text-black"

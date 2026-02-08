@@ -40,6 +40,7 @@ interface ProcessImageGenerationParams {
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
   editDescription: string | null;
+  styleNotes?: string | null;
   model: Model;
   aspectRatio: AspectRatio | null;
   referenceImageUrls: string[];
@@ -210,6 +211,7 @@ export async function generateAndUploadImage({
   outdoorLight,
   indoorLight,
   editDescription,
+  styleNotes,
   model,
   aspectRatio,
   generationType,
@@ -222,6 +224,7 @@ export async function generateAndUploadImage({
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
   editDescription: string | null;
+  styleNotes?: string | null;
   model: Model;
   aspectRatio: AspectRatio | null;
   generationType: "iteration" | "regeneration" | "initial";
@@ -290,6 +293,7 @@ export async function generateAndUploadImage({
     outdoorLight,
     indoorLight,
     editDescription: cleanedEditDescription,
+    styleNotes,
     model,
     referenceImages: preparedImage.referenceImageBuffers,
     aspectRatio,
@@ -341,6 +345,7 @@ export async function processImageGeneration({
   outdoorLight,
   indoorLight,
   editDescription,
+  styleNotes,
   model,
   aspectRatio,
   referenceImageUrls,
@@ -362,6 +367,7 @@ export async function processImageGeneration({
     outdoorLight,
     indoorLight,
     editDescription,
+    styleNotes,
     model,
     aspectRatio,
     generationType,

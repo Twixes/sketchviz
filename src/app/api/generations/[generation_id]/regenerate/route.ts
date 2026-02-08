@@ -56,7 +56,8 @@ export async function POST(
       threads!inner (
         id,
         user_id,
-        input_url
+        input_url,
+        project_id
       )
     `,
     )
@@ -74,6 +75,7 @@ export async function POST(
   const thread = currentGeneration.threads as unknown as {
     user_id: string;
     input_url: string;
+    project_id: string | null;
   };
   if (thread.user_id !== userId) {
     return NextResponse.json(
@@ -81,6 +83,28 @@ export async function POST(
       { status: 403 },
     );
   }
+
+  // Fetch project context if thread belongs to a project
+  let styleNotes: string | null = null;
+  let projectReferenceImageUrls: string[] = [];
+  if (thread.project_id) {
+    const { data: project } = await supabase
+      .from("projects")
+      .select("style_notes, reference_image_urls")
+      .eq("id", thread.project_id)
+      .single();
+
+    if (project) {
+      styleNotes = project.style_notes;
+      projectReferenceImageUrls =
+        (project.reference_image_urls as string[]) || [];
+    }
+  }
+
+  const allReferenceImageUrls = [
+    ...projectReferenceImageUrls,
+    ...(reference_image_urls || []),
+  ];
 
   const threadId = currentGeneration.thread_id;
 
@@ -128,9 +152,10 @@ export async function POST(
         outdoorLight: outdoor_light,
         indoorLight: indoor_light,
         editDescription: edit_description,
+        styleNotes,
         model,
         aspectRatio: aspect_ratio,
-        referenceImageUrls: reference_image_urls || [],
+        referenceImageUrls: allReferenceImageUrls,
         generationType: "regeneration",
         useBasePrompt: isFirstGeneration,
       });

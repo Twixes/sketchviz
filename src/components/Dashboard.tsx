@@ -7,7 +7,8 @@ import { Examples } from "@/components/Examples";
 import { NeonShapesDashboard } from "@/components/NeonShapesDashboard";
 import { NeonShapesHero } from "@/components/NeonShapesHero";
 import { PageWrapper } from "@/components/PageWrapper";
-import { RecentThreads } from "@/components/RecentThreads";
+import { RecentProjects } from "@/components/ProjectsSection";
+import { RecentThreads } from "@/components/RecentThreadsSection";
 import type { SessionUser } from "@/components/SessionProvider";
 import { useSession } from "@/components/SessionProvider";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
@@ -117,6 +118,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
             </div>
           </section>
           {isFreeUser && !hasBillingIssue && <UpgradeBanner />}
+          <RecentProjects />
           <RecentThreads />
         </section>
       </NeonShapesDashboard>

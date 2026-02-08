@@ -3,6 +3,7 @@ import {
   DotFilledIcon,
   ExitIcon,
   InfoCircledIcon,
+  LayersIcon,
   RocketIcon,
   UploadIcon,
 } from "@radix-ui/react-icons";
