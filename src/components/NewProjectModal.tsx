@@ -141,7 +141,7 @@ function NameAndUploadStep() {
   const hasScenes = store.sceneFiles.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
         <h2 className="text-xl font-semibold text-black">
           {getStepLabel("name")}
@@ -156,7 +156,7 @@ function NameAndUploadStep() {
         type="text"
         value={store.projectTitle}
         onChange={(e) => store.setProjectTitle(e.target.value)}
-        placeholder="e.g., Downtown Apartment"
+        placeholder="Project name"
         className="w-full rounded-xl border border-black/20 bg-white px-3 py-2.5 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20"
       />
 
@@ -223,6 +223,13 @@ function NameAndUploadStep() {
         <Button
           variant="primary"
           disabled={!store.projectTitle.trim() || !hasScenes}
+          tooltip={
+            !store.projectTitle.trim()
+              ? "Please enter a project name"
+              : !hasScenes
+                ? "Please upload at least one scene image"
+                : undefined
+          }
           onClick={() => store.setWizardStep("select")}
         >
           Next
@@ -656,12 +663,7 @@ export function NewProjectModal() {
     >
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay asChild>
-          <motion.div
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          />
+          <motion.div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" />
         </DialogPrimitive.Overlay>
         <DialogPrimitive.Content
           asChild
@@ -696,7 +698,6 @@ export function NewProjectModal() {
               <motion.div
                 key={store.wizardStep}
                 variants={STEP_SLIDE_VARIANTS}
-                initial="enter"
                 animate="center"
                 exit="exit"
                 transition={LAYOUT_TRANSITION}

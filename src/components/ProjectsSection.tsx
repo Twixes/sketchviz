@@ -2,6 +2,7 @@
 
 import { PlusIcon } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
+import { NeonShape } from "@/components/NeonShape";
 import { ProjectCard } from "@/components/ProjectCard";
 import { useProjectsQuery } from "@/hooks/use-projects-query";
 import { Button } from "@/lib/components/ui/Button";
@@ -62,23 +63,51 @@ export function RecentProjects() {
 
 function NewProjectCTACard() {
   return (
-    <motion.div
+    <motion.button
+      type="button"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-dashed border-black/20 bg-white/75 p-6 text-center"
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      onClick={() => useProjectStore.getState().openModal()}
+      className="group relative col-span-full cursor-pointer overflow-hidden rounded-xl border border-black/20 bg-linear-to-br from-black/3 to-black/8 px-8 py-10 text-left transition-colors hover:border-black/40 hover:from-black/5 hover:to-black/12"
     >
-      <p className="text-sm text-black/50">
-        No projects yet. Create one for consistent multi-scene visualizations.
-      </p>
-      <Button
-        variant="secondary"
+      {/* Decorative neon shapes */}
+      <NeonShape
+        shape="diamond"
+        color="pink"
+        size="md"
+        animation="breathing"
+        className="absolute -right-4 -top-4 opacity-40 transition-opacity group-hover:opacity-70"
+      />
+      <NeonShape
+        shape="crescent"
+        color="turquoise"
         size="sm"
-        leftIcon={<PlusIcon />}
-        onClick={() => useProjectStore.getState().openModal()}
-        className="mt-3"
-      >
-        New project
-      </Button>
-    </motion.div>
+        animation="breathing"
+        className="absolute bottom-2 right-16 opacity-30 transition-opacity group-hover:opacity-60"
+      />
+      <NeonShape
+        shape="zigzag"
+        color="violet"
+        size="sm"
+        animation="breathing"
+        className="absolute -left-2 bottom-0 rotate-12 opacity-25 transition-opacity group-hover:opacity-50"
+      />
+
+      <div className="relative flex items-center gap-5">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-black/10 transition-colors group-hover:bg-black/15">
+          <PlusIcon className="size-6 text-black/60 transition-colors group-hover:text-black/80" />
+        </div>
+        <div>
+          <h3 className="text-base font-semibold text-black">
+            Create your first project
+          </h3>
+          <p className="mt-0.5 text-sm text-black/50">
+            Tie multiple scenes together with a shared style and references
+          </p>
+        </div>
+      </div>
+    </motion.button>
   );
 }
