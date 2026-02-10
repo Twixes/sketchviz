@@ -31,6 +31,7 @@ interface ControlPanelProps {
   onReferenceImageDrop: (file: File) => Promise<void>;
   onReferenceImageRemove: (index: number) => void;
   onGenerate: () => Promise<void>;
+  proOnlyModel?: boolean;
 }
 
 export function ControlPanel(props: ControlPanelProps) {
@@ -113,6 +114,7 @@ export function ControlPanel(props: ControlPanelProps) {
           value={props.model}
           onChange={props.onModelChange}
           disabled={isDisabled}
+          proOnly={props.proOnlyModel}
         />
       </div>
 

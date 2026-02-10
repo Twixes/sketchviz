@@ -416,6 +416,15 @@ function VisualizeStep() {
   const acceptStyleMutation = useAcceptStyleMutation();
   const [isAccepting, setIsAccepting] = useState(false);
 
+  // Force Pro model for style consistency in the project wizard
+  const currentModel = threadEditorStore.model;
+  const setModel = threadEditorStore.setModel;
+  useEffect(() => {
+    if (!currentModel.startsWith("google/")) {
+      setModel("google/gemini-3-pro-image-preview");
+    }
+  }, [currentModel, setModel]);
+
   const threadId = store.startingSceneThreadId;
   const activeGeneration = threadEditorStore.getActiveGeneration();
   const hasGeneration = !!activeGeneration?.output_url;

@@ -474,6 +474,7 @@ export function ThreadView({
           onReferenceImageDrop={handleReferenceImageDrop}
           onReferenceImageRemove={removeReferenceImage}
           onGenerate={handleGenerate}
+          proOnlyModel={embedded}
         />
 
         {!embedded && isReadOnly ? (
