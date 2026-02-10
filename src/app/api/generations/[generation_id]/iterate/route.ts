@@ -56,7 +56,8 @@ export async function POST(
       output_url,
       threads!inner (
         id,
-        user_id
+        user_id,
+        project_id
       )
     `,
     )
@@ -71,7 +72,10 @@ export async function POST(
   }
 
   // Verify ownership (RLS SELECT is public, so we must check explicitly)
-  const thread = previousGeneration.threads as unknown as { user_id: string };
+  const thread = previousGeneration.threads as unknown as {
+    user_id: string;
+    project_id: string | null;
+  };
   if (thread.user_id !== userId) {
     return NextResponse.json(
       { error: "You don't have permission to iterate on this thread" },
@@ -86,6 +90,28 @@ export async function POST(
       { status: 400 },
     );
   }
+
+  // Fetch project context if thread belongs to a project
+  let styleNotes: string | null = null;
+  let projectReferenceImageUrls: string[] = [];
+  if (thread.project_id) {
+    const { data: project } = await supabase
+      .from("projects")
+      .select("style_notes, reference_image_urls")
+      .eq("id", thread.project_id)
+      .single();
+
+    if (project) {
+      styleNotes = project.style_notes;
+      projectReferenceImageUrls =
+        (project.reference_image_urls as string[]) || [];
+    }
+  }
+
+  const allReferenceImageUrls = [
+    ...projectReferenceImageUrls,
+    ...(reference_image_urls || []),
+  ];
 
   const threadId = previousGeneration.thread_id;
   const inputUrl = decodeURI(previousGeneration.output_url); // Use previous output as new input
@@ -124,9 +150,10 @@ export async function POST(
         outdoorLight: outdoor_light,
         indoorLight: indoor_light,
         editDescription: edit_description,
+        styleNotes,
         model,
         aspectRatio: aspect_ratio,
-        referenceImageUrls: reference_image_urls || [],
+        referenceImageUrls: allReferenceImageUrls,
         generationType: "iteration",
         useBasePrompt: use_base_prompt,
       });

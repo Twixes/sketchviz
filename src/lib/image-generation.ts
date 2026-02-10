@@ -40,6 +40,7 @@ interface ProcessImageGenerationParams {
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
   editDescription: string | null;
+  styleNotes?: string | null;
   model: Model;
   aspectRatio: AspectRatio | null;
   referenceImageUrls: string[];
@@ -145,26 +146,16 @@ export async function prepareImageForGeneration({
     for (const refUrl of referenceImageUrls) {
       try {
         const refParsed = parseStorageUrl(refUrl);
-        let refBlob: Blob;
-        let refContentType: string;
-
-        if (refParsed) {
-          refBlob = await downloadFile({
-            supabase,
-            bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
-            path: refParsed.path,
-          });
-          refContentType = refBlob.type;
-        } else {
-          const refResponse = await fetch(refUrl);
-          if (!refResponse.ok) {
-            console.warn(`Failed to fetch reference image: ${refUrl}`);
-            continue;
-          }
-          refContentType = refResponse.headers.get("content-type") || "";
-          const refArrayBuffer = await refResponse.arrayBuffer();
-          refBlob = new Blob([refArrayBuffer], { type: refContentType });
+        if (!refParsed) {
+          continue;
         }
+
+        const refBlob = await downloadFile({
+          supabase,
+          bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
+          path: refParsed.path,
+        });
+        const refContentType = refBlob.type;
 
         if (refContentType && ACCEPTED_MIME_TYPES.includes(refContentType)) {
           const refArrayBuffer = await refBlob.arrayBuffer();
@@ -210,6 +201,7 @@ export async function generateAndUploadImage({
   outdoorLight,
   indoorLight,
   editDescription,
+  styleNotes,
   model,
   aspectRatio,
   generationType,
@@ -222,6 +214,7 @@ export async function generateAndUploadImage({
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
   editDescription: string | null;
+  styleNotes?: string | null;
   model: Model;
   aspectRatio: AspectRatio | null;
   generationType: "iteration" | "regeneration" | "initial";
@@ -290,6 +283,7 @@ export async function generateAndUploadImage({
     outdoorLight,
     indoorLight,
     editDescription: cleanedEditDescription,
+    styleNotes,
     model,
     referenceImages: preparedImage.referenceImageBuffers,
     aspectRatio,
@@ -341,6 +335,7 @@ export async function processImageGeneration({
   outdoorLight,
   indoorLight,
   editDescription,
+  styleNotes,
   model,
   aspectRatio,
   referenceImageUrls,
@@ -362,6 +357,7 @@ export async function processImageGeneration({
     outdoorLight,
     indoorLight,
     editDescription,
+    styleNotes,
     model,
     aspectRatio,
     generationType,

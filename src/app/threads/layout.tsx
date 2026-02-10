@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
-  title: "History",
+  title: "Sketches",
 };
 
 export default function ThreadsLayout({ children }: { children: ReactNode }) {

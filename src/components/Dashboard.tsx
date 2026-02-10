@@ -1,13 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { BillingIssueBanner } from "@/components/BillingIssueBanner";
 import { DashboardStats } from "@/components/DashboardStats";
 import { Examples } from "@/components/Examples";
 import { NeonShapesDashboard } from "@/components/NeonShapesDashboard";
 import { NeonShapesHero } from "@/components/NeonShapesHero";
+import { NewProjectModal } from "@/components/NewProjectModal";
 import { PageWrapper } from "@/components/PageWrapper";
-import { RecentThreads } from "@/components/RecentThreads";
+import { RecentProjects } from "@/components/ProjectsSection";
+import { RecentThreads } from "@/components/RecentThreadsSection";
 import type { SessionUser } from "@/components/SessionProvider";
 import { useSession } from "@/components/SessionProvider";
 import { UpgradeBanner } from "@/components/UpgradeBanner";
@@ -23,6 +26,9 @@ interface DashboardProps {
 export function Dashboard({ user, onFileSelected }: DashboardProps) {
   const { supabase } = useSession();
   const { data: planData } = usePlanQuery();
+  // This fallback is okay because the hook always runs (hooks can't be conditional themselves)
+  const isProjectsEnabled =
+    useFeatureFlagEnabled("projects") || process.env.NODE_ENV === "development";
 
   const isFreeUser = planData?.planType === "free";
   const hasBillingIssue = planData?.hasBillingIssue ?? false;
@@ -91,6 +97,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
             </div>
             <Examples />
           </section>
+          <NewProjectModal />
         </NeonShapesDashboard>
       </PageWrapper>
     );
@@ -117,8 +124,10 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
             </div>
           </section>
           {isFreeUser && !hasBillingIssue && <UpgradeBanner />}
+          {isProjectsEnabled && <RecentProjects />}
           <RecentThreads />
         </section>
+        <NewProjectModal />
       </NeonShapesDashboard>
     </PageWrapper>
   );

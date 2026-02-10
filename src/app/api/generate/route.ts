@@ -90,6 +90,38 @@ export async function POST(request: Request) {
     }
   }
 
+  // Check if thread belongs to a project and fetch project context
+  let styleNotes: string | null = null;
+  let projectReferenceImageUrls: string[] = [];
+  const threadForProject = existingThread;
+  if (threadForProject) {
+    const { data: threadWithProject } = await supabase
+      .from("threads")
+      .select("project_id")
+      .eq("id", threadId)
+      .single();
+
+    if (threadWithProject?.project_id) {
+      const { data: project } = await supabase
+        .from("projects")
+        .select("style_notes, reference_image_urls")
+        .eq("id", threadWithProject.project_id)
+        .single();
+
+      if (project) {
+        styleNotes = project.style_notes;
+        projectReferenceImageUrls =
+          (project.reference_image_urls as string[]) || [];
+      }
+    }
+  }
+
+  // Merge project reference images with thread reference images
+  const allReferenceImageUrls = [
+    ...projectReferenceImageUrls,
+    ...(reference_image_urls || []),
+  ];
+
   // Create a new generation record
   const { data: generation, error: generationError } = await supabase
     .from("generations")
@@ -118,7 +150,7 @@ export async function POST(request: Request) {
       supabase,
       inputUrl: blobUrl,
       aspectRatio: aspect_ratio,
-      referenceImageUrls: reference_image_urls || [],
+      referenceImageUrls: allReferenceImageUrls,
       generationType: "initial",
     });
 
@@ -133,6 +165,7 @@ export async function POST(request: Request) {
         outdoorLight: outdoor_light,
         indoorLight: indoor_light,
         editDescription: edit_description,
+        styleNotes,
         model,
         aspectRatio: aspect_ratio,
         generationType: "initial",

@@ -13,6 +13,7 @@ interface ModelSelectorProps {
   value: Model;
   onChange: (value: Model) => void;
   disabled?: boolean;
+  proOnly?: boolean;
 }
 
 function ResolutionBadge({
@@ -128,16 +129,27 @@ export const MODEL_OPTIONS: ModelOption[] = [
   },
 ];
 
+const PRO_ONLY_REASON = "Pro quality is required for project-level consistency";
+
 export function ModelSelector({
   value,
   onChange,
   disabled,
+  proOnly,
 }: ModelSelectorProps) {
+  const options = proOnly
+    ? MODEL_OPTIONS.map((opt) =>
+        opt.value.startsWith("google/")
+          ? opt
+          : { ...opt, disabledReason: PRO_ONLY_REASON },
+      )
+    : MODEL_OPTIONS;
+
   return (
     <Select
       label="Quality"
       value={value}
-      options={MODEL_OPTIONS}
+      options={options}
       onChange={onChange}
       disabled={disabled}
     />
