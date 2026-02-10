@@ -368,7 +368,7 @@ function SelectStep() {
   const allUploaded = store.sceneFiles.every((f) => f.blobUrl !== null);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
         <h2 className="text-xl font-semibold text-black">
           {getStepLabel("select")}
@@ -518,7 +518,7 @@ function ExtractingStyleStep() {
   const ellipsis = useAnimatedEllipsis();
 
   return (
-    <div className="flex flex-col items-center justify-center py-16 space-y-6">
+    <div className="flex flex-col items-center justify-center py-16 space-y-4">
       <div className="relative">
         <NeonShape
           shape="spiral"
@@ -540,7 +540,8 @@ function ExtractingStyleStep() {
           {ellipsis}
         </p>
         <p className="text-sm text-black/60">
-          Analyzing your visualization to capture the look
+          Analyzing your visualization to capture the look. This may take 30-60
+          seconds.
         </p>
       </div>
     </div>
@@ -588,7 +589,7 @@ function ReviewStyleStep() {
   }, [store, notes, queryClient, router]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div>
         <h2 className="text-xl font-semibold text-black">
           {getStepLabel("review-style")}
