@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { BillingIssueBanner } from "@/components/BillingIssueBanner";
 import { DashboardStats } from "@/components/DashboardStats";
 import { Examples } from "@/components/Examples";
@@ -25,6 +26,7 @@ interface DashboardProps {
 export function Dashboard({ user, onFileSelected }: DashboardProps) {
   const { supabase } = useSession();
   const { data: planData } = usePlanQuery();
+  const isProjectsEnabled = useFeatureFlagEnabled("projects");
 
   const isFreeUser = planData?.planType === "free";
   const hasBillingIssue = planData?.hasBillingIssue ?? false;
@@ -120,7 +122,7 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
             </div>
           </section>
           {isFreeUser && !hasBillingIssue && <UpgradeBanner />}
-          <RecentProjects />
+          {isProjectsEnabled && <RecentProjects />}
           <RecentThreads />
         </section>
         <NewProjectModal />
