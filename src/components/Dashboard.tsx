@@ -26,7 +26,9 @@ interface DashboardProps {
 export function Dashboard({ user, onFileSelected }: DashboardProps) {
   const { supabase } = useSession();
   const { data: planData } = usePlanQuery();
-  const isProjectsEnabled = useFeatureFlagEnabled("projects");
+  // This fallback is okay because the hook always runs (hooks can't be conditional themselves)
+  const isProjectsEnabled =
+    useFeatureFlagEnabled("projects") || process.env.NODE_ENV === "development";
 
   const isFreeUser = planData?.planType === "free";
   const hasBillingIssue = planData?.hasBillingIssue ?? false;
