@@ -146,26 +146,16 @@ export async function prepareImageForGeneration({
     for (const refUrl of referenceImageUrls) {
       try {
         const refParsed = parseStorageUrl(refUrl);
-        let refBlob: Blob;
-        let refContentType: string;
-
-        if (refParsed) {
-          refBlob = await downloadFile({
-            supabase,
-            bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
-            path: refParsed.path,
-          });
-          refContentType = refBlob.type;
-        } else {
-          const refResponse = await fetch(refUrl);
-          if (!refResponse.ok) {
-            console.warn(`Failed to fetch reference image: ${refUrl}`);
-            continue;
-          }
-          refContentType = refResponse.headers.get("content-type") || "";
-          const refArrayBuffer = await refResponse.arrayBuffer();
-          refBlob = new Blob([refArrayBuffer], { type: refContentType });
+        if (!refParsed) {
+          continue;
         }
+
+        const refBlob = await downloadFile({
+          supabase,
+          bucket: refParsed.bucket as typeof BUCKET_INPUT_IMAGES,
+          path: refParsed.path,
+        });
+        const refContentType = refBlob.type;
 
         if (refContentType && ACCEPTED_MIME_TYPES.includes(refContentType)) {
           const refArrayBuffer = await refBlob.arrayBuffer();

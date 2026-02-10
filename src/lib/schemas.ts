@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { ASPECT_RATIOS } from "./aspect-ratio";
 import { DEFAULT_MODEL_PROVIDER } from "./constants";
+import { parseStorageUrl } from "./supabase/storage";
+
+const storageUrl = z
+  .string()
+  .url()
+  .refine((url) => parseStorageUrl(url) !== null, {
+    message: "Images must be uploaded to Supabase storage",
+  });
 
 // Model schema
 export const modelSchema = z.enum([
@@ -66,7 +74,7 @@ const generateRequestSchemaBase = z.object({
   indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
   model: modelSchema.optional(),
-  reference_image_urls: z.array(z.string().url()).max(3).optional(),
+  reference_image_urls: z.array(storageUrl).max(3).optional(),
   aspect_ratio: aspectRatioSchema.nullable().default(null).optional(),
 });
 
@@ -85,7 +93,7 @@ const iterateRequestSchemaBase = z.object({
   indoor_light: indoorLightSchema.optional(),
   edit_description: z.string().nullable().optional(),
   model: modelSchema.optional(),
-  reference_image_urls: z.array(z.string().url()).max(3).optional(),
+  reference_image_urls: z.array(storageUrl).max(3).optional(),
   aspect_ratio: aspectRatioSchema.nullable().default(null).optional(),
   // When true, uses the base "Turn this SketchUp render..." prompt instead of iteration prompt
   use_base_prompt: z.boolean().optional().default(false),
@@ -102,24 +110,26 @@ export type IterateRequest = z.infer<typeof iterateRequestSchema>;
 export const createProjectSchema = z.object({
   title: z.string().min(1, "Title is required").max(255),
   scene_input_urls: z
-    .array(z.string().url())
-    .min(1, "At least one scene is required"),
+    .array(storageUrl)
+    .min(1, "At least one scene is required")
+    .max(50),
 });
 
 export type CreateProjectRequest = z.infer<typeof createProjectSchema>;
 
 export const updateProjectSchema = z.object({
   title: z.string().min(1).max(255).optional(),
-  style_notes: z.string().nullable().optional(),
-  reference_image_urls: z.array(z.string().url()).max(3).optional(),
+  style_notes: z.string().max(10000).nullable().optional(),
+  reference_image_urls: z.array(storageUrl).max(3).optional(),
 });
 
 export type UpdateProjectRequest = z.infer<typeof updateProjectSchema>;
 
 export const addScenesSchema = z.object({
   input_urls: z
-    .array(z.string().url())
-    .min(1, "At least one scene URL is required"),
+    .array(storageUrl)
+    .min(1, "At least one scene URL is required")
+    .max(50),
 });
 
 export type AddScenesRequest = z.infer<typeof addScenesSchema>;

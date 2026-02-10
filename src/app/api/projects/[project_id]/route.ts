@@ -50,6 +50,7 @@ export async function GET(
     `,
     )
     .eq("id", projectId)
+    .eq("user_id", userId)
     .single();
 
   if (error || !project) {
