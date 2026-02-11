@@ -18,9 +18,7 @@ export default function PressPage() {
         transition={FADE_TRANSITION}
         className="space-y-8"
       >
-        <div className="rounded-3xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] backdrop-blur-sm lg:p-12">
-          <MarkdownContent content={pressContent} />
-        </div>
+        <MarkdownContent content={pressContent} />
       </motion.div>
     </PageWrapper>
   );
