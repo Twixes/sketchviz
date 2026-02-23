@@ -9,11 +9,10 @@ import {
   UploadIcon,
 } from "@radix-ui/react-icons";
 import { motion } from "motion/react";
-import Image from "next/image";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { Logo } from "@/components/Logo";
 import { usePlanQuery } from "@/hooks/use-plan-query";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
@@ -115,26 +114,6 @@ export function Header({ user }: HeaderProps) {
         )}
       </div>
     </motion.header>
-  );
-}
-
-function Logo(): JSX.Element {
-  return (
-    <Link
-      href="/"
-      className="flex items-center gap-2 lg:gap-3 whitespace-nowrap"
-    >
-      <Image
-        src="/icon.png"
-        alt="SketchViz"
-        className="size-16 -m-1"
-        width={64}
-        height={64}
-      />
-      <p className="text-lg font-semibold tracking-tight leading-tight text-black">
-        SketchViz
-      </p>
-    </Link>
   );
 }
 
