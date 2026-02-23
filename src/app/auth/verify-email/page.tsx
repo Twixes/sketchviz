@@ -71,7 +71,7 @@ export default function VerifyEmailPage() {
             ) : (
               "your email address"
             )}
-            . Click the link to verify your account.
+            . Click the link to verify your account.
           </p>
 
           {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
@@ -90,7 +90,7 @@ export default function VerifyEmailPage() {
             href="/auth/login"
             className="text-sm text-black/50 hover:text-black/80 transition-colors"
           >
-            Back to log in
+            Back to login
           </Link>
         </motion.div>
       </div>

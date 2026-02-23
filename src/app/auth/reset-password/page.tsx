@@ -104,7 +104,7 @@ export default function ResetPasswordPage() {
               href="/auth/login"
               className="text-sm text-black/50 hover:text-black/80 transition-colors"
             >
-              Back to log in
+              Back to login
             </Link>
           </div>
         </motion.div>
