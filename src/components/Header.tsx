@@ -107,7 +107,7 @@ export function Header({ user }: HeaderProps) {
               link={`${signInHref}&mode=signup`}
               className="cursor-pointer"
             >
-              Sign up
+              Get started
             </Button>
           </>
         )}
