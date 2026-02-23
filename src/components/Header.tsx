@@ -3,7 +3,6 @@ import {
   DashboardIcon,
   DotFilledIcon,
   EnterIcon,
-  ExitIcon,
   InfoCircledIcon,
   RocketIcon,
   UploadIcon,
@@ -12,9 +11,9 @@ import { motion } from "motion/react";
 import { usePathname, useRouter } from "next/navigation";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { AccountAvatar } from "@/components/AccountAvatar";
 import { Logo } from "@/components/Logo";
 import { usePlanQuery } from "@/hooks/use-plan-query";
-import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import { FADE_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
@@ -28,7 +27,6 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const pathname = usePathname();
-  const handleSignOut = useSignOutCallback();
   const { data: planData } = usePlanQuery();
 
   const redirectParam = useMemo(() => {
@@ -74,14 +72,7 @@ export function Header({ user }: HeaderProps) {
                 Pricing
               </Button>
             )}
-            <Button
-              variant="secondary"
-              onClick={handleSignOut}
-              leftIcon={<ExitIcon />}
-              className="cursor-pointer"
-            >
-              Log out
-            </Button>
+            <AccountAvatar user={user} />
           </>
         ) : (
           <>

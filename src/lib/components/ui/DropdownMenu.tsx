@@ -2,6 +2,7 @@
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "./Button";
@@ -50,25 +51,41 @@ export function DropdownMenu({
 interface DropdownMenuItemProps {
   children: ReactNode;
   onClick?: () => void;
+  /** When provided, renders the item as a Next.js Link for proper navigation behavior. */
+  link?: string;
   destructive?: boolean;
   disabled?: boolean;
 }
 
+const itemClasses = (destructive?: boolean, disabled?: boolean) =>
+  cn(
+    "flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none transition-colors",
+    disabled && "opacity-50 cursor-not-allowed",
+    destructive
+      ? "text-red-600 hover:bg-red-50 focus:bg-red-50"
+      : "text-black hover:bg-black/5 focus:bg-black/5",
+  );
+
 export function DropdownMenuItem({
   children,
   onClick,
+  link,
   destructive,
   disabled,
 }: DropdownMenuItemProps) {
+  if (link) {
+    return (
+      <DropdownMenuPrimitive.Item asChild disabled={disabled}>
+        <Link href={link} className={itemClasses(destructive, disabled)}>
+          {children}
+        </Link>
+      </DropdownMenuPrimitive.Item>
+    );
+  }
+
   return (
     <DropdownMenuPrimitive.Item
-      className={cn(
-        "flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm outline-none transition-colors",
-        disabled && "opacity-50 cursor-not-allowed",
-        destructive
-          ? "text-red-600 hover:bg-red-50 focus:bg-red-50"
-          : "text-black hover:bg-black/5 focus:bg-black/5",
-      )}
+      className={itemClasses(destructive, disabled)}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
     >
