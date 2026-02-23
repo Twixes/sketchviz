@@ -45,7 +45,7 @@ export async function updateSession(request: NextRequest) {
   // handles redirecting unauthenticated users who try to access existing threads.
   if (!user && request.nextUrl.pathname === "/threads") {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/signin";
+    url.pathname = "/auth/login";
     url.searchParams.set("redirect", request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }

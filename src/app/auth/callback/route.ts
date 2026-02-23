@@ -1,5 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { isValidRedirectPath } from "@/lib/auth-utils";
 import { FREE_PLAN_PRODUCT_ID } from "@/lib/constants";
 import { extractFirstName } from "@/lib/language-utils";
 import { polar } from "@/lib/polar";
@@ -99,7 +100,7 @@ export async function GET(request: Request) {
     if (error) {
       // Redirect to sign-in with error
       return NextResponse.redirect(
-        `${origin}/auth/signin?error=${encodeURIComponent(error.message)}`,
+        `${origin}/auth/login?error=${encodeURIComponent(error.message)}`,
       );
     }
 
@@ -132,16 +133,4 @@ export async function GET(request: Request) {
     redirectUrl.searchParams.set("signup", "true");
   }
   return NextResponse.redirect(redirectUrl);
-}
-
-/**
- * Validates that a redirect path is safe (same-origin, no open redirect).
- */
-function isValidRedirectPath(path: string | null): path is string {
-  if (!path) return false;
-  // Must start with exactly one slash (prevents protocol-relative URLs like //evil.com)
-  if (!path.startsWith("/") || path.startsWith("//")) return false;
-  // Block path traversal
-  if (path.includes("..")) return false;
-  return true;
 }

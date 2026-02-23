@@ -87,7 +87,7 @@ export default function VerifyEmailPage() {
           </Button>
 
           <Link
-            href="/auth/signin"
+            href="/auth/login"
             className="text-sm text-black/50 hover:text-black/80 transition-colors"
           >
             Back to log in

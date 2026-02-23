@@ -8,7 +8,7 @@ interface SignInOptions {
 export function useSignInCallback(): (options?: SignInOptions) => void {
   return useCallback((options?: SignInOptions) => {
     posthog.capture("log_in_started");
-    const url = new URL("/auth/signin", window.location.origin);
+    const url = new URL("/auth/login", window.location.origin);
     if (options?.redirectAfterLogin) {
       url.searchParams.set("redirect", options.redirectAfterLogin);
     }

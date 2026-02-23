@@ -1,6 +1,8 @@
 import {
+  ArrowRightIcon,
   DashboardIcon,
   DotFilledIcon,
+  EnterIcon,
   ExitIcon,
   InfoCircledIcon,
   RocketIcon,
@@ -30,11 +32,9 @@ export function Header({ user }: HeaderProps) {
   const handleSignOut = useSignOutCallback();
   const { data: planData } = usePlanQuery();
 
-  const signInHref = useMemo(() => {
-    const url = new URL("/auth/signin", window.location.origin);
+  const redirectParam = useMemo(() => {
     const redirect = pathname === "/" ? "/dashboard" : pathname;
-    url.searchParams.set("redirect", redirect);
-    return url.pathname + url.search;
+    return `?redirect=${encodeURIComponent(redirect)}`;
   }, [pathname]);
 
   return (
@@ -97,14 +97,16 @@ export function Header({ user }: HeaderProps) {
             </Button>
             <Button
               variant="secondary"
-              link={signInHref}
+              link={`/auth/login${redirectParam}`}
+              leftIcon={<EnterIcon />}
               className="cursor-pointer"
             >
               Log in
             </Button>
             <Button
               variant="primary"
-              link={`${signInHref}&mode=signup`}
+              link={`/auth/signup${redirectParam}`}
+              leftIcon={<ArrowRightIcon />}
               className="cursor-pointer"
             >
               Get started
