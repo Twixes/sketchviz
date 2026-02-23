@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef } from "react";
 import { Button } from "@/lib/components/ui/Button";
 import { Dialog } from "@/lib/components/ui/Dialog";
+import { Input } from "@/lib/components/ui/Input";
 import { type GrantCreditsResult, grantCreditsAction } from "./actions";
 
 interface GrantCreditsModalProps {
@@ -62,7 +63,7 @@ export function GrantCreditsModal({
     >
       <form ref={formRef} id="grant-credits-form" action={formAction}>
         <input type="hidden" name="userId" value={userId} />
-        <input
+        <Input
           id="credit-amount"
           name="creditAmount"
           type="number"
@@ -70,11 +71,8 @@ export function GrantCreditsModal({
           max="10000"
           required
           placeholder="Enter amount"
-          className="w-full rounded-xl border border-black/20 px-4 py-2 text-sm focus:border-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 transition-colors"
+          error={state.error}
         />
-        {state.error && (
-          <p className="mt-2 text-sm text-red-600">{state.error}</p>
-        )}
       </form>
     </Dialog>
   );

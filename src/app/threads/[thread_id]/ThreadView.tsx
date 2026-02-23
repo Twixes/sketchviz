@@ -480,7 +480,7 @@ export function ThreadView({
         {!embedded && isReadOnly ? (
           <div className="rounded-2xl border border-black/10 bg-white/75 p-4 text-center">
             <p className="text-sm text-black/60 cursor-default">
-              You're viewing a shared thread. Sign in as the owner to iterate.
+              You're viewing a shared thread. Log in as the owner to iterate.
             </p>
           </div>
         ) : (

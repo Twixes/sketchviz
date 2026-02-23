@@ -3,7 +3,6 @@ import {
   DotFilledIcon,
   ExitIcon,
   InfoCircledIcon,
-  LayersIcon,
   RocketIcon,
   UploadIcon,
 } from "@radix-ui/react-icons";
@@ -14,10 +13,8 @@ import { usePathname, useRouter } from "next/navigation";
 import type { JSX } from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { usePlanQuery } from "@/hooks/use-plan-query";
-import { useSignInCallback } from "@/hooks/use-sign-in-callback";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import { useUploadMutation } from "@/hooks/use-upload-mutation";
-import GoogleIcon from "@/icons/google.svg";
 import { FADE_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
@@ -30,14 +27,15 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const pathname = usePathname();
-  const signIn = useSignInCallback();
   const handleSignOut = useSignOutCallback();
   const { data: planData } = usePlanQuery();
 
-  const handleSignIn = useCallback(() => {
-    // If on home page, redirect to dashboard after login
-    signIn(pathname === "/" ? { redirectAfterLogin: "/dashboard" } : undefined);
-  }, [signIn, pathname]);
+  const signInHref = useMemo(() => {
+    const url = new URL("/auth/signin", window.location.origin);
+    const redirect = pathname === "/" ? "/dashboard" : pathname;
+    url.searchParams.set("redirect", redirect);
+    return url.pathname + url.search;
+  }, [pathname]);
 
   return (
     <motion.header
@@ -99,11 +97,17 @@ export function Header({ user }: HeaderProps) {
             </Button>
             <Button
               variant="secondary"
-              onClick={handleSignIn}
-              leftIcon={<GoogleIcon />}
+              link={signInHref}
               className="cursor-pointer"
             >
-              Sign in with Google
+              Log in
+            </Button>
+            <Button
+              variant="primary"
+              link={`${signInHref}&mode=signup`}
+              className="cursor-pointer"
+            >
+              Sign up
             </Button>
           </>
         )}

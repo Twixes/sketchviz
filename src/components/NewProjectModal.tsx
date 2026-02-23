@@ -22,6 +22,7 @@ import { NeonShape } from "@/components/NeonShape";
 import { useAcceptStyleMutation } from "@/hooks/use-accept-style-mutation";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
+import { Input } from "@/lib/components/ui/Input";
 import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import { createClient } from "@/lib/supabase/client";
@@ -151,13 +152,12 @@ function NameAndUploadStep() {
         </p>
       </div>
 
-      <input
+      <Input
         ref={nameInputRef}
         type="text"
         value={store.projectTitle}
         onChange={(e) => store.setProjectTitle(e.target.value)}
         placeholder="Project name"
-        className="w-full rounded-xl border border-black/20 bg-white px-3 py-2.5 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20"
       />
 
       <input

@@ -17,7 +17,7 @@ export default function AuthSuccess() {
     <div className="flex min-h-screen items-center justify-center bg-white">
       <div className="text-center">
         <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-black/20 border-t-black" />
-        <p className="text-sm text-black/60">Sign in successful!</p>
+        <p className="text-sm text-black/60">Log in successful!</p>
       </div>
     </div>
   );

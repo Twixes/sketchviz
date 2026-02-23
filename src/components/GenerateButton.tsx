@@ -78,7 +78,7 @@ export function GenerateButton({
         leftIcon={<EnterIcon />}
         className="relative w-full px-20"
       >
-        Sign up with Google to try for free
+        Sign up to try for free
       </Button>
     );
   }

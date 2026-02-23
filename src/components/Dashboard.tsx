@@ -53,7 +53,9 @@ export function Dashboard({ user, onFileSelected }: DashboardProps) {
     staleTime: 30_000,
   });
 
-  const firstName = extractFirstName(user.user_metadata.full_name);
+  const firstName = user.user_metadata.full_name
+    ? extractFirstName(user.user_metadata.full_name)
+    : null;
   const hour = new Date().getHours();
   const timeGreeting =
     hour < 5

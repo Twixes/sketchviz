@@ -39,7 +39,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect /threads list page - redirect to signin with return URL
+  // Protect /threads list page - redirect to login with return URL
   // Note: /threads/[thread_id] is intentionally NOT protected here to allow
   // the "Try this out" preview flow for unauthenticated users. The thread page
   // handles redirecting unauthenticated users who try to access existing threads.

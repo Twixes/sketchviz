@@ -66,24 +66,16 @@ export default function PricingPage() {
               buttonVariant={user ? "secondary" : "primary"}
               buttonDisabled={!!user && planData?.planType === "free"}
               buttonLoading={isLoadingBillingPortal}
-              onButtonClick={async () => {
-                setIsLoadingBillingPortal(true);
+              onButtonClick={() => {
                 if (!user) {
-                  await handleSignIn();
+                  handleSignIn({ redirectAfterLogin: "/pricing" });
                 } else if (planData?.planType === "pro") {
+                  setIsLoadingBillingPortal(true);
                   posthog.capture("manage_plan_clicked", {
-                    user_id: user?.id,
-                    current_plan: planData?.planType,
+                    user_id: user.id,
+                    current_plan: planData.planType,
                   });
-                  let userId = null;
-                  if (!user) {
-                    userId = await handleSignIn();
-                  }
-                  if (user || userId) {
-                    window.location.href = "/billing/portal";
-                  } else {
-                    setIsLoadingBillingPortal(false);
-                  }
+                  window.location.href = "/billing/portal";
                 }
               }}
               animationDelay={0.3}
@@ -106,20 +98,16 @@ export default function PricingPage() {
                   : "Get Pro"
               }
               buttonVariant={user ? "primary" : "secondary"}
-              onButtonClick={async () => {
-                setIsUpgrading(true);
+              onButtonClick={() => {
                 posthog.capture("upgrade_to_pro_clicked", {
                   user_id: user?.id,
                   current_plan: planData?.planType,
                 });
-                let userId = null;
                 if (!user) {
-                  userId = await handleSignIn();
-                }
-                if (user || userId) {
-                  window.location.href = "/billing/upgrade";
+                  handleSignIn({ redirectAfterLogin: "/billing/upgrade" });
                 } else {
-                  setIsUpgrading(false);
+                  setIsUpgrading(true);
+                  window.location.href = "/billing/upgrade";
                 }
               }}
               animationDelay={0.4}

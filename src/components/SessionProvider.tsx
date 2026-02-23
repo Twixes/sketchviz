@@ -19,7 +19,7 @@ export type SessionUser = {
   id: string;
   email: string;
   user_metadata: {
-    full_name: string;
+    full_name?: string;
     avatar_url?: string;
     email_verified?: boolean;
   };
