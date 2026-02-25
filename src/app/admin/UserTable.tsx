@@ -1,12 +1,13 @@
 "use client";
 
-import { PlusCircledIcon } from "@radix-ui/react-icons";
+import { PersonIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { useCallback, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/lib/components/ui/DropdownMenu";
 import type { AdminUser } from "./actions";
+import { impersonateUserAction } from "./actions";
 import { GrantCreditsModal } from "./GrantCreditsModal";
 
 interface UserTableProps {
@@ -18,6 +19,22 @@ export function UserTable({ users }: UserTableProps) {
 
   const handleGrantCredits = useCallback((user: AdminUser) => {
     setGrantModalUser(user);
+  }, []);
+
+  const handleImpersonate = useCallback(async (user: AdminUser) => {
+    if (
+      !window.confirm(
+        `Log in as ${user.email}? You will be signed out of your admin account.`,
+      )
+    ) {
+      return;
+    }
+    const result = await impersonateUserAction(user.user_id);
+    if (result.success) {
+      window.location.href = "/dashboard";
+    } else {
+      alert(result.error ?? "Failed to impersonate user");
+    }
   }, []);
 
   const handleCloseModal = useCallback(() => {
@@ -58,6 +75,10 @@ export function UserTable({ users }: UserTableProps) {
                     <DropdownMenuItem onClick={() => handleGrantCredits(user)}>
                       <PlusCircledIcon className="size-4" />
                       Grant extra credits
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleImpersonate(user)}>
+                      <PersonIcon className="size-4" />
+                      Log in as this user
                     </DropdownMenuItem>
                   </DropdownMenu>
                 </td>
