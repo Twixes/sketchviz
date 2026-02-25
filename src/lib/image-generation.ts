@@ -227,12 +227,20 @@ export async function generateAndUploadImage({
     getPlanForUser(userId),
   ]);
   if (creditsAvailable === null) {
-    throw new Error("Failed to fetch available credits");
+    throw new Error(
+      "Failed to fetch available credits. Please try again later.",
+    );
   }
   // Only block free users (or users with billing issues) - Pro users in good standing are billed for overages
-  const effectivePlanType = planInfo.hasBillingIssue ? "free" : planInfo.type;
-  if (effectivePlanType === "free" && creditsAvailable < creditCost) {
-    throw new Error("Insufficient credits");
+  if (planInfo.hasBillingIssue) {
+    throw new Error(
+      "Looks like you have a billing issue. Please update your payment method in Billing.",
+    );
+  }
+  if (planInfo.type === "free" && creditsAvailable < creditCost) {
+    throw new Error(
+      "You don't have enough credits to generate this image. Please upgrade to Pro.",
+    );
   }
 
   // Track analytics
