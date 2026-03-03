@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "%s • SketchViz",
   },
   description:
-    "Turn SketchUp renders into photorealistic visualizations with AI.",
+    "Turn SketchUp/Revit renders into photorealistic visualizations with AI.",
   appleWebApp: {
     title: "SketchViz",
   },

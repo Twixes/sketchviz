@@ -185,7 +185,7 @@ function NewRenderButton(): JSX.Element {
         leftIcon={<UploadIcon />}
         className="cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
-        tooltip="Select a raw SketchUp render to visualize"
+        tooltip="Select a raw SketchUp/Revit render to visualize"
       >
         New render
       </Button>

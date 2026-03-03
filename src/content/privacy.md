@@ -13,7 +13,7 @@ When you sign in with Google OAuth, we collect:
 - Your Google profile picture
 
 ### 1.2 Images You Upload
-- Original SketchUp renders you upload for processing
+- Original raw renders you upload for processing
 - AI-generated photorealistic images created by our service
 - Lighting parameters and optional descriptions you provide
 - Associated metadata (upload timestamps, thread organization)

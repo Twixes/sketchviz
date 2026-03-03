@@ -1,6 +1,6 @@
 # SketchViz
 
-Turn SketchUp renders into photorealistic images using Google Gemini. Upload a rough render, adjust lighting parameters, and get a polished visualization in seconds.
+Turn SketchUp/Revit renders into photorealistic images using Google Gemini. Upload a rough render, adjust lighting parameters, and get a polished visualization in seconds.
 
 **Stack:** Next.js 16 (App Router), React 19, TypeScript, Supabase (auth + storage + RLS), Google Gemini 3 Pro/2.5 Flash, Polar.sh (credits), PostHog (analytics), TailwindCSS 4.
 

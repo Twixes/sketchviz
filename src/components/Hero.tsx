@@ -15,8 +15,8 @@ export function Hero() {
         transition={SLOW_TRANSITION}
         className="text-4xl font-semibold leading-tight text-black sm:text-5xl"
       >
-        Transform your{" "}
-        <span className="outline-title">SketchUp&nbsp;renders</span> into{" "}
+        Transform <span className="outline-title">SketchUp</span> or{" "}
+        <span className="outline-title">Revit</span>&nbsp;renders into{" "}
         <span className="gradient-title">photorealistic visuals</span>.
       </motion.h1>
       <motion.p

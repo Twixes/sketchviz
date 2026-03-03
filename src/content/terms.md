@@ -8,7 +8,7 @@ By accessing or using the Service, you agree to be bound by these Terms. If you 
 
 ## 1. Description of Service
 
-SketchViz is an AI-powered visualization studio that transforms SketchUp renders into photorealistic visualizations using artificial intelligence technology. The Service allows users to upload architectural renders and generate enhanced, photorealistic images.
+SketchViz is an AI-powered visualization studio that transforms raw renders into photorealistic visualizations using artificial intelligence technology. The Service allows users to upload architectural renders and generate enhanced, photorealistic images.
 
 ## 2. Account Registration and Security
 

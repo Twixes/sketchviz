@@ -40,7 +40,7 @@ pnpm format
 - **Content**: react-markdown (Markdown rendering)
 
 ### Core Flow
-1. User uploads SketchUp render → uploaded to Supabase Storage (`input-images` bucket) via `/api/upload`
+1. User uploads SketchUp/Revit render → uploaded to Supabase Storage (`input-images` bucket) via `/api/upload`
 2. User optionally uploads up to 3 reference images for materials/textures/style (stored in `input-images` bucket)
 3. User adjusts parameters:
    - Lighting (outdoor: sunny/overcast/night, indoor: all_on/all_off, or custom text)

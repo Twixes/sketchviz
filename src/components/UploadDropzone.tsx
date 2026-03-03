@@ -153,7 +153,7 @@ export function UploadDropzone({
             </div>
             <div className="space-y-2">
               <p className="text-xl font-semibold text-black">
-                Drop or paste your SketchUp render
+                Drop or paste your raw render
               </p>
               <p className="text-sm text-black/60">
                 PNG, JPG, WEBP, HEIC, or HEIF – up to 20 MB
