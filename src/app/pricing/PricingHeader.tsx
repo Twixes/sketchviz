@@ -34,7 +34,7 @@ export function PricingHeader() {
         transition={{ delay: 0.1, ...FADE_TRANSITION }}
         className="text-4xl font-semibold tracking-tight lg:text-5xl"
       >
-        Simple, transparent pricing
+        Friendly pricing for fantastic visuals
       </motion.h1>
       <motion.p
         initial={{ opacity: 0 }}
@@ -42,7 +42,7 @@ export function PricingHeader() {
         transition={{ delay: 0.2, ...FADE_TRANSITION }}
         className="mx-auto mt-4 max-w-2xl text-base text-black/60 text-balance lg:text-xl"
       >
-        Start free – upgrade when you need more power
+        Start free – upgrade when you need more power.
       </motion.p>
     </div>
   );
