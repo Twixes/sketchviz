@@ -104,6 +104,7 @@ export function ModelSelector({
       <>
         {def.label}{" "}
         <CreditBadge
+          isNew={def.baseModel === "standard"}
           creditCost={[
             determineCreditCostOfImageGeneration({ model: def.models.low }),
             determineCreditCostOfImageGeneration({ model: def.models.high }),
