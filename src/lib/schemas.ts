@@ -14,6 +14,8 @@ const storageUrl = z
 export const modelSchema = z.enum([
   "google/gemini-3-pro-image-preview",
   "google/gemini-3-pro-image-preview/4k",
+  "google/gemini-3.1-flash-image-preview",
+  "google/gemini-3.1-flash-image-preview/4k",
   "google/gemini-2.5-flash-image-preview",
   "bfl/flux-2-klein-9b/1k",
   "bfl/flux-2-klein-9b/1.5k",

@@ -13,6 +13,12 @@ export function determineCreditCostOfImageGeneration({
   if (model === "google/gemini-3-pro-image-preview/4k") {
     return 24; // Each 4K output image is 0.24 USD
   }
+  if (model === "google/gemini-3.1-flash-image-preview") {
+    return 7; // Each 2K output image is ~0.07 USD
+  }
+  if (model === "google/gemini-3.1-flash-image-preview/4k") {
+    return 12; // Each 4K output image is ~0.12 USD
+  }
   if (model === "google/gemini-2.5-flash-image-preview") {
     return 4; // Each output image is 0.04 USD
   }

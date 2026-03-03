@@ -127,11 +127,11 @@ async function generateImageFromPrompt(
     },
   };
 
-  // Only add imageSize for pro models (flash model doesn't support it)
-  const isProModel = params.model.startsWith(
-    "google/gemini-3-pro-image-preview",
-  );
-  if (isProModel) {
+  // Add imageSize for models that support it (Pro and Standard, but not legacy Flash)
+  const supportsImageSize =
+    params.model.startsWith("google/gemini-3-pro-image-preview") ||
+    params.model.startsWith("google/gemini-3.1-flash-image-preview");
+  if (supportsImageSize) {
     providerOptions.google.imageConfig!.imageSize =
       imageSizeFromModel === "4k" ? "4K" : "2K";
   }

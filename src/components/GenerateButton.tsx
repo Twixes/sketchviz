@@ -113,12 +113,14 @@ export function CreditBadge({
   hasWarning = false,
   className,
 }: {
-  creditCost: number;
+  /** Cost in credits, shown as "X credits" when provided as a single number, or "X/Y/Z credits" when provided as an array of numbers. */
+  creditCost: number | number[];
   /** Cost per reference image, shown as "+X/ref" when provided */
   perRefCost?: number;
   hasWarning?: boolean;
   className?: string;
 }) {
+  const creditCosts = Array.isArray(creditCost) ? creditCost : [creditCost];
   return (
     <div
       className={cn(
@@ -127,7 +129,8 @@ export function CreditBadge({
       )}
     >
       {hasWarning && <ExclamationTriangleIcon className="mr-0.5" />}
-      {creditCost} credits{perRefCost ? ` + ${perRefCost}/reference` : ""}
+      {creditCosts.join("/")} credits
+      {perRefCost ? ` + ${perRefCost}/reference` : ""}
     </div>
   );
 }
