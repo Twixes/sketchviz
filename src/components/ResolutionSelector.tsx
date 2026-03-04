@@ -83,14 +83,12 @@ interface ResolutionSelectorProps {
   value: Model;
   onChange: (value: Model) => void;
   disabled?: boolean;
-  size?: "sm" | "md";
 }
 
 export function ResolutionSelector({
   value,
   onChange,
   disabled,
-  size,
 }: ResolutionSelectorProps) {
   const { baseModel, tier } = parseModel(value);
   const options = buildResolutionOptions(baseModel);
@@ -102,7 +100,6 @@ export function ResolutionSelector({
       options={options}
       onChange={(newTier) => onChange(buildModel(baseModel, newTier))}
       disabled={disabled}
-      size={size}
     />
   );
 }
