@@ -95,7 +95,7 @@ export function ControlPanel(props: ControlPanelProps) {
           <MixerHorizontalIcon className="size-3.5" />
           Parameters
         </legend>
-        <div className="flex items-center gap-x-4 whitespace-nowrap">
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap">
           <AspectRatioSelector
             value={props.aspectRatio}
             onChange={props.onAspectRatioChange}
@@ -122,7 +122,7 @@ export function ControlPanel(props: ControlPanelProps) {
           <SunIcon className="size-3.5" />
           Environment
         </legend>
-        <div className="flex items-center gap-x-4 whitespace-nowrap">
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 whitespace-nowrap">
           <LightSelector
             label="Outdoor light"
             value={props.outdoorLight}
