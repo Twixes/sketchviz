@@ -3,6 +3,7 @@ import sharp from "sharp";
 import {
   cleanUpEditDescription,
   generateIterationImage,
+  generateSceneStyleTransfer,
   generateVisualizationImage,
 } from "./ai";
 import type { AspectRatio } from "./aspect-ratio";
@@ -19,6 +20,13 @@ import {
   parseStorageUrl,
   uploadFile,
 } from "./supabase/storage";
+
+export interface StyleSourceImages {
+  sourceInputBuffer: Buffer;
+  sourceInputMediaType: string;
+  sourceOutputBuffer: Buffer;
+  sourceOutputMediaType: string;
+}
 
 export interface PreparedImageData {
   imageBuffer: Buffer;
@@ -40,7 +48,7 @@ interface ProcessImageGenerationParams {
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
   editDescription: string | null;
-  styleNotes?: string | null;
+  styleSourceImages?: StyleSourceImages | null;
   model: Model;
   aspectRatio: AspectRatio | null;
   referenceImageUrls: string[];
@@ -53,6 +61,78 @@ interface ProcessImageGenerationResult {
   creditCost: number;
   width: number;
   height: number;
+}
+
+/**
+ * Fetches the source scene's input+output image buffers for style transfer.
+ * Returns null if no style source generation exists for the project.
+ */
+export async function getStyleSourceImages({
+  supabase,
+  projectId,
+}: {
+  supabase: SupabaseClient;
+  projectId: string;
+}): Promise<StyleSourceImages | null> {
+  const { data: project } = await supabase
+    .from("projects")
+    .select("style_source_generation_id")
+    .eq("id", projectId)
+    .single();
+
+  if (!project?.style_source_generation_id) {
+    return null;
+  }
+
+  const { data: generation } = await supabase
+    .from("generations")
+    .select(
+      `
+      output_url,
+      threads!inner (
+        input_url
+      )
+    `,
+    )
+    .eq("id", project.style_source_generation_id)
+    .single();
+
+  if (!generation?.output_url) {
+    return null;
+  }
+
+  const thread = generation.threads as unknown as { input_url: string };
+  if (!thread.input_url) {
+    return null;
+  }
+
+  // Download both source input and output images
+  const sourceInputParsed = parseStorageUrl(thread.input_url);
+  const sourceOutputParsed = parseStorageUrl(generation.output_url);
+
+  if (!sourceInputParsed || !sourceOutputParsed) {
+    return null;
+  }
+
+  const [sourceInputBlob, sourceOutputBlob] = await Promise.all([
+    downloadFile({
+      supabase,
+      bucket: sourceInputParsed.bucket as typeof BUCKET_INPUT_IMAGES,
+      path: sourceInputParsed.path,
+    }),
+    downloadFile({
+      supabase,
+      bucket: sourceOutputParsed.bucket as typeof BUCKET_OUTPUT_IMAGES,
+      path: sourceOutputParsed.path,
+    }),
+  ]);
+
+  return {
+    sourceInputBuffer: Buffer.from(await sourceInputBlob.arrayBuffer()),
+    sourceInputMediaType: sourceInputBlob.type,
+    sourceOutputBuffer: Buffer.from(await sourceOutputBlob.arrayBuffer()),
+    sourceOutputMediaType: sourceOutputBlob.type,
+  };
 }
 
 /**
@@ -201,7 +281,7 @@ export async function generateAndUploadImage({
   outdoorLight,
   indoorLight,
   editDescription,
-  styleNotes,
+  styleSourceImages,
   model,
   aspectRatio,
   generationType,
@@ -214,7 +294,7 @@ export async function generateAndUploadImage({
   outdoorLight: OutdoorLight;
   indoorLight: IndoorLight;
   editDescription: string | null;
-  styleNotes?: string | null;
+  styleSourceImages?: StyleSourceImages | null;
   model: Model;
   aspectRatio: AspectRatio | null;
   generationType: "iteration" | "regeneration" | "initial";
@@ -274,6 +354,21 @@ export async function generateAndUploadImage({
     event: "image_generation_started",
     properties: analyticsMetadata,
   });
+
+  // Generate per-scene style transfer instructions if source images are available
+  let styleNotes: string | null = null;
+  if (styleSourceImages) {
+    styleNotes = await generateSceneStyleTransfer({
+      sourceInputBuffer: styleSourceImages.sourceInputBuffer,
+      sourceInputMediaType: styleSourceImages.sourceInputMediaType,
+      sourceOutputBuffer: styleSourceImages.sourceOutputBuffer,
+      sourceOutputMediaType: styleSourceImages.sourceOutputMediaType,
+      targetInputBuffer: preparedImage.imageBuffer,
+      targetInputMediaType: preparedImage.contentType,
+      userId,
+      traceId,
+    });
+  }
 
   // Choose which generation function to use
   // Use the iteration function (no base prompt) when:
@@ -343,7 +438,7 @@ export async function processImageGeneration({
   outdoorLight,
   indoorLight,
   editDescription,
-  styleNotes,
+  styleSourceImages,
   model,
   aspectRatio,
   referenceImageUrls,
@@ -365,7 +460,7 @@ export async function processImageGeneration({
     outdoorLight,
     indoorLight,
     editDescription,
-    styleNotes,
+    styleSourceImages,
     model,
     aspectRatio,
     generationType,

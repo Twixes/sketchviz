@@ -3,7 +3,11 @@ import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
 } from "@/lib/constants";
-import { processImageGeneration } from "@/lib/image-generation";
+import {
+  getStyleSourceImages,
+  processImageGeneration,
+  type StyleSourceImages,
+} from "@/lib/image-generation";
 import { posthogNode } from "@/lib/posthog/server";
 import { iterateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
@@ -92,17 +96,22 @@ export async function POST(
   }
 
   // Fetch project context if thread belongs to a project
-  let styleNotes: string | null = null;
+  let styleSourceImages: StyleSourceImages | null = null;
   let projectReferenceImageUrls: string[] = [];
   if (thread.project_id) {
     const { data: project } = await supabase
       .from("projects")
-      .select("style_notes, reference_image_urls")
+      .select("style_source_generation_id, reference_image_urls")
       .eq("id", thread.project_id)
       .single();
 
     if (project) {
-      styleNotes = project.style_notes;
+      if (project.style_source_generation_id) {
+        styleSourceImages = await getStyleSourceImages({
+          supabase,
+          projectId: thread.project_id,
+        });
+      }
       projectReferenceImageUrls =
         (project.reference_image_urls as string[]) || [];
     }
@@ -150,7 +159,7 @@ export async function POST(
         outdoorLight: outdoor_light,
         indoorLight: indoor_light,
         editDescription: edit_description,
-        styleNotes,
+        styleSourceImages,
         model,
         aspectRatio: aspect_ratio,
         referenceImageUrls: allReferenceImageUrls,

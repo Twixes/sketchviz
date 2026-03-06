@@ -437,6 +437,81 @@ export async function extractStyleNotes(params: {
   return result.text;
 }
 
+const SCENE_STYLE_TRANSFER_PROMPT = `
+You are analyzing how a SketchUp render was transformed into a photorealistic visualization, so that the same visual treatment can be applied to a DIFFERENT scene in the same project.
+
+You will receive three images:
+1. SOURCE INPUT: The original SketchUp render that was transformed
+2. SOURCE OUTPUT: The photorealistic result of that transformation
+3. TARGET INPUT: A new SketchUp render from a different viewpoint/room that needs the same treatment
+
+Compare the source input→output transformation and write concise instructions for applying the same style to the target scene. Focus on:
+
+MATERIAL MAPPING: How were SketchUp materials translated? Map only materials that are VISIBLE in the target scene. Do NOT assume materials from the source appear in the target — look at what the target actually shows.
+
+LIGHTING QUALITY: Describe the light character (color temperature, contrast, shadow softness, ambient fill) without referencing specific light directions or positions from the source scene.
+
+COLOR GRADING: Overall warmth/coolness, saturation level, contrast curve, any atmospheric quality.
+
+RENDERING STYLE: Photographic quality — depth of field, post-processing aesthetic.
+
+DO NOT mention:
+- Furniture, objects, or spatial layout from the source scene
+- Left/right/specific positions from the source scene
+- Materials not visible in the target scene
+
+Write as direct instructions to an image generator. Be specific but concise.
+`.trim();
+
+export async function generateSceneStyleTransfer(params: {
+  sourceInputBuffer: Buffer;
+  sourceInputMediaType: string;
+  sourceOutputBuffer: Buffer;
+  sourceOutputMediaType: string;
+  targetInputBuffer: Buffer;
+  targetInputMediaType: string;
+  userId: string;
+  traceId: string;
+}): Promise<string> {
+  if (process.env.SKIP_AI === "1") {
+    return "Test style transfer: warm tones, soft ambient lighting, modern minimalist aesthetic adapted for this scene.";
+  }
+  let model = googleClient.languageModel("gemini-3.1-flash-preview");
+  if (posthogNode) {
+    model = withTracing(model, posthogNode, {
+      posthogDistinctId: params.userId,
+      posthogTraceId: params.traceId,
+    });
+  }
+  const result = await generateText({
+    model,
+    prompt: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: SCENE_STYLE_TRANSFER_PROMPT },
+          {
+            type: "file",
+            data: params.sourceInputBuffer,
+            mediaType: params.sourceInputMediaType,
+          },
+          {
+            type: "file",
+            data: params.sourceOutputBuffer,
+            mediaType: params.sourceOutputMediaType,
+          },
+          {
+            type: "file",
+            data: params.targetInputBuffer,
+            mediaType: params.targetInputMediaType,
+          },
+        ],
+      },
+    ],
+  });
+  return result.text;
+}
+
 export async function titleVisualizationImage(params: {
   buffer: Buffer;
   mediaType: string;

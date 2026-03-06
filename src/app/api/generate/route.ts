@@ -7,8 +7,10 @@ import {
 } from "@/lib/constants";
 import {
   generateAndUploadImage,
+  getStyleSourceImages,
   type PreparedImageData,
   prepareImageForGeneration,
+  type StyleSourceImages,
 } from "@/lib/image-generation";
 import { posthogNode } from "@/lib/posthog/server";
 import { generateRequestSchema } from "@/lib/schemas";
@@ -91,7 +93,7 @@ export async function POST(request: Request) {
   }
 
   // Check if thread belongs to a project and fetch project context
-  let styleNotes: string | null = null;
+  let styleSourceImages: StyleSourceImages | null = null;
   let projectReferenceImageUrls: string[] = [];
   const threadForProject = existingThread;
   if (threadForProject) {
@@ -104,12 +106,17 @@ export async function POST(request: Request) {
     if (threadWithProject?.project_id) {
       const { data: project } = await supabase
         .from("projects")
-        .select("style_notes, reference_image_urls")
+        .select("style_source_generation_id, reference_image_urls")
         .eq("id", threadWithProject.project_id)
         .single();
 
       if (project) {
-        styleNotes = project.style_notes;
+        if (project.style_source_generation_id) {
+          styleSourceImages = await getStyleSourceImages({
+            supabase,
+            projectId: threadWithProject.project_id,
+          });
+        }
         projectReferenceImageUrls =
           (project.reference_image_urls as string[]) || [];
       }
@@ -165,7 +172,7 @@ export async function POST(request: Request) {
         outdoorLight: outdoor_light,
         indoorLight: indoor_light,
         editDescription: edit_description,
-        styleNotes,
+        styleSourceImages,
         model,
         aspectRatio: aspect_ratio,
         generationType: "initial",
