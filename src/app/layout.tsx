@@ -70,6 +70,10 @@ export default async function RootLayout({
           gtag('config', 'AW-971292206');
         `}
       </Script>
+      <Script
+        src="https://app.lemlist.com/api/visitors/tracking?k=ab8R64u6LsYMlYygFzBYdMxM1ppjC46qBruAITyywhc%3D&t=tea_ESMicc2uGGBgZ6BFv"
+        strategy="afterInteractive"
+      />
       <body
         className={`${outfit.variable} antialiased`}
         style={
