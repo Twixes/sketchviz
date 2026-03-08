@@ -51,7 +51,7 @@ export default function UpdatePasswordPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={FADE_TRANSITION}
-          className="w-full max-w-sm rounded-2xl border border-black/10 bg-white p-8 shadow-xl"
+          className="w-full max-w-sm rounded-xl border border-black/10 bg-white p-8 shadow-xl"
         >
           <Link
             href="/"

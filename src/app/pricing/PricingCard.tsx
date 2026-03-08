@@ -43,7 +43,7 @@ export function PricingCard({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ ...FADE_TRANSITION, delay: animationDelay }}
-      className="relative flex flex-col overflow-hidden rounded-3xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
+      className="relative flex flex-col overflow-hidden rounded-2xl border-2 border-black/10 bg-white/80 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)]"
     >
       <div className="relative flex-1">
         <div className="flex items-center gap-1">

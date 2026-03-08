@@ -51,7 +51,7 @@ export function Select<T extends string | null>({
       <Popover.Root open={isOpen && !disabled} onOpenChange={setIsOpen}>
         <Popover.Trigger
           disabled={disabled}
-          className="inline-flex items-center justify-between gap-2 flex-1 rounded-xl border border-black/20 bg-white px-4 py-2 text-sm font-medium text-black transition-all duration-150 hover:bg-black/5 hover:border-black/40 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-black/20"
+          className="inline-flex items-center justify-between gap-2 flex-1 rounded-lg border border-black/20 bg-white px-3 py-2 text-sm font-medium text-black transition-all duration-150 hover:bg-black/5 hover:border-black/40 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-black/20"
         >
           <span id={label} className="flex items-center gap-2 truncate">
             {currentOption ? (
@@ -88,7 +88,7 @@ export function Select<T extends string | null>({
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content
-            className="z-50 overflow-hidden rounded-xl border border-black/20 bg-white shadow-xl p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200"
+            className="z-50 overflow-hidden flex flex-col gap-px rounded-lg border border-black/20 bg-white shadow-xl p-1 animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-200"
             align="start"
             sideOffset={4}
           >
@@ -108,7 +108,7 @@ export function Select<T extends string | null>({
                       setIsOpen(false);
                     }
                   }}
-                  className="group relative w-full pr-8"
+                  className="group relative w-full pr-8 rounded-md"
                 >
                   {option.icon && (
                     <option.icon
@@ -130,7 +130,7 @@ export function Select<T extends string | null>({
                     {option.description && (
                       <span
                         className={cn(
-                          "text-xs",
+                          "text-xs leading-tight",
                           isSelected ? "text-white/70" : "text-black/50",
                         )}
                       >
@@ -152,7 +152,7 @@ export function Select<T extends string | null>({
                       <Tooltip.Trigger asChild>{button}</Tooltip.Trigger>
                       <Tooltip.Portal>
                         <Tooltip.Content
-                          className="z-50 rounded-lg bg-black px-3 py-2 text-xs text-white shadow-lg max-w-xs"
+                          className="z-50 rounded-md bg-black px-3 py-2 text-xs text-white shadow-lg max-w-xs"
                           sideOffset={5}
                         >
                           {option.disabledReason}
@@ -167,14 +167,14 @@ export function Select<T extends string | null>({
               return button;
             })}
             {allowCustomInput && (
-              <div className="relative flex items-center gap-2 rounded-lg p-1 text-sm">
+              <div className="relative flex items-center gap-2 rounded-md text-sm">
                 <input
                   type="text"
                   value={customInputValue}
                   onChange={(e) => onChange((e.target.value || null) as T)}
                   placeholder={customInputPlaceholder}
                   disabled={disabled}
-                  className="w-full rounded-lg border border-black/20 bg-white px-2 py-1.5 text-sm text-black placeholder:text-black/40 transition-transform duration-150 hover:border-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-md border border-black/20 bg-white px-2 py-1.75 text-sm text-black placeholder:text-black/40 transition-transform duration-150 hover:border-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             )}

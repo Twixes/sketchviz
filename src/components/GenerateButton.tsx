@@ -124,7 +124,7 @@ export function CreditBadge({
   return (
     <div
       className={cn(
-        "rounded flex items-center px-1 border border-black/20 text-xs",
+        "rounded-sm flex items-center px-1 border border-black/20 text-xs",
         className,
       )}
     >

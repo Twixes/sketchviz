@@ -62,7 +62,7 @@ export function StyleNotesPanel({
 
   if (!styleNotes && !isEditing) {
     return (
-      <div className="rounded-xl border border-dashed border-black/20 bg-white/50 p-4 text-center">
+      <div className="rounded-lg border border-dashed border-black/20 bg-white/50 p-4 text-center">
         <p className="text-sm text-black/50">
           No style notes yet. Visualize your first scene and accept the style to
           extract notes.
@@ -72,7 +72,7 @@ export function StyleNotesPanel({
   }
 
   return (
-    <div className="rounded-xl border border-black/10 bg-white/75 p-4 space-y-3">
+    <div className="rounded-lg border border-black/10 bg-white/75 p-4 space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-black">Style notes</h3>
         {!isEditing && (
@@ -139,7 +139,7 @@ export function StyleNotesPanel({
                 prose-ol:my-2 prose-ol:list-decimal prose-ol:pl-5
                 prose-li:mb-1 prose-li:text-sm prose-li:text-black/70
                 prose-strong:font-semibold prose-strong:text-black
-                prose-code:text-xs prose-code:bg-black/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded"
+                prose-code:text-xs prose-code:bg-black/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm"
             >
               <Markdown>{styleNotes}</Markdown>
             </div>

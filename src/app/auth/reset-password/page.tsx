@@ -45,7 +45,7 @@ export default function ResetPasswordPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={FADE_TRANSITION}
-          className="w-full max-w-sm rounded-2xl border border-black/10 bg-white p-8 shadow-xl"
+          className="w-full max-w-sm rounded-xl border border-black/10 bg-white p-8 shadow-xl"
         >
           <Link
             href="/"
@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
           </p>
 
           {sent ? (
-            <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-center">
+            <div className="rounded-md bg-emerald-50 border border-emerald-200 p-4 text-center">
               <p className="text-sm text-emerald-800">
                 Check your email for a reset link. You can close this page.
               </p>

@@ -378,7 +378,7 @@ export function ProjectSceneView({
   if (isLoading) {
     return (
       <PageWrapper user={user} gap="small">
-        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+        <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Loading scene...</p>
         </div>
       </PageWrapper>
@@ -388,7 +388,7 @@ export function ProjectSceneView({
   if (!thread) {
     return (
       <PageWrapper user={user} gap="small">
-        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+        <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Scene not found</p>
         </div>
       </PageWrapper>
@@ -400,7 +400,7 @@ export function ProjectSceneView({
     return (
       <PageWrapper user={user} gap="small">
         <motion.section className="space-y-6">
-          <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center space-y-4">
+          <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center space-y-4">
             <div className="loading-ring mx-auto" aria-hidden />
             <p className="text-lg font-semibold text-black">
               Generating scene {autoGenProgress.completed + 1} of{" "}
@@ -437,7 +437,7 @@ export function ProjectSceneView({
 
         {/* Style indicator */}
         {project?.style_notes && (
-          <div className="rounded-lg border border-black/10 bg-white/50 px-3 py-2">
+          <div className="rounded-md border border-black/10 bg-white/50 px-3 py-2">
             <p className="text-xs text-black/50">
               <CheckCircledIcon className="inline size-3 mr-1" />
               Project style applied to generations

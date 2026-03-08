@@ -179,7 +179,7 @@ function NameAndUploadStep() {
         /* biome-ignore lint/a11y/useKeyWithClickEvents: dropzone */
         <div
           className={clsx(
-            "rounded-xl border-2 border-dashed p-8 text-center transition-colors",
+            "rounded-lg border-2 border-dashed p-8 text-center transition-colors",
             "border-black/20 hover:border-black/40 cursor-pointer",
           )}
           onClick={() => fileInputRef.current?.click()}
@@ -211,7 +211,7 @@ function NameAndUploadStep() {
           {/* biome-ignore lint/a11y/useKeyWithClickEvents: add more button */}
           {/* biome-ignore lint/a11y/noStaticElementInteractions: add more button */}
           <div
-            className="aspect-video rounded-lg border-2 border-dashed border-black/20 flex items-center justify-center cursor-pointer hover:border-black/40 transition-colors"
+            className="aspect-video rounded-md border-2 border-dashed border-black/20 flex items-center justify-center cursor-pointer hover:border-black/40 transition-colors"
             onClick={() => fileInputRef.current?.click()}
           >
             <PlusIcon className="size-6 text-black/40" />
@@ -258,7 +258,7 @@ function SceneThumbnail({
       {/* biome-ignore lint/a11y/noStaticElementInteractions: thumbnail button */}
       <div
         className={clsx(
-          "aspect-video rounded-lg overflow-hidden border-2 transition-all",
+          "aspect-video rounded-md overflow-hidden border-2 transition-all",
           onSelect && "cursor-pointer",
           isSelected
             ? "border-black ring-2 ring-black/20"
@@ -464,7 +464,7 @@ function VisualizeStep() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-blue-200 bg-blue-50/80 p-3">
+      <div className="rounded-lg border border-blue-200 bg-blue-50/80 p-3">
         <p className="text-sm text-blue-800">
           Visualize, re-visualize, and iterate until you're happy with the look
           – then accept it. The accepted style will be applied to all other
@@ -604,7 +604,7 @@ function ReviewStyleStep() {
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         rows={8}
-        className="w-full rounded-xl border border-black/20 bg-white px-3 py-2.5 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-y"
+        className="w-full rounded-lg border border-black/20 bg-white px-3 py-2.5 text-sm text-black placeholder:text-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 resize-y"
       />
 
       <div className="flex justify-between">
@@ -674,7 +674,7 @@ export function NewProjectModal() {
             e.preventDefault();
           }}
         >
-          <motion.div className="fixed left-1/2 top-1/2 z-50 w-full max-w-5xl max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-black/10 bg-white p-6 shadow-xl">
+          <motion.div className="fixed left-1/2 top-1/2 z-50 w-full max-w-5xl max-h-[90vh] overflow-y-auto -translate-x-1/2 -translate-y-1/2 rounded-xl border border-black/10 bg-white p-6 shadow-xl">
             <DialogPrimitive.Title className="sr-only">
               New Project
             </DialogPrimitive.Title>

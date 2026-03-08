@@ -15,12 +15,12 @@ export function UpgradeBanner() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-xl bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-900"
+      className="relative overflow-hidden rounded-lg bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-900"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5">
         <div className="space-y-3">
           <div className="flex items-center gap-2 leading-tight">
-            <div className="flex items-center justify-center size-7 rounded-lg bg-white/10 text-white">
+            <div className="flex items-center justify-center size-7 rounded-md bg-white/10 text-white">
               <RocketIcon className="size-3.5" />
             </div>
             <span>

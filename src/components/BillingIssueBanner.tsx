@@ -16,11 +16,11 @@ export function BillingIssueBanner() {
     <motion.div
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700"
+      className="relative overflow-hidden rounded-lg bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center size-7 rounded-lg bg-white/20 text-white shrink-0">
+          <div className="flex items-center justify-center size-7 rounded-md bg-white/20 text-white shrink-0">
             <ExclamationTriangleIcon className="size-4" />
           </div>
           <div>

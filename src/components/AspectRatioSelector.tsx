@@ -4,11 +4,7 @@ import {
   SectionIcon,
   SquareIcon,
 } from "@radix-ui/react-icons";
-import {
-  ASPECT_RATIO_LABELS,
-  ASPECT_RATIOS,
-  type AspectRatio,
-} from "@/lib/aspect-ratio";
+import { ASPECT_RATIOS, type AspectRatio } from "@/lib/aspect-ratio";
 import { Select, type SelectOption } from "@/lib/components/ui/Select";
 import type { Model } from "@/lib/schemas";
 
@@ -54,14 +50,14 @@ export function AspectRatioSelector({
     disabledReason: preserveDisabledReason,
   };
 
-  const aspectRatioOptions: AspectRatioOption[] = ASPECT_RATIOS.map(
-    (ratio) => ({
-      value: ratio,
-      label: ratio,
-      description: ASPECT_RATIO_LABELS[ratio],
-      icon: getAspectRatioIcon(ratio),
-    }),
-  );
+  const aspectRatioOptions: AspectRatioOption[] = Object.entries(
+    ASPECT_RATIOS,
+  ).map(([value, description]) => ({
+    value: value as AspectRatio,
+    label: value,
+    description,
+    icon: getAspectRatioIcon(value as AspectRatio),
+  }));
 
   const allOptions = [preserveOption, ...aspectRatioOptions];
 

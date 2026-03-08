@@ -69,7 +69,7 @@ export function RecentThreads() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-black">Recent sketches</h2>
         </div>
-        <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
+        <div className="rounded-lg border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Loading...</p>
         </div>
       </section>

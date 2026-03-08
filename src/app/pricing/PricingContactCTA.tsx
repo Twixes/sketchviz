@@ -13,7 +13,7 @@ export function PricingContactCTA({ animationDelay }: PricingContactCTAProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: animationDelay, ...FADE_TRANSITION }}
-      className="relative overflow-hidden rounded-3xl border-2 border-black/10 bg-gradient-to-r from-white/80 to-white/60 p-10 text-center"
+      className="relative overflow-hidden rounded-2xl border-2 border-black/10 bg-gradient-to-r from-white/80 to-white/60 p-10 text-center"
     >
       {/* Neon decorative shapes */}
       <NeonShape

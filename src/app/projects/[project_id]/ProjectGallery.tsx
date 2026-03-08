@@ -184,7 +184,7 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
   if (isLoading) {
     return (
       <PageWrapper user={user} gap="small" documentTitle="Project">
-        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+        <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Loading project...</p>
         </div>
       </PageWrapper>
@@ -194,7 +194,7 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
   if (!project) {
     return (
       <PageWrapper user={user} gap="small" documentTitle="Project">
-        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+        <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Project not found</p>
         </div>
       </PageWrapper>
@@ -214,7 +214,7 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
       <motion.section className="space-y-8">
         {/* Auto-generation progress */}
         {autoGenState.isRunning && (
-          <div className="rounded-xl border border-black/10 bg-white/75 p-4 space-y-3">
+          <div className="rounded-lg border border-black/10 bg-white/75 p-4 space-y-3">
             <p className="text-sm font-medium text-black">
               Generating {autoGenState.completed}/{autoGenState.total} scenes...
             </p>
@@ -231,7 +231,7 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
 
         {/* Setup Banner */}
         {isInSetup && (
-          <div className="rounded-xl border border-amber-300 bg-amber-50/80 p-4">
+          <div className="rounded-lg border border-amber-300 bg-amber-50/80 p-4">
             <p className="text-sm text-amber-800">
               <strong>Project in setup:</strong> Open a scene below, visualize
               it, then click "Proceed with this look" to set the project style.
@@ -285,7 +285,7 @@ export function ProjectGallery({ projectId, user }: ProjectGalleryProps) {
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-black/20 bg-white/50 p-8 text-center">
+            <div className="rounded-lg border border-dashed border-black/20 bg-white/50 p-8 text-center">
               <p className="text-sm text-black/50">No scenes yet</p>
             </div>
           )}

@@ -32,7 +32,7 @@ function ResolutionBadge({
   };
   return (
     <span
-      className={`rounded px-1 text-xs font-semibold border ${styles[resolution]}`}
+      className={`rounded-sm px-1 text-xs font-semibold border ${styles[resolution]}`}
     >
       {labels[resolution]}
     </span>

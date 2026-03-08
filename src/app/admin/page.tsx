@@ -47,7 +47,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 SketchViz
               </span>
             </Link>
-            <span className="flex items-center gap-1.5 rounded-lg bg-amber-100 border border-amber-200 px-2.5 py-1 text-xs font-semibold text-amber-800">
+            <span className="flex items-center gap-1.5 rounded-md bg-amber-100 border border-amber-200 px-2.5 py-1 text-xs font-semibold text-amber-800">
               <LockClosedIcon className="size-3" />
               Admin
             </span>
@@ -75,7 +75,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             key={page}
             fallback={
               <>
-                <div className="h-5 w-32 animate-pulse rounded bg-black/10" />
+                <div className="h-5 w-32 animate-pulse rounded-sm bg-black/10" />
                 <UserTableSkeleton />
               </>
             }

@@ -11,7 +11,7 @@ export interface ButtonProps
   variant?: "primary" | "secondary" | "ghost" | "icon" | "list-item";
 
   // Sizes
-  size?: "xs" | "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg";
 
   // Icon support (auto-scaled based on size)
   leftIcon?: React.ReactNode;
@@ -31,9 +31,8 @@ export interface ButtonProps
   tooltip?: string | React.ReactNode;
 }
 
-const LoadingSpinner = ({ size }: { size: "xs" | "sm" | "md" | "lg" }) => {
+const LoadingSpinner = ({ size }: { size: "sm" | "md" | "lg" }) => {
   const sizeClass = {
-    xs: "size-3",
     sm: "size-3.5",
     md: "size-4",
     lg: "size-5",
@@ -134,38 +133,19 @@ export const Button = ({
   }[variant];
 
   // Size-specific classes
-  const sizeClasses = {
-    primary: {
-      xs: "px-1.5 py-1 text-xs gap-1 rounded-md",
-      sm: "px-2 py-1.5 text-xs gap-1.5 rounded-lg",
-      md: "px-3 py-2 text-sm gap-2 rounded-xl",
-      lg: "px-4 py-3 text-sm gap-2 rounded-xl",
-    },
-    secondary: {
-      xs: "px-1.5 py-0.5 text-xs gap-1 rounded-md",
-      sm: "px-2 py-0.75 text-xs gap-1.5 rounded-lg",
-      md: "px-3 py-2 text-sm gap-2 rounded-xl",
-      lg: "px-4 py-3 text-sm gap-2 rounded-xl",
-    },
-    ghost: {
-      xs: "px-1.5 py-0.5 text-xs gap-1 rounded-md",
-      sm: "px-2 py-0.75 text-xs gap-1.5 rounded-lg",
-      md: "px-3 py-2 text-sm gap-2 rounded-xl",
-      lg: "px-4 py-3 text-sm gap-2 rounded-xl",
-    },
-    icon: {
-      xs: "p-0.5 rounded-md",
-      sm: "p-1 rounded-lg",
-      md: "p-2 rounded-xl",
-      lg: "p-3 rounded-xl",
-    },
-    "list-item": {
-      xs: "px-1.5 py-0.5 text-xs gap-1 rounded-md",
-      sm: "px-2 py-0.75 text-xs gap-2 rounded-lg",
-      md: "px-3 py-2 text-sm gap-2 rounded-lg",
-      lg: "px-4 py-3 text-sm gap-2 rounded-lg",
-    },
-  }[variant][size];
+  const sizeClasses = (
+    variant === "icon"
+      ? {
+          sm: "p-1 rounded-md",
+          md: "p-2 rounded-lg",
+          lg: "p-3 rounded-lg",
+        }
+      : {
+          sm: "px-1.5 py-0.75 text-xs gap-1.5 rounded-md",
+          md: "px-3 py-2 text-sm gap-2 rounded-lg",
+          lg: "px-4 py-3 text-sm gap-2 rounded-lg",
+        }
+  )[size];
 
   // Scale effect classes
   const scaleClasses =
@@ -206,7 +186,7 @@ export const Button = ({
         <Tooltip.Trigger asChild>{button}</Tooltip.Trigger>
         <Tooltip.Portal>
           <Tooltip.Content
-            className="z-50 rounded-lg bg-black px-3 py-2 text-xs text-white shadow-lg max-w-xs"
+            className="z-50 rounded-md bg-black px-3 py-2 text-xs text-white shadow-lg max-w-xs"
             sideOffset={5}
           >
             {tooltip}

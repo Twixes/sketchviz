@@ -2,33 +2,20 @@
  * Aspect ratio utilities for image generation
  */
 
-export const ASPECT_RATIOS = [
-  "1:1",
-  "21:9",
-  "16:9",
-  "3:2",
-  "4:3",
-  "5:4",
-  "4:5",
-  "3:4",
-  "2:3",
-  "9:16",
-] as const;
-
-export type AspectRatio = (typeof ASPECT_RATIOS)[number];
-
-export const ASPECT_RATIO_LABELS: Record<AspectRatio, string> = {
-  "1:1": "Square",
-  "2:3": "Portrait 2:3",
-  "3:2": "Landscape 3:2",
-  "3:4": "Portrait 3:4",
-  "4:3": "Landscape 4:3",
-  "4:5": "Portrait 4:5",
-  "5:4": "Landscape 5:4",
+export const ASPECT_RATIOS = {
   "9:16": "Portrait 9:16",
+  "2:3": "Portrait 2:3",
+  "3:4": "Portrait 3:4",
+  "4:5": "Portrait 4:5",
+  "1:1": "Square",
+  "5:4": "Landscape 5:4",
+  "4:3": "Landscape 4:3",
+  "3:2": "Landscape 3:2",
   "16:9": "Landscape 16:9",
   "21:9": "Ultra-wide 21:9",
-};
+} as const;
+
+export type AspectRatio = keyof typeof ASPECT_RATIOS;
 
 /**
  * Convert aspect ratio string to numeric ratio
@@ -45,19 +32,16 @@ export function parseAspectRatio(ratio: AspectRatio): number {
  * @returns The closest predefined aspect ratio
  */
 export function findClosestAspectRatio(imageRatio: number): AspectRatio {
-  let closestRatio: AspectRatio = ASPECT_RATIOS[0];
+  let closestRatio: AspectRatio = "1:1";
   let minDifference = Number.POSITIVE_INFINITY;
-
-  for (const ratio of ASPECT_RATIOS) {
-    const targetRatio = parseAspectRatio(ratio);
+  for (const ratio of Object.keys(ASPECT_RATIOS)) {
+    const targetRatio = parseAspectRatio(ratio as AspectRatio);
     const difference = Math.abs(imageRatio - targetRatio);
-
     if (difference < minDifference) {
       minDifference = difference;
-      closestRatio = ratio;
+      closestRatio = ratio as AspectRatio;
     }
   }
-
   return closestRatio;
 }
 

@@ -23,7 +23,7 @@ export function GenerationCard({ generation, index }: GenerationCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="rounded-2xl border border-black/10 bg-white/75 p-6 shadow-sm"
+      className="rounded-xl border border-black/10 bg-white/75 p-6 shadow-sm"
     >
       <div className="mb-4">
         <p className="text-sm font-semibold text-black/60">

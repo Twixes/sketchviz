@@ -12,7 +12,7 @@ export function SettingsCard({
   children,
 }: SettingsCardProps) {
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-black/10 bg-white p-6 shadow-sm">
       <h2 className="text-lg font-semibold text-black">{title}</h2>
       {description && (
         <p className="mt-1 text-sm text-black/60">{description}</p>

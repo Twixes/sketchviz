@@ -398,7 +398,7 @@ export function ThreadView({
   // Loading state for existing threads
   if (!isNewThread && isLoading) {
     const loadingContent = (
-      <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+      <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
         <p className="text-black/50">Loading thread...</p>
       </div>
     );
@@ -414,7 +414,7 @@ export function ThreadView({
   if (!isNewThread && !thread) {
     const notFoundContent = (
       <motion.section className="space-y-6">
-        <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+        <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Thread not found</p>
         </div>
       </motion.section>
@@ -478,7 +478,7 @@ export function ThreadView({
         />
 
         {!embedded && isReadOnly ? (
-          <div className="rounded-2xl border border-black/10 bg-white/75 p-4 text-center">
+          <div className="rounded-xl border border-black/10 bg-white/75 p-4 text-center">
             <p className="text-sm text-black/60 cursor-default">
               You're viewing a shared thread. Log in as the owner to iterate.
             </p>

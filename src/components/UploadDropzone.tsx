@@ -112,7 +112,7 @@ export function UploadDropzone({
       <div
         className={cn([
           "group relative flex cursor-pointer flex-col items-center justify-center gap-4 max-h-[75vh] max-w-full mx-auto text-center transition",
-          "rounded-xl border border-black/30 bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-lg px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]",
+          "rounded-lg border border-black/30 bg-gradient-to-br from-white/90 to-white/60 backdrop-blur-lg px-6 py-10 shadow-[0_24px_60px_-40px_rgba(18,18,18,0.45)]",
           isDragging
             ? "border-pink-400 bg-pink-50/80"
             : "hover:border-black/60",
@@ -142,13 +142,13 @@ export function UploadDropzone({
               src={inputSignedUrl}
               alt="Original"
               onLoad={handleInputLoad}
-              className="absolute inset-0 h-full w-full bg-black object-cover rounded-xl"
+              className="absolute inset-0 h-full w-full bg-black object-cover rounded-lg"
             />
             <Hint position="top-right">Click to replace image</Hint>
           </>
         ) : (
           <>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-black text-white shadow-[0_10px_25px_-15px_rgba(0,0,0,0.5)]">
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-black text-white shadow-[0_10px_25px_-15px_rgba(0,0,0,0.5)]">
               <UploadIcon className="size-6" />
             </div>
             <div className="space-y-2">

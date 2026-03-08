@@ -159,7 +159,7 @@ function ReferenceImagePreview({
             "absolute transition-all pointer-events-none",
             isUploading
               ? "-inset-[3px] p-0.5 rounded-[11px]"
-              : "inset-0 p-0 rounded-lg",
+              : "inset-0 p-0 rounded-md",
           )}
           style={{
             background: `conic-gradient(from var(--ring-rotation), #000 0deg, #000 144deg, transparent 144deg)`,
@@ -174,7 +174,7 @@ function ReferenceImagePreview({
         <Button
           variant="ghost"
           onClick={onClick}
-          className="size-16 !p-0 rounded-lg border border-black/20 overflow-hidden relative cursor-zoom-in hover:ring-2 hover:ring-black/30 hover:ring-offset-1"
+          className="size-16 !p-0 rounded-md border border-black/20 overflow-hidden relative cursor-zoom-in hover:ring-2 hover:ring-black/30 hover:ring-offset-1"
           aria-label="View reference image full size"
         >
           <img
@@ -247,7 +247,7 @@ function ImageModal({ image, onClose }: ImageModalProps) {
         <img
           src={image.localSrc}
           alt="Reference full view"
-          className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-xl"
+          className="max-w-full max-h-[90vh] object-contain rounded-md shadow-xl"
         />
       </div>
     </div>,

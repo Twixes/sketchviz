@@ -120,7 +120,7 @@ export function ModelSelector({
       <>
         {def.label}{" "}
         {def.baseModel === "standard" && (
-          <span className="inline-flex items-center rounded border border-black/20 px-1 text-xs">
+          <span className="inline-flex items-center rounded-sm border border-black/20 px-1 text-xs">
             NEW
           </span>
         )}

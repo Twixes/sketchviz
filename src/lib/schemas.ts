@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ASPECT_RATIOS } from "./aspect-ratio";
+import { ASPECT_RATIOS, type AspectRatio } from "./aspect-ratio";
 import { DEFAULT_MODEL_PROVIDER } from "./constants";
 import { parseStorageUrl } from "./supabase/storage";
 
@@ -23,10 +23,10 @@ export const modelSchema = z.enum([
 
 export type Model = z.infer<typeof modelSchema>;
 
-// Aspect ratio schema
-export const aspectRatioSchema = z.enum(ASPECT_RATIOS);
-
-export type AspectRatioType = z.infer<typeof aspectRatioSchema>;
+// Aspect ratio schema – keys asserted as tuple to preserve literal types
+export const aspectRatioSchema = z.enum(
+  Object.keys(ASPECT_RATIOS) as AspectRatio[],
+);
 
 // Outdoor light schema
 export const outdoorLightSchema = z
@@ -47,7 +47,7 @@ function validateAspectRatioWithReferences<
   T extends {
     model?: Model;
     reference_image_urls?: string[] | null;
-    aspect_ratio?: AspectRatioType | null;
+    aspect_ratio?: AspectRatio | null;
   },
 >(data: T, ctx: z.RefinementCtx) {
   // If reference images are provided, aspect_ratio is required

@@ -23,7 +23,7 @@ export function AuthFormShell({ children }: AuthFormShellProps) {
           <div className="mb-6 flex justify-center">
             <Logo />
           </div>
-          <div className="w-sm max-w-full rounded-2xl border border-black/10 bg-white p-8 shadow-xl">
+          <div className="w-sm max-w-full rounded-xl border border-black/10 bg-white p-8 shadow-xl">
             {children}
           </div>
         </motion.div>

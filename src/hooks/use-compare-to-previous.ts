@@ -4,6 +4,7 @@ import { useThreadEditorStore } from "@/stores/thread-editor-store";
 interface UseCompareToPreviousResult {
   handlePointerDown: (e: React.PointerEvent) => void;
   handlePointerUp: () => void;
+  isComparing: boolean;
 }
 
 export function useCompareToPrevious(): UseCompareToPreviousResult {
@@ -15,6 +16,7 @@ export function useCompareToPrevious(): UseCompareToPreviousResult {
     (state) => state.navigateToLayer,
   );
   const setIsComparing = useThreadEditorStore((state) => state.setIsComparing);
+  const isComparing = useThreadEditorStore((state) => state.isComparing);
 
   const canCompare = activeLayerIndex > 0 && !isGenerating;
   const originalIndexRef = useRef<number | null>(null);
@@ -51,5 +53,5 @@ export function useCompareToPrevious(): UseCompareToPreviousResult {
     [canCompare, activeLayerIndex, navigateToLayer, setIsComparing],
   );
 
-  return { handlePointerDown, handlePointerUp };
+  return { handlePointerDown, handlePointerUp, isComparing };
 }

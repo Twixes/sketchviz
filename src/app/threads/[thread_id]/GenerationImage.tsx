@@ -18,7 +18,7 @@ export function GenerationImage({ src, alt, label }: GenerationImageProps) {
         {label}
       </p>
       {src && signedUrl ? (
-        <div className="overflow-hidden rounded-lg border border-black/10 bg-black/5">
+        <div className="overflow-hidden rounded-md border border-black/10 bg-black/5">
           <img
             src={signedUrl}
             alt={alt}
@@ -28,7 +28,7 @@ export function GenerationImage({ src, alt, label }: GenerationImageProps) {
           />
         </div>
       ) : (
-        <div className="flex h-40 items-center justify-center rounded-lg border border-dashed border-black/20 bg-black/5">
+        <div className="flex h-40 items-center justify-center rounded-md border border-dashed border-black/20 bg-black/5">
           <p className="text-sm text-black/40">No output generated</p>
         </div>
       )}

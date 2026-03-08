@@ -48,6 +48,7 @@ export function LayerNavigationControls({
   const {
     handlePointerDown: handleComparePointerDown,
     handlePointerUp: handleComparePointerUp,
+    isComparing,
   } = useCompareToPrevious();
 
   // Keyboard navigation
@@ -101,7 +102,7 @@ export function LayerNavigationControls({
         )}
         tooltip="Hold to compare with previous layer"
       >
-        <Half2Icon className="w-5 h-5" />
+        <Half2Icon className={clsx("w-5 h-5", isComparing && "rotate-180")} />
       </Button>
 
       {/* Previous arrow */}

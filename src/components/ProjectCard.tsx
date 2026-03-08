@@ -84,7 +84,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="group relative overflow-hidden rounded-xl border border-black/20 bg-white/75 p-0 text-left transition-all hover:border-black/40 hover:bg-white/90"
+      className="group relative overflow-hidden rounded-lg border border-black/20 bg-white/75 backdrop-blur-lg p-0 text-left transition-all hover:border-black/40 hover:bg-white/90"
     >
       <Link href={`/projects/${project.id}`} className="block">
         {signedUrls.length > 0 ? (

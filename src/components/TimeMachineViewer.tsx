@@ -187,7 +187,7 @@ function LayerImage({
     <motion.div
       onClick={onClick}
       className={clsx(
-        "absolute inset-0 w-full rounded-2xl",
+        "absolute inset-0 w-full rounded-xl",
         isActive ? "cursor-default" : "cursor-pointer",
       )}
       style={{ zIndex, filter: `brightness(${brightness})` }}
@@ -199,7 +199,7 @@ function LayerImage({
       transition={isComparing ? { duration: 0 } : TIME_MACHINE_LAYER_SPRING}
       whileHover={!isActive ? { scale: scale * 1.01 } : undefined}
     >
-      <div className="relative w-full h-full bg-white rounded-2xl border border-black/40 overflow-hidden">
+      <div className="relative w-full h-full bg-white rounded-xl border border-black/40 overflow-hidden">
         {signedUrl ? (
           <Image
             src={signedUrl}
@@ -219,10 +219,10 @@ function LayerImage({
         )}
 
         {/* Layer label */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+        <div className="absolute bottom-2 left-2 flex items-center gap-2">
           <div
             className={clsx(
-              "flex items-center h-6 px-2 rounded-lg text-xs font-medium backdrop-blur-sm transition-opacity",
+              "flex items-center h-6 px-2 rounded-md text-xs font-medium backdrop-blur-sm transition-opacity",
               isActive ? "bg-black/70 text-white" : "bg-white/70 text-black/70",
             )}
           >
@@ -230,7 +230,7 @@ function LayerImage({
           </div>
         </div>
         {signedUrl && layer.index > 0 && (
-          <div className="absolute bottom-3 right-3 flex gap-2">
+          <div className="absolute bottom-2 right-2 flex gap-2">
             {signedUrl && layer.index > 0 && isOwner && generationId && (
               <DropdownMenu buttonVariant="secondary" dropdownAlign="start">
                 <DropdownMenuItem
@@ -348,7 +348,7 @@ export function TimeMachineViewer({
   if (layers.length === 0) {
     return (
       <div
-        className="w-full rounded-2xl border border-dashed border-black/20 bg-white/50 flex items-center justify-center"
+        className="w-full rounded-xl border border-dashed border-black/20 bg-white/50 flex items-center justify-center"
         style={{ aspectRatio: cssAspectRatio }}
       >
         <span className="text-black/40">No generations yet</span>

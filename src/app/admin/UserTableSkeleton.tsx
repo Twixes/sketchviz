@@ -1,6 +1,6 @@
 export function UserTableSkeleton() {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white/90 shadow-sm">
+    <div className="overflow-x-auto rounded-xl border border-black/10 bg-white/90 shadow-sm">
       <table className="w-full">
         <thead>
           <tr className="border-b border-black/10 text-left text-sm font-semibold text-black">
@@ -19,19 +19,19 @@ export function UserTableSkeleton() {
               className="border-b border-black/5 text-sm text-black/80"
             >
               <td className="px-4 py-3">
-                <div className="h-4 w-48 animate-pulse rounded bg-black/10" />
+                <div className="h-4 w-48 animate-pulse rounded-sm bg-black/10" />
               </td>
               <td className="px-4 py-3">
-                <div className="ml-auto h-4 w-12 animate-pulse rounded bg-black/10" />
+                <div className="ml-auto h-4 w-12 animate-pulse rounded-sm bg-black/10" />
               </td>
               <td className="px-4 py-3">
-                <div className="ml-auto h-4 w-12 animate-pulse rounded bg-black/10" />
+                <div className="ml-auto h-4 w-12 animate-pulse rounded-sm bg-black/10" />
               </td>
               <td className="px-4 py-3">
-                <div className="h-4 w-24 animate-pulse rounded bg-black/10" />
+                <div className="h-4 w-24 animate-pulse rounded-sm bg-black/10" />
               </td>
               <td className="px-4 py-3">
-                <div className="h-4 w-6 animate-pulse rounded bg-black/10" />
+                <div className="h-4 w-6 animate-pulse rounded-sm bg-black/10" />
               </td>
             </tr>
           ))}

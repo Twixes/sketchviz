@@ -43,7 +43,7 @@ export function UserTable({ users }: UserTableProps) {
 
   return (
     <>
-      <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white/90 shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-black/10 bg-white/90 shadow-sm">
         <table className="w-full">
           <thead>
             <tr className="border-b border-black/10 text-left text-sm font-semibold text-black">

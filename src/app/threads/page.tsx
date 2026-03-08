@@ -85,7 +85,7 @@ export default function ThreadsPage() {
     >
       <motion.section className="space-y-8">
         {isLoading ? (
-          <div className="rounded-2xl border border-black/10 bg-white/75 p-8 text-center">
+          <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
             <p className="text-black/50">Loading threads...</p>
           </div>
         ) : threads && threads.length > 0 ? (
@@ -95,7 +95,7 @@ export default function ThreadsPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
+          <div className="rounded-xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
             <p className="text-lg text-black/50">No threads yet</p>
             <p className="mt-2 text-sm text-black/40">
               Start by creating your first visualization

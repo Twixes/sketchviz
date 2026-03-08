@@ -17,12 +17,12 @@ export function RecentProjects() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-black">
             Projects
-            <span className="ml-2 align-middle rounded-md bg-black/10 px-1.5 py-0.5 text-xs font-medium text-black/50">
+            <span className="ml-2 align-middle rounded bg-black/10 px-1.5 py-0.5 text-xs font-medium text-black/50">
               BETA
             </span>
           </h2>
         </div>
-        <div className="rounded-xl border border-black/10 bg-white/75 p-8 text-center">
+        <div className="rounded-lg border border-black/10 bg-white/75 p-8 text-center">
           <p className="text-black/50">Loading...</p>
         </div>
       </section>
@@ -34,7 +34,7 @@ export function RecentProjects() {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-black">
           Projects
-          <span className="ml-2 align-middle rounded-md bg-black/10 px-1.5 py-0.5 text-xs font-medium text-black/50">
+          <span className="ml-2 align-middle rounded bg-black/10 px-1.5 py-0.5 text-xs font-medium text-black/50">
             BETA
           </span>
         </h2>
@@ -70,7 +70,7 @@ function NewProjectCTACard() {
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={() => useProjectStore.getState().openModal()}
-      className="group relative col-span-full cursor-pointer overflow-hidden rounded-xl border border-black/20 bg-linear-to-br from-black/3 to-black/8 px-8 py-10 text-left transition-colors hover:border-black/40 hover:from-black/5 hover:to-black/12"
+      className="group relative col-span-full cursor-pointer overflow-hidden rounded-lg border border-black/20 bg-linear-to-br from-black/3 to-black/8 px-8 py-10 text-left transition-colors hover:border-black/40 hover:from-black/5 hover:to-black/12"
     >
       {/* Decorative neon shapes */}
       <NeonShape
@@ -96,7 +96,7 @@ function NewProjectCTACard() {
       />
 
       <div className="relative flex items-center gap-5">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-black/10 transition-colors group-hover:bg-black/15">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-black/10 transition-colors group-hover:bg-black/15">
           <PlusIcon className="size-6 text-black/60 transition-colors group-hover:text-black/80" />
         </div>
         <div>

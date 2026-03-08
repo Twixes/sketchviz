@@ -91,7 +91,7 @@ export function ControlPanel(props: ControlPanelProps) {
     <div className="flex flex-wrap gap-x-8 gap-y-4">
       {/* Image parameters section */}
       <fieldset className="flex flex-col gap-2 w-full">
-        <legend className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-black/50 mb-1">
+        <legend className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-black/50 mb-1.5">
           <MixerHorizontalIcon className="size-3.5" />
           Parameters
         </legend>
@@ -118,7 +118,7 @@ export function ControlPanel(props: ControlPanelProps) {
       </fieldset>
       {/* Environment section */}
       <fieldset className="flex flex-col gap-2 w-full">
-        <legend className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-black/50 mb-1">
+        <legend className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-black/50 mb-1.5">
           <SunIcon className="size-3.5" />
           Environment
         </legend>
@@ -161,7 +161,7 @@ export function ControlPanel(props: ControlPanelProps) {
             minRows={1}
             disabled={isDisabled}
             className={clsx([
-              "w-full rounded-xl border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40",
+              "w-full rounded-lg border bg-white px-3 pt-2 text-sm text-black placeholder:text-black/40",
               "focus:outline-none focus:ring-2 focus:ring-black/20 resize-none transition-colors",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               props.referenceImages.length > 0 ? "pb-20" : "pb-10",

@@ -32,7 +32,7 @@ export async function UserTableContainer({ page }: UserTableContainerProps) {
     if (listError) {
       console.error("Error fetching auth users:", listError);
       return (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
           <p className="text-red-600">Failed to fetch users</p>
         </div>
       );
@@ -52,7 +52,7 @@ export async function UserTableContainer({ page }: UserTableContainerProps) {
 
   if (allUsers.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
+      <div className="rounded-xl border border-dashed border-black/20 bg-white/75 p-12 text-center">
         <p className="text-lg text-black/50">No users yet</p>
       </div>
     );
@@ -67,7 +67,7 @@ export async function UserTableContainer({ page }: UserTableContainerProps) {
   if (statsError) {
     console.error("Error fetching generation stats:", statsError);
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
         <p className="text-red-600">Failed to fetch generation stats</p>
       </div>
     );

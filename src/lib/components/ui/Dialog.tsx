@@ -30,7 +30,7 @@ export function Dialog({
         <DialogPrimitive.Content
           className={cn(
             "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2",
-            "rounded-2xl border border-black/10 bg-white p-6 shadow-xl",
+            "rounded-xl border border-black/10 bg-white p-6 shadow-xl",
             "animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%]",
           )}
         >

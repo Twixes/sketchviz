@@ -34,7 +34,7 @@ export function DashboardStats() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-1 md:grid-cols-[1fr_1fr] rounded-xl overflow-hidden border border-black/[0.12] bg-gradient-to-br from-white/70 via-white/60 to-amber-50/30 backdrop-blur-lg"
+      className="grid grid-cols-1 md:grid-cols-[1fr_1fr] rounded-lg overflow-hidden border border-black/[0.12] bg-gradient-to-br from-white/70 via-white/60 to-amber-50/30 backdrop-blur-lg"
     >
       {/* Credits */}
       <div className="p-5 flex flex-col border-b md:border-b-0 md:border-r border-black/[0.06]">
@@ -44,12 +44,12 @@ export function DashboardStats() {
           </h5>
           {!isPlanLoading &&
             (isPro ? (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-black/50 bg-black/5 px-1.5 py-0.5 rounded-lg">
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-black/50 bg-black/5 px-1.5 py-0.5 rounded-md">
                 <RocketIcon className="size-3" />
                 Pro
               </span>
             ) : isFree ? (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-black/50 bg-black/5 px-1.5 py-0.5 rounded-lg">
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-black/50 bg-black/5 px-1.5 py-0.5 rounded-md">
                 Free
               </span>
             ) : null)}
@@ -57,7 +57,7 @@ export function DashboardStats() {
           <Button
             link="/billing/portal"
             variant="secondary"
-            size="xs"
+            size="sm"
             rightIcon={<ArrowRightIcon />}
           >
             Billing
@@ -131,7 +131,7 @@ export function DashboardStats() {
           <Button
             link="/threads"
             variant="secondary"
-            size="xs"
+            size="sm"
             rightIcon={<ArrowRightIcon />}
           >
             History

@@ -73,7 +73,7 @@ export function BeforeAfterComparison({
       className="flex select-none flex-col gap-3"
       ref={containerRef}
     >
-      <div className="relative aspect-3/2 overflow-hidden rounded-2xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)]">
+      <div className="relative aspect-3/2 overflow-hidden rounded-xl border border-black/10 bg-black/5 shadow-[0_20px_50px_-30px_rgba(12,12,12,0.3)]">
         {/* Before image (base layer - left side) */}
         <Image
           src={before}
@@ -127,7 +127,7 @@ export function BeforeAfterComparison({
           size="sm"
           onClick={handleTryExample}
           leftIcon={<Pencil1Icon className="w-3 h-3" />}
-          className="absolute left-3 bottom-3"
+          className="absolute left-2 bottom-2"
         >
           Try this out
         </Button>
