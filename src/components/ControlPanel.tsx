@@ -184,7 +184,7 @@ export function ControlPanel(props: ControlPanelProps) {
             {!props.model.startsWith("google/gemini-3-pro-image-preview") &&
               (props.editDescription || props.referenceImages.length > 0) && (
                 <span className="grow text-right text-xs text-black/50 select-none pointer-events-none">
-                  Hint: For targeted changes, Pro quality is more reliable
+                  Hint: For targeted changes, Pro quality is most reliable
                 </span>
               )}
           </div>

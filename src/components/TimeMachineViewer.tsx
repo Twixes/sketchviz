@@ -375,7 +375,7 @@ export function TimeMachineViewer({
       )}
       {/* Container with dynamic aspect ratio */}
       <div
-        className="relative w-auto mx-auto max-h-[calc(90vh-8rem)] z-10"
+        className="relative w-auto mx-auto max-h-[calc(90vh-2rem)] z-10"
         style={{ aspectRatio: cssAspectRatio }}
       >
         <AnimatePresence mode="popLayout">

@@ -69,6 +69,10 @@ strong {
   font-weight: 600;
 }
 
+legend {
+  cursor: default;
+}
+
 .neon-shell {
   position: relative;
   overflow: hidden;

@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckIcon, Cross2Icon, Pencil1Icon } from "@radix-ui/react-icons";
+import * as Tooltip from "@radix-ui/react-tooltip";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { Button } from "@/lib/components/ui/Button";
 
@@ -122,35 +123,57 @@ export function EditableTitle({ title, onSave }: EditableTitleProps) {
   }
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: we want to allow clicking to start editing
-    // biome-ignore lint/a11y/useKeyWithClickEvents: it's okay
-    <div
-      className="group flex w-fit items-center gap-2 border-b-2 -mb-0.5 border-transparent hover:border-black/30 cursor-text"
-      onClick={() => {
-        // Use the current text selection if the user dragged across the title
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
-          const range = sel.getRangeAt(0);
-          startEditing({ start: range.startOffset, end: range.endOffset });
-        } else if (sel && sel.rangeCount > 0) {
-          const range = sel.getRangeAt(0);
-          startEditing({ start: range.startOffset, end: range.startOffset });
-        } else {
-          startEditing();
-        }
-      }}
-    >
-      <h1 className="text-2xl lg:text-3xl font-semibold text-black">{title}</h1>
-      <Button
-        variant="icon"
-        size="sm"
-        colorScheme="light"
-        tooltip="Edit title"
-        onClick={() => startEditing()}
-        className="opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <Pencil1Icon className="w-4 h-4" />
-      </Button>
-    </div>
+    <Tooltip.Provider>
+      <Tooltip.Root delayDuration={200}>
+        <Tooltip.Trigger asChild>
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: we want to allow clicking to start editing */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: it's okay */}
+          <div
+            className="group flex w-fit items-center gap-2 border-b-2 -mb-0.5 border-transparent hover:border-black/30 cursor-text"
+            onClick={() => {
+              // Use the current text selection if the user dragged across the title
+              const sel = window.getSelection();
+              if (sel && sel.rangeCount > 0 && !sel.isCollapsed) {
+                const range = sel.getRangeAt(0);
+                startEditing({
+                  start: range.startOffset,
+                  end: range.endOffset,
+                });
+              } else if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                startEditing({
+                  start: range.startOffset,
+                  end: range.startOffset,
+                });
+              } else {
+                startEditing();
+              }
+            }}
+          >
+            <h1 className="text-2xl lg:text-3xl font-semibold text-black">
+              {title}
+            </h1>
+            <Button
+              variant="icon"
+              size="sm"
+              colorScheme="light"
+              onClick={() => startEditing()}
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Pencil1Icon className="w-4 h-4" />
+            </Button>
+          </div>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content
+            className="z-50 rounded-lg bg-black px-3 py-2 text-xs text-white shadow-lg max-w-xs"
+            sideOffset={5}
+          >
+            Click to rename
+            <Tooltip.Arrow className="fill-black" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
+    </Tooltip.Provider>
   );
 }

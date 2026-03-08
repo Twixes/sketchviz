@@ -111,7 +111,6 @@ export function CreditBadge({
   creditCost,
   perRefCost,
   hasWarning = false,
-  isNew = false,
   className,
 }: {
   /** Cost in credits, shown as "X credits" when provided as a single number, or "X/Y/Z credits" when provided as an array of numbers. */
@@ -119,7 +118,6 @@ export function CreditBadge({
   /** Cost per reference image, shown as "+X/ref" when provided */
   perRefCost?: number;
   hasWarning?: boolean;
-  isNew?: boolean;
   className?: string;
 }) {
   const creditCosts = Array.isArray(creditCost) ? creditCost : [creditCost];
@@ -131,7 +129,6 @@ export function CreditBadge({
       )}
     >
       {hasWarning && <ExclamationTriangleIcon className="mr-0.5" />}
-      {isNew && "NEW • "}
       {creditCosts.join("/")} credits
       {perRefCost ? ` + ${perRefCost}/reference` : ""}
     </div>

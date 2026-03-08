@@ -5,9 +5,7 @@ import {
 } from "@radix-ui/react-icons";
 import type React from "react";
 import { Select } from "@/lib/components/ui/Select";
-import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
-import { CreditBadge } from "./GenerateButton";
 
 /** The abstract model tiers, independent of resolution. */
 export type BaseModel = "pro" | "standard" | "lite";
@@ -28,7 +26,13 @@ export const MODEL_DEFINITIONS: ModelDefinition[] = [
     baseModel: "pro",
     label: "Pro",
     icon: RocketIcon,
-    description: "Top-tier quality. Powered by Google Gemini.",
+    description: (
+      <>
+        Top-tier quality for targeted changes.
+        <br />
+        14/24 credits. Powered by Google.
+      </>
+    ),
     models: {
       high: "google/gemini-3-pro-image-preview/4k",
       low: "google/gemini-3-pro-image-preview",
@@ -38,7 +42,13 @@ export const MODEL_DEFINITIONS: ModelDefinition[] = [
     baseModel: "standard",
     label: "Standard",
     icon: ImageIcon,
-    description: "Balanced quality. Powered by Google Gemini.",
+    description: (
+      <>
+        Balanced quality for most visuals.
+        <br />
+        7/12 credits. Powered by Google.
+      </>
+    ),
     models: {
       high: "google/gemini-3.1-flash-image-preview/4k",
       low: "google/gemini-3.1-flash-image-preview",
@@ -48,7 +58,13 @@ export const MODEL_DEFINITIONS: ModelDefinition[] = [
     baseModel: "lite",
     label: "Lite",
     icon: LightningBoltIcon,
-    description: "Fast results. Powered by Black Forest Labs FLUX.",
+    description: (
+      <>
+        Fast results for quick previews.
+        <br />
+        3/5 credits. Powered by Black Forest Labs.
+      </>
+    ),
     models: {
       high: "bfl/flux-2-klein-9b/1.5k",
       low: "bfl/flux-2-klein-9b/1k",
@@ -103,13 +119,11 @@ export function ModelSelector({
     label: (
       <>
         {def.label}{" "}
-        <CreditBadge
-          isNew={def.baseModel === "standard"}
-          creditCost={[
-            determineCreditCostOfImageGeneration({ model: def.models.low }),
-            determineCreditCostOfImageGeneration({ model: def.models.high }),
-          ]}
-        />
+        {def.baseModel === "standard" && (
+          <span className="inline-flex items-center rounded border border-black/20 px-1 text-xs">
+            NEW
+          </span>
+        )}
       </>
     ),
     description: def.description,

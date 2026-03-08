@@ -34,7 +34,7 @@ export default function Home() {
 
   return (
     <PageWrapper user={user}>
-      <section className="grid gap-8 sm:gap-12 items-center lg:grid-cols-[1.05fr_0.95fr]">
+      <section className="grid gap-8 sm:gap-12 items-center lg:grid-cols-[1.1fr_0.9fr]">
         <div className="contents lg:block lg:space-y-8">
           <Hero />
           <div className="order-2 lg:order-0">
