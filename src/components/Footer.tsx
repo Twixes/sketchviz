@@ -10,8 +10,7 @@ const FOOTER_SECTIONS = [
   {
     title: "Resources",
     links: [
-      { href: "/docs", label: "Docs" },
-      { href: "/docs/getting-started", label: "Get Started" },
+      { href: "/docs/getting-started", label: "Get started" },
       { href: "/docs/faq", label: "FAQ" },
     ],
   },
