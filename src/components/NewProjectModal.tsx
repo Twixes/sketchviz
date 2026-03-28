@@ -23,8 +23,13 @@ import { useAcceptStyleMutation } from "@/hooks/use-accept-style-mutation";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
 import { Button } from "@/lib/components/ui/Button";
 import { Input } from "@/lib/components/ui/Input";
-import { ACCEPTED_MIME_TYPES } from "@/lib/constants";
+import {
+  ACCEPTED_MIME_TYPES,
+  DEFAULT_IMAGE_EDITING_MODEL,
+  DEFAULT_MODEL_PROVIDER,
+} from "@/lib/constants";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
+import type { Model } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/client";
 import { useProjectStore } from "@/stores/project-store";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
@@ -423,12 +428,14 @@ function VisualizeStep() {
   const acceptStyleMutation = useAcceptStyleMutation();
   const [isAccepting, setIsAccepting] = useState(false);
 
-  // Force Pro model for style consistency in the project wizard
+  // Use Google Standard when switching from a non-Google model in the project wizard
   const currentModel = threadEditorStore.model;
   const setModel = threadEditorStore.setModel;
   useEffect(() => {
     if (!currentModel.startsWith("google/")) {
-      setModel("google/gemini-3-pro-image-preview");
+      setModel(
+        `${DEFAULT_MODEL_PROVIDER}/${DEFAULT_IMAGE_EDITING_MODEL}` as Model,
+      );
     }
   }, [currentModel, setModel]);
 

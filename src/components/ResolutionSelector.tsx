@@ -4,6 +4,7 @@ import type { Model } from "@/lib/schemas";
 import { CreditBadge } from "./GenerateButton";
 import {
   buildModel,
+  DEFAULT_BASE_MODEL,
   MODEL_DEFINITIONS,
   parseModel,
   type ResolutionTier,
@@ -58,9 +59,12 @@ const RESOLUTION_LABELS: Record<
 };
 
 function buildResolutionOptions(currentBaseModel: string): ResolutionOption[] {
-  const labels = RESOLUTION_LABELS[currentBaseModel] ?? RESOLUTION_LABELS.pro;
+  const labels =
+    RESOLUTION_LABELS[currentBaseModel] ??
+    RESOLUTION_LABELS[DEFAULT_BASE_MODEL];
   const def =
     MODEL_DEFINITIONS.find((d) => d.baseModel === currentBaseModel) ??
+    MODEL_DEFINITIONS.find((d) => d.baseModel === DEFAULT_BASE_MODEL) ??
     MODEL_DEFINITIONS[0];
 
   return (["high", "low"] as const).map((tier) => ({

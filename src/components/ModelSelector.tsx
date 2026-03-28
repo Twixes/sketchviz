@@ -72,11 +72,18 @@ export const MODEL_DEFINITIONS: ModelDefinition[] = [
   },
 ];
 
+/** Default quality for new sessions and when a model string is unknown. */
+export const DEFAULT_BASE_MODEL: BaseModel = "standard";
+export const DEFAULT_RESOLUTION_TIER: ResolutionTier = "low";
+
 /** Build a full Model string from base model + tier. */
 export function buildModel(baseModel: BaseModel, tier: ResolutionTier): Model {
   const def = MODEL_DEFINITIONS.find((d) => d.baseModel === baseModel);
   if (!def) {
-    return MODEL_DEFINITIONS[0].models[tier];
+    const fallback =
+      MODEL_DEFINITIONS.find((d) => d.baseModel === DEFAULT_BASE_MODEL) ??
+      MODEL_DEFINITIONS[0];
+    return fallback.models[tier];
   }
   return def.models[tier];
 }
@@ -92,8 +99,7 @@ export function parseModel(model: Model): {
     if (def.models.low === model)
       return { baseModel: def.baseModel, tier: "low" };
   }
-  // Fallback to pro high
-  return { baseModel: "pro", tier: "high" };
+  return { baseModel: DEFAULT_BASE_MODEL, tier: DEFAULT_RESOLUTION_TIER };
 }
 
 interface ModelSelectorProps {
