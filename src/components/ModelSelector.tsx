@@ -116,16 +116,7 @@ export function ModelSelector({
   let options = MODEL_DEFINITIONS.map((def) => ({
     value: def.baseModel,
     icon: def.icon,
-    label: (
-      <>
-        {def.label}{" "}
-        {def.baseModel === "standard" && (
-          <span className="inline-flex items-center rounded-sm border border-black/20 px-1 text-xs">
-            NEW
-          </span>
-        )}
-      </>
-    ),
+    label: def.label,
     description: def.description,
   }));
 
