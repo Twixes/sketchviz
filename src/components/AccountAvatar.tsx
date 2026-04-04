@@ -1,6 +1,11 @@
 "use client";
 
-import { ExitIcon, PersonIcon, ReaderIcon } from "@radix-ui/react-icons";
+import {
+  ExitIcon,
+  GroupIcon,
+  PersonIcon,
+  ReaderIcon,
+} from "@radix-ui/react-icons";
 import { useState } from "react";
 import { useSignOutCallback } from "@/hooks/use-sign-out-callback";
 import {
@@ -51,6 +56,10 @@ export function AccountAvatar({ user }: AccountAvatarProps) {
       <DropdownMenuItem link="/account">
         <PersonIcon className="size-4" />
         Account settings
+      </DropdownMenuItem>
+      <DropdownMenuItem link="/team">
+        <GroupIcon className="size-4" />
+        Team
       </DropdownMenuItem>
       <DropdownMenuItem link="/billing/portal">
         <ReaderIcon className="size-4" />

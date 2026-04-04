@@ -1,7 +1,11 @@
 import { geolocation } from "@vercel/functions";
 import { NextResponse } from "next/server";
-import { getCreditsForUser, getPlanForUser } from "@/lib/polar";
+import {
+  getCreditsForBillingEntity,
+  getPlanForBillingEntity,
+} from "@/lib/polar";
 import { createClient } from "@/lib/supabase/server";
+import { getBillingContext } from "@/lib/teams";
 import type { PlanResponse } from "./types";
 
 export const COUNTRIES_WITH_VAT: string[] = [
@@ -44,9 +48,25 @@ export async function GET(
 
   const userId = data?.claims?.sub;
 
-  const [credits, planInfo] = userId
-    ? await Promise.all([getCreditsForUser(userId), getPlanForUser(userId)])
-    : ([null, null] as const);
+  let credits: number | null = null;
+  let planInfo: Awaited<ReturnType<typeof getPlanForBillingEntity>> | null =
+    null;
+  let teamId: string | null = null;
+  let teamName: string | null = null;
+  let teamRole: PlanResponse["teamRole"] = null;
+
+  if (userId) {
+    const billingContext = await getBillingContext(userId);
+    [credits, planInfo] = await Promise.all([
+      getCreditsForBillingEntity(billingContext.billingEntityId),
+      getPlanForBillingEntity(billingContext.billingEntityId),
+    ]);
+    if (billingContext.type === "team") {
+      teamId = billingContext.teamId;
+      teamName = billingContext.teamName;
+      teamRole = billingContext.role;
+    }
+  }
 
   const isVatApplicable =
     (!!geo.country && COUNTRIES_WITH_VAT.includes(geo.country)) ||
@@ -57,5 +77,8 @@ export async function GET(
     planType: planInfo?.type ?? null,
     isVatApplicable,
     hasBillingIssue: planInfo?.hasBillingIssue ?? false,
+    teamId,
+    teamName,
+    teamRole,
   });
 }

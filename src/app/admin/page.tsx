@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { checkAdminAccess } from "@/lib/admin";
 import { Button } from "@/lib/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
+import { CreateTeamForm } from "./CreateTeamForm";
 import { UserTableContainer } from "./UserTableContainer";
 import { UserTableSkeleton } from "./UserTableSkeleton";
 
@@ -63,10 +64,15 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
         {/* Page Title */}
         <section className="mb-8">
-          <h1 className="text-3xl font-semibold text-black">User Management</h1>
+          <h1 className="text-3xl font-semibold text-black">User management</h1>
           <p className="mt-2 text-black/60">
             View users and manage their credits
           </p>
+        </section>
+
+        {/* Team Management */}
+        <section className="mb-8">
+          <CreateTeamForm />
         </section>
 
         {/* User Table with Suspense */}

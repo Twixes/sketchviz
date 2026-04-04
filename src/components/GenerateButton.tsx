@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/cn";
 import { Button } from "@/lib/components/ui/Button";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
+import type { PlanType } from "@/lib/polar";
 import type { Model } from "@/lib/schemas";
 import type { SessionUser } from "./SessionProvider";
 
@@ -17,7 +18,7 @@ interface GenerateButtonProps {
   user: SessionUser | null;
   model: Model;
   credits: number | null | undefined;
-  planType: "free" | "pro" | null | undefined;
+  planType: PlanType | null | undefined;
   isGenerating: boolean;
   /**
    * Whether this is an iteration on an existing generation.

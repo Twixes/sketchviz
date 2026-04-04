@@ -62,7 +62,7 @@ export function Header({ user }: HeaderProps) {
             >
               Dashboard
             </Button>
-            {planData?.planType === "free" && (
+            {planData?.planType === "free" && !planData?.teamId && (
               <Button
                 variant="secondary"
                 leftIcon={<RocketIcon />}
@@ -111,6 +111,8 @@ export function Header({ user }: HeaderProps) {
 function CreditsButton(): JSX.Element {
   const { data: creditsData, isLoading: isLoadingCredits } = usePlanQuery();
   const [isLoadingBillingPortal, setIsLoadingBillingPortal] = useState(false);
+  const isPaidPlan =
+    creditsData?.planType === "pro" || creditsData?.planType === "team";
 
   return (
     <Button
@@ -124,9 +126,12 @@ function CreditsButton(): JSX.Element {
       tooltip={
         <>
           {!isLoadingCredits &&
-            (creditsData?.planType === "pro" ? (
+            (isPaidPlan ? (
               <>
-                The Pro plan includes 1,000 credits per month.
+                {creditsData?.teamName
+                  ? `Team: ${creditsData.teamName}. Shared`
+                  : "The Pro plan includes 1,000"}{" "}
+                credits per month.
                 <br />
                 Usage beyond that is pay-as-you-go at $0.015/credit.
               </>
@@ -142,10 +147,13 @@ function CreditsButton(): JSX.Element {
         </>
       }
     >
+      {creditsData?.teamName && (
+        <span className="text-black/50">{creditsData.teamName}</span>
+      )}
       <span className="text-black/50">Credits left:</span>
       {isLoadingCredits ? (
         "..."
-      ) : creditsData && creditsData.planType === "pro" ? (
+      ) : creditsData && isPaidPlan ? (
         <>
           <span className="text-xl leading-none">∞</span>
           <span className="text-black/40 font-normal">

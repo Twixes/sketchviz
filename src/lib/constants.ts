@@ -50,6 +50,10 @@ export const PRO_PLAN_PRODUCT_ID =
   process.env.NODE_ENV === "production"
     ? "a127ef8f-a886-49c3-9e8b-3435fd8d1694"
     : "9679f6d9-59c8-4cf5-bd82-8c12379c84e9";
+export const TEAM_PLAN_PRODUCT_ID =
+  process.env.NODE_ENV === "production"
+    ? "TODO_PRODUCTION_TEAM_PRODUCT_ID"
+    : "TODO_SANDBOX_TEAM_PRODUCT_ID";
 export const CREDIT_METER_ID =
   process.env.NODE_ENV === "production"
     ? "37470072-5831-4972-a30f-3e96e8e02f9f"

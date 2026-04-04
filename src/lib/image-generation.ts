@@ -9,7 +9,11 @@ import type { AspectRatio } from "./aspect-ratio";
 import { calculateCropDimensions } from "./aspect-ratio";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "./constants";
 import { determineCreditCostOfImageGeneration } from "./credits";
-import { getCreditsForUser, getPlanForUser, polar } from "./polar";
+import {
+  getCreditsForBillingEntity,
+  getPlanForBillingEntity,
+  polar,
+} from "./polar";
 import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 import {
@@ -19,6 +23,7 @@ import {
   parseStorageUrl,
   uploadFile,
 } from "./supabase/storage";
+import { getBillingContext } from "./teams";
 
 export interface PreparedImageData {
   imageBuffer: Buffer;
@@ -222,9 +227,10 @@ export async function generateAndUploadImage({
 }): Promise<ProcessImageGenerationResult> {
   const creditCost = determineCreditCostOfImageGeneration({ model });
 
+  const billingContext = await getBillingContext(userId);
   const [creditsAvailable, planInfo] = await Promise.all([
-    getCreditsForUser(userId),
-    getPlanForUser(userId),
+    getCreditsForBillingEntity(billingContext.billingEntityId),
+    getPlanForBillingEntity(billingContext.billingEntityId),
   ]);
   if (creditsAvailable === null) {
     throw new Error(
@@ -263,7 +269,7 @@ export async function generateAndUploadImage({
       events: [
         {
           name: "image_generation_started",
-          externalCustomerId: userId,
+          externalCustomerId: billingContext.billingEntityId,
           metadata: analyticsMetadata,
         },
       ],

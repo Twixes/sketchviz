@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { checkAdminAccess } from "@/lib/admin";
+import { TEAM_PLAN_PRODUCT_ID } from "@/lib/constants";
 import { polar } from "@/lib/polar";
 import { posthogNode } from "@/lib/posthog/server";
 import { createClient } from "@/lib/supabase/server";
@@ -168,4 +169,127 @@ export interface AdminUser {
   generation_count: number;
   credits: number | null;
   created_at: string;
+}
+
+// --- Team management ---
+
+const createTeamSchema = z.object({
+  name: z.string().min(1).max(100),
+  seatCount: z.coerce.number().int().min(1).max(500),
+  ownerEmail: z.string().email(),
+});
+
+export interface CreateTeamResult {
+  success: boolean;
+  error?: string;
+  checkoutUrl?: string;
+  teamId?: string;
+}
+
+export async function createTeamAction(
+  _prevState: CreateTeamResult,
+  formData: FormData,
+): Promise<CreateTeamResult> {
+  const supabase = await createClient();
+  const { isAdmin, email: adminEmail } = await checkAdminAccess(supabase);
+
+  if (!isAdmin) {
+    return { success: false, error: "Forbidden" };
+  }
+
+  const validation = createTeamSchema.safeParse({
+    name: formData.get("name"),
+    seatCount: formData.get("seatCount"),
+    ownerEmail: formData.get("ownerEmail"),
+  });
+  if (!validation.success) {
+    return { success: false, error: validation.error.issues[0].message };
+  }
+  const { name, seatCount, ownerEmail } = validation.data;
+
+  const serviceClient = createServiceClient();
+
+  try {
+    // Look up user by email
+    const { data: usersData, error: listError } =
+      await serviceClient.auth.admin.listUsers();
+    const ownerUser = usersData?.users.find(
+      (u) => u.email?.toLowerCase() === ownerEmail.toLowerCase(),
+    );
+    if (listError || !ownerUser) {
+      return {
+        success: false,
+        error: "No user found with that email. They must sign up first.",
+      };
+    }
+    const ownerUserId = ownerUser.id;
+
+    // Check user is not already on a team
+    const { data: existingMembership } = await serviceClient
+      .from("team_members")
+      .select("id")
+      .eq("user_id", ownerUserId)
+      .single();
+    if (existingMembership) {
+      return { success: false, error: "This user is already on a team" };
+    }
+
+    // Create team in Supabase
+    const { data: team, error: teamError } = await serviceClient
+      .from("teams")
+      .insert({ name, owner_user_id: ownerUserId })
+      .select("id")
+      .single();
+    if (teamError || !team) {
+      return { success: false, error: "Failed to create team" };
+    }
+
+    // Add owner as team member
+    const { error: memberError } = await serviceClient
+      .from("team_members")
+      .insert({ team_id: team.id, user_id: ownerUserId, role: "owner" });
+    if (memberError) {
+      await serviceClient.from("teams").delete().eq("id", team.id);
+      return { success: false, error: "Failed to create team membership" };
+    }
+
+    // Create Polar checkout — generates a shareable payment link.
+    // The Polar customer is created automatically when the checkout completes,
+    // with externalCustomerId = team.id linking it to our team record.
+    // This avoids email uniqueness conflicts with the owner's personal Polar customer.
+    const baseUrl =
+      process.env.NODE_ENV === "production"
+        ? "https://sketchviz.app"
+        : "http://localhost:3000";
+    const checkout = await polar.checkouts.create({
+      products: [TEAM_PLAN_PRODUCT_ID],
+      externalCustomerId: team.id,
+      seats: seatCount,
+      customerEmail: ownerEmail,
+      customerName: name,
+      successUrl: `${baseUrl}/team?setup=success`,
+    });
+
+    posthogNode?.capture({
+      distinctId: adminEmail ?? "unknown_admin",
+      event: "admin_team_created",
+      properties: {
+        team_id: team.id,
+        team_name: name,
+        seat_count: seatCount,
+        owner_user_id: ownerUserId,
+        admin_email: adminEmail,
+      },
+    });
+
+    revalidatePath("/admin");
+
+    return { success: true, checkoutUrl: checkout.url, teamId: team.id };
+  } catch (error) {
+    console.error("Failed to create team:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to create team",
+    };
+  }
 }

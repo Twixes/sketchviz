@@ -7,6 +7,7 @@ import { EditableTitle } from "./EditableTitle";
 import { Header } from "./Header";
 import { NeonBackground } from "./NeonBackground";
 import type { SessionUser } from "./SessionProvider";
+import { TeamInvitationBanner } from "./TeamInvitationBanner";
 
 interface PageWrapperProps {
   user: SessionUser | null;
@@ -56,6 +57,7 @@ export function PageWrapper({
   const content = (
     <>
       <Header user={user} />
+      {user && <TeamInvitationBanner />}
       <section className={`flex grow flex-col ${gapClasses[gap]}`}>
         {(title || description) && (
           <div>
