@@ -225,6 +225,9 @@ export async function POST(request: Request) {
     const message =
       error instanceof Error ? error.message : "Failed to generate image.";
 
+    // Clean up the phantom generation record (it has output_url: null)
+    await supabase.from("generations").delete().eq("id", generationId);
+
     // Track failed generation
     posthogNode?.capture({
       distinctId: userId,

@@ -206,6 +206,9 @@ export async function POST(
     const message =
       error instanceof Error ? error.message : "Failed to iterate on image.";
 
+    // Clean up the phantom generation record (it has output_url: null)
+    await supabase.from("generations").delete().eq("id", newGenerationId);
+
     // Track failed iteration
     posthogNode?.capture({
       distinctId: userId,
