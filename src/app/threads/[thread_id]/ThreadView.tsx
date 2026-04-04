@@ -19,6 +19,7 @@ import { useUploadMutation } from "@/hooks/use-upload-mutation";
 import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
+  PENDING_GENERATION_POLL_MS,
 } from "@/lib/constants";
 import {
   type Generation,
@@ -150,7 +151,20 @@ export function ThreadView({
       return data as Thread;
     },
     enabled: !isNewThread,
+    // Poll while the latest generation is still pending (output_url is null)
+    refetchInterval: (query) => {
+      const thread = query.state.data;
+      if (!thread?.generations?.length) return false;
+      const latest = thread.generations[thread.generations.length - 1];
+      return latest.output_url === null ? PENDING_GENERATION_POLL_MS : false;
+    },
   });
+
+  // Track whether a generation is pending from the server (e.g. after page refresh)
+  const hasPendingGeneration =
+    !!fetchedThread?.generations?.length &&
+    fetchedThread.generations[fetchedThread.generations.length - 1]
+      .output_url === null;
 
   // Derive ownership and read-only state
   const isOwner = user?.id === fetchedThread?.user_id;
@@ -366,7 +380,7 @@ export function ThreadView({
   // Use unified store for both new and existing threads
   const isGenerating = isNewThread
     ? threadEditorStore.isBusyForUser
-    : threadEditorStore.isGenerating;
+    : threadEditorStore.isGenerating || hasPendingGeneration;
   const outdoorLight = threadEditorStore.outdoorLight;
   const indoorLight = threadEditorStore.indoorLight;
   const editDescription = threadEditorStore.editDescription;

@@ -166,8 +166,16 @@ legend {
   mask-composite: exclude;
   box-sizing: border-box;
   /* Duration scales with estimated seconds: 98% reached at 1.67% of duration */
-  animation: ring-progress calc(var(--ring-estimated-seconds) * 60s)
+  --ring-animation-duration: calc(var(--ring-estimated-seconds) * 60s);
+  animation: ring-progress var(--ring-animation-duration)
     cubic-bezier(0.2, 0.25, 0.8, 0.75) infinite;
+  /* Negative delay jumps ahead in the animation (e.g. after a page refresh mid-generation) */
+  animation-delay: calc(
+    var(--ring-skip-to, 0) *
+    var(--ring-animation-duration) *
+    -1
+  );
+  animation-fill-mode: both;
   pointer-events: none;
 }
 

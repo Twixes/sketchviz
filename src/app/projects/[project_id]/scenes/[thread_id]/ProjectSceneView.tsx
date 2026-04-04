@@ -24,6 +24,7 @@ import { Button } from "@/lib/components/ui/Button";
 import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
+  PENDING_GENERATION_POLL_MS,
 } from "@/lib/constants";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { Model } from "@/lib/schemas";
@@ -102,7 +103,20 @@ export function ProjectSceneView({
 
       return data as Thread;
     },
+    // Poll while the latest generation is still pending (output_url is null)
+    refetchInterval: (query) => {
+      const thread = query.state.data;
+      if (!thread?.generations?.length) return false;
+      const latest = thread.generations[thread.generations.length - 1];
+      return latest.output_url === null ? PENDING_GENERATION_POLL_MS : false;
+    },
   });
+
+  // Track whether a generation is pending from the server (e.g. after page refresh)
+  const hasPendingGeneration =
+    !!fetchedThread?.generations?.length &&
+    fetchedThread.generations[fetchedThread.generations.length - 1]
+      .output_url === null;
 
   useEffect(() => {
     if (fetchedThread) {
@@ -361,7 +375,9 @@ export function ProjectSceneView({
   const activeGeneration = threadEditorStore.getActiveGeneration();
   const canIterate = hasGenerations && !!activeGeneration?.output_url;
   const isGenerating =
-    threadEditorStore.isBusyForUser || threadEditorStore.isGenerating;
+    threadEditorStore.isBusyForUser ||
+    threadEditorStore.isGenerating ||
+    hasPendingGeneration;
   const activeLayerIndex = threadEditorStore.activeLayerIndex;
 
   const handleGenerate =

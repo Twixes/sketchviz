@@ -265,6 +265,11 @@ function LayerImage({
           style={
             {
               "--ring-estimated-seconds": estimatedSeconds,
+              // If the layer has no image yet, we're resuming a pending generation
+              // (e.g. after a page refresh) — skip ahead to ~40% in the ring
+              ...(layer.imageUrl === null && {
+                "--ring-skip-to": 0.0021,
+              }),
             } as React.CSSProperties
           }
           aria-hidden

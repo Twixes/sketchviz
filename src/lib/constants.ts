@@ -57,3 +57,6 @@ export const CREDIT_METER_ID =
 
 export const DEFAULT_FREE_PLAN_CREDITS = 100;
 export const DEFAULT_PRO_PLAN_CREDITS = 1000;
+
+// Polling
+export const PENDING_GENERATION_POLL_MS = 1000;
