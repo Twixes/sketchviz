@@ -1,9 +1,11 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
+import { Suspense } from "react";
 import { Toaster } from "sonner";
 import "./globals.css";
 import Script from "next/script";
+import { OAuthErrorToast } from "@/components/OAuthErrorToast";
 import { QueryProvider } from "@/components/QueryProvider";
 import {
   SessionProvider,
@@ -93,6 +95,9 @@ export default async function RootLayout({
         <QueryProvider>
           <SessionProvider initialUser={user}>{children}</SessionProvider>
         </QueryProvider>
+        <Suspense>
+          <OAuthErrorToast />
+        </Suspense>
         <Toaster position="bottom-right" />
         <SpeedInsights />
       </body>
