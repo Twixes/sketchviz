@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
 import { toast } from "sonner";
+import type { PlanResponse } from "@/app/api/plan/types";
 import type { AspectRatio } from "@/lib/aspect-ratio";
+import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
@@ -79,6 +81,15 @@ export function useRegenerateMutation() {
       aspectRatio,
     }) => {
       setIsGenerating(true);
+      // Optimistically subtract credits
+      if (model) {
+        const creditCost = determineCreditCostOfImageGeneration({ model });
+        queryClient.setQueryData<PlanResponse>(["plan"], (old) =>
+          old?.credits != null
+            ? { ...old, credits: old.credits - creditCost }
+            : old,
+        );
+      }
       posthog.capture("regeneration_started", {
         generation_id: generationId,
         outdoor_light: outdoorLight,
@@ -100,7 +111,6 @@ export function useRegenerateMutation() {
         data.height,
       );
       setIsGenerating(false);
-      queryClient.invalidateQueries({ queryKey: ["plan"] });
       navigateNext();
       posthog.capture("regeneration_completed", {
         thread_id: data.threadId,
@@ -120,6 +130,17 @@ export function useRegenerateMutation() {
       setIsGenerating(false);
       const message =
         error instanceof Error ? error.message : "Something went wrong.";
+      // Restore optimistically subtracted credits
+      if (variables.model) {
+        const creditCost = determineCreditCostOfImageGeneration({
+          model: variables.model,
+        });
+        queryClient.setQueryData<PlanResponse>(["plan"], (old) =>
+          old?.credits != null
+            ? { ...old, credits: old.credits + creditCost }
+            : old,
+        );
+      }
       toast.error(message);
       posthog.capture("regeneration_failed", {
         error: message,

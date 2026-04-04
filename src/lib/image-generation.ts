@@ -300,29 +300,19 @@ export async function generateAndUploadImage({
     ...(generationType === "regeneration" && { is_regeneration: true }),
   };
 
-  const [cleanedEditDescription] = await Promise.all([
-    editDescription
-      ? cleanUpEditDescription({
-          editDescription,
-          userId,
-          traceId,
-        })
-      : Promise.resolve(editDescription),
-    polar.events.ingest({
-      events: [
-        {
-          name: "image_generation_started",
-          externalCustomerId: userId,
-          metadata: analyticsMetadata,
-        },
-      ],
-    }),
-  ]);
   posthogNode?.capture({
     distinctId: userId,
     event: "image_generation_started",
     properties: analyticsMetadata,
   });
+
+  const cleanedEditDescription = editDescription
+    ? await cleanUpEditDescription({
+        editDescription,
+        userId,
+        traceId,
+      })
+    : editDescription;
 
   // Choose which generation function to use
   // Use the iteration function (no base prompt) when:
@@ -369,6 +359,17 @@ export async function generateAndUploadImage({
     file: outputBuffer,
     contentType: result.mediaType,
     userId,
+  });
+
+  // Deduct credits only after successful generation
+  await polar.events.ingest({
+    events: [
+      {
+        name: "image_generation_started",
+        externalCustomerId: userId,
+        metadata: analyticsMetadata,
+      },
+    ],
   });
 
   return {

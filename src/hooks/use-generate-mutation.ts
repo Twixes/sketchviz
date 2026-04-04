@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import posthog from "posthog-js";
 import { toast } from "sonner";
+import type { PlanResponse } from "@/app/api/plan/types";
 import type { AspectRatio } from "@/lib/aspect-ratio";
+import { determineCreditCostOfImageGeneration } from "@/lib/credits";
 import type { IndoorLight, Model, OutdoorLight } from "@/lib/schemas";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
@@ -75,6 +77,15 @@ export function useGenerateMutation() {
     }) => {
       setError(null);
       setIsGenerating(true);
+      // Optimistically subtract credits
+      if (model) {
+        const creditCost = determineCreditCostOfImageGeneration({ model });
+        queryClient.setQueryData<PlanResponse>(["plan"], (old) =>
+          old?.credits != null
+            ? { ...old, credits: old.credits - creditCost }
+            : old,
+        );
+      }
       posthog.capture("generation_started", {
         outdoor_light: outdoorLight,
         indoor_light: indoorLight,
@@ -89,7 +100,6 @@ export function useGenerateMutation() {
 
     onSuccess: (data, variables) => {
       setIsGenerating(false);
-      queryClient.invalidateQueries({ queryKey: ["plan"] });
       posthog.capture("generation_completed", {
         thread_id: data.threadId,
         generation_id: data.generationId,
@@ -109,6 +119,17 @@ export function useGenerateMutation() {
         error instanceof Error ? error.message : "Something went wrong.";
       setError(message);
       setIsGenerating(false);
+      // Restore optimistically subtracted credits
+      if (variables.model) {
+        const creditCost = determineCreditCostOfImageGeneration({
+          model: variables.model,
+        });
+        queryClient.setQueryData<PlanResponse>(["plan"], (old) =>
+          old?.credits != null
+            ? { ...old, credits: old.credits + creditCost }
+            : old,
+        );
+      }
       toast.error(message);
       posthog.capture("generation_failed", {
         error: message,
