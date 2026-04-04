@@ -1,4 +1,4 @@
-import type { SupabaseClient, User } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import sharp from "sharp";
 import {
   cleanUpEditDescription,
@@ -9,7 +9,12 @@ import type { AspectRatio } from "./aspect-ratio";
 import { calculateCropDimensions } from "./aspect-ratio";
 import { ACCEPTED_MIME_TYPES, MAX_UPLOAD_BYTES } from "./constants";
 import { determineCreditCostOfImageGeneration } from "./credits";
-import { getCreditsForUser, getPlanForUser, polar } from "./polar";
+import {
+  ensurePolarProvisioned,
+  getCreditsForUser,
+  getPlanForUser,
+  polar,
+} from "./polar";
 import { posthogNode } from "./posthog/server";
 import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 import {
@@ -19,6 +24,13 @@ import {
   parseStorageUrl,
   uploadFile,
 } from "./supabase/storage";
+
+export class InsufficientCreditsError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InsufficientCreditsError";
+  }
+}
 
 export interface PreparedImageData {
   imageBuffer: Buffer;
@@ -222,25 +234,62 @@ export async function generateAndUploadImage({
 }): Promise<ProcessImageGenerationResult> {
   const creditCost = determineCreditCostOfImageGeneration({ model });
 
-  const [creditsAvailable, planInfo] = await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let [creditsAvailable, planInfo] = await Promise.all([
     getCreditsForUser(userId),
     getPlanForUser(userId),
   ]);
-  if (creditsAvailable === null) {
-    throw new Error(
-      "Failed to fetch available credits. Please try again later.",
-    );
+
+  // If no subscription found (missing provisioning), retry provisioning once and re-check
+  if (!planInfo.subscriptionId && user?.email) {
+    try {
+      await ensurePolarProvisioned({
+        userId,
+        email: user.email,
+        name:
+          typeof user.user_metadata?.full_name === "string"
+            ? user.user_metadata.full_name
+            : user.email,
+      });
+      // Re-fetch after provisioning
+      [creditsAvailable, planInfo] = await Promise.all([
+        getCreditsForUser(userId),
+        getPlanForUser(userId),
+      ]);
+    } catch (error) {
+      console.error("Polar provisioning retry failed:", error);
+      posthogNode?.captureException(error, userId);
+    }
   }
-  // Only block free users (or users with billing issues) - Pro users in good standing are billed for overages
-  if (planInfo.hasBillingIssue) {
-    throw new Error(
-      "Looks like you have a billing issue. Please update your payment method in Billing.",
-    );
-  }
-  if (planInfo.type === "free" && creditsAvailable < creditCost) {
-    throw new Error(
-      "You don't have enough credits to generate this image. Please upgrade to Pro.",
-    );
+
+  // Grace period: allow usage for new accounts while Polar provisioning completes
+  const GRACE_PERIOD_MS = 10 * 60 * 1000;
+  const isWithinGracePeriod =
+    user?.created_at &&
+    Date.now() - new Date(user.created_at).getTime() < GRACE_PERIOD_MS;
+
+  if (isWithinGracePeriod && !planInfo.subscriptionId) {
+    // Polar provisioning hasn't completed yet — allow usage within grace window
+  } else {
+    if (creditsAvailable === null) {
+      throw new Error(
+        "Failed to fetch available credits. Please try again later.",
+      );
+    }
+    // Only block free users (or users with billing issues) - Pro users in good standing are billed for overages
+    if (planInfo.hasBillingIssue) {
+      throw new InsufficientCreditsError(
+        "Looks like you have a billing issue. Please update your payment method in Billing.",
+      );
+    }
+    if (planInfo.type === "free" && creditsAvailable < creditCost) {
+      throw new InsufficientCreditsError(
+        "You don't have enough credits to generate this image. Please upgrade to Pro.",
+      );
+    }
   }
 
   // Track analytics

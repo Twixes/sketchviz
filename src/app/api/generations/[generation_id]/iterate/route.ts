@@ -3,7 +3,10 @@ import {
   DEFAULT_IMAGE_EDITING_MODEL,
   DEFAULT_MODEL_PROVIDER,
 } from "@/lib/constants";
-import { processImageGeneration } from "@/lib/image-generation";
+import {
+  InsufficientCreditsError,
+  processImageGeneration,
+} from "@/lib/image-generation";
 import { posthogNode } from "@/lib/posthog/server";
 import { iterateRequestSchema } from "@/lib/schemas";
 import { createClient } from "@/lib/supabase/server";
@@ -221,6 +224,7 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    const status = error instanceof InsufficientCreditsError ? 402 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

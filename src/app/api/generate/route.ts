@@ -7,6 +7,7 @@ import {
 } from "@/lib/constants";
 import {
   generateAndUploadImage,
+  InsufficientCreditsError,
   type PreparedImageData,
   prepareImageForGeneration,
 } from "@/lib/image-generation";
@@ -241,7 +242,8 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    const status = error instanceof InsufficientCreditsError ? 402 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }
 
