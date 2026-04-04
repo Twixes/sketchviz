@@ -74,12 +74,11 @@ export default function LoginPage() {
           minLength={6}
         />
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <div className="text-right">
+        <div className="flex items-baseline justify-between">
+          {error ? <p className="text-sm text-red-600">{error}</p> : <span />}
           <Link
             href="/auth/reset-password"
-            className="text-xs text-black/50 hover:text-black/80 transition-colors"
+            className="text-xs text-black/50 hover:text-black/80 transition-colors shrink-0"
           >
             Forgot password?
           </Link>
