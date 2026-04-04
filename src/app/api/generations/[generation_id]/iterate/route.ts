@@ -203,7 +203,7 @@ export async function POST(
     });
   } catch (error) {
     console.error("Iterate endpoint error:", error);
-    const message =
+    const internalMessage =
       error instanceof Error ? error.message : "Failed to iterate on image.";
 
     // Clean up the phantom generation record (it has output_url: null)
@@ -217,7 +217,7 @@ export async function POST(
         thread_id: threadId,
         previous_generation_id: generationId,
         model,
-        error: message,
+        error: internalMessage,
         outdoor_light,
         indoor_light,
         has_edit_description: edit_description !== null,
@@ -227,7 +227,12 @@ export async function POST(
       },
     });
 
-    const status = error instanceof InsufficientCreditsError ? 402 : 500;
-    return NextResponse.json({ error: message }, { status });
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json({ error: internalMessage }, { status: 402 });
+    }
+    return NextResponse.json(
+      { error: "Failed to iterate on image." },
+      { status: 500 },
+    );
   }
 }

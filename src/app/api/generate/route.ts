@@ -222,7 +222,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Generate endpoint error:", error);
-    const message =
+    const internalMessage =
       error instanceof Error ? error.message : "Failed to generate image.";
 
     // Clean up the phantom generation record (it has output_url: null)
@@ -236,7 +236,7 @@ export async function POST(request: Request) {
         thread_id: threadId,
         generation_id: generationId,
         model,
-        error: message,
+        error: internalMessage,
         outdoor_light,
         indoor_light,
         has_edit_description: edit_description !== null,
@@ -245,8 +245,13 @@ export async function POST(request: Request) {
       },
     });
 
-    const status = error instanceof InsufficientCreditsError ? 402 : 500;
-    return NextResponse.json({ error: message }, { status });
+    if (error instanceof InsufficientCreditsError) {
+      return NextResponse.json({ error: internalMessage }, { status: 402 });
+    }
+    return NextResponse.json(
+      { error: "Failed to generate image." },
+      { status: 500 },
+    );
   }
 }
 
