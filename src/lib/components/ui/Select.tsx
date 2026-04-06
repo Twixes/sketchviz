@@ -13,26 +13,36 @@ export interface SelectOption<T> {
   disabledReason?: string;
 }
 
-interface SelectProps<T> {
+interface SelectProps<T, OptionT extends T = T> {
   label: string;
   value: T;
-  options: SelectOption<T>[];
+  options: SelectOption<OptionT>[];
   onChange: (value: T) => void;
+  required?: boolean;
+  placeholder?: React.ReactNode;
   allowCustomInput?: boolean;
   customInputPlaceholder?: string;
   disabled?: boolean;
+  layout?: "horizontal" | "vertical";
 }
 
-export function Select<T extends string | null>({
+export function Select<T extends string | null, OptionT extends T = T>({
   label,
   value,
   options,
   onChange,
+  required = true,
+  placeholder = "Select an option",
   allowCustomInput = false,
   customInputPlaceholder = "…or specify it in text",
   disabled = false,
-}: SelectProps<T>) {
+  layout = "horizontal",
+}: SelectProps<T, OptionT>) {
   const [isOpen, setIsOpen] = useState(false);
+  const triggerId = `select-${label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")}`;
 
   // Find the current option or determine if it's a custom value
   const currentOption = options.find((opt) => opt.value === value);
@@ -42,19 +52,40 @@ export function Select<T extends string | null>({
     !options.some((opt) => opt.value === value);
   const customInputValue = isCustomValue ? (value as string) : "";
   const fallbackOption = options[0];
+  const showPlaceholder = !required && !currentOption && !isCustomValue;
 
   return (
-    <div className="flex items-center gap-2">
-      <label htmlFor={label} className="text-sm font-semibold text-black">
-        {label}:
+    <div
+      className={cn(
+        layout === "vertical"
+          ? "flex flex-col gap-1.5"
+          : "flex items-center gap-2",
+      )}
+    >
+      <label
+        htmlFor={triggerId}
+        className={cn(
+          "text-black",
+          layout === "vertical"
+            ? "text-sm font-medium text-black/70"
+            : "text-sm font-semibold",
+        )}
+      >
+        {layout === "vertical" ? label : `${label}:`}
       </label>
       <Popover.Root open={isOpen && !disabled} onOpenChange={setIsOpen}>
         <Popover.Trigger
+          id={triggerId}
           disabled={disabled}
-          className="inline-flex items-center justify-between gap-2 flex-1 rounded-lg border border-black/20 bg-white px-3 py-2 text-sm font-medium text-black transition-all duration-150 hover:bg-black/5 hover:border-black/40 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-black/20"
+          className={cn(
+            "inline-flex items-center justify-between gap-2 rounded-lg border border-black/20 bg-white px-3 py-2 text-sm font-medium text-black transition-all duration-150 hover:bg-black/5 hover:border-black/40 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-black/20 min-w-30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-black/20",
+            layout === "vertical" ? "w-full" : "flex-1",
+          )}
         >
-          <span id={label} className="flex items-center gap-2 truncate">
-            {currentOption ? (
+          <span className="flex items-center gap-2 truncate">
+            {showPlaceholder ? (
+              <span className="text-black/40">{placeholder}</span>
+            ) : currentOption ? (
               <>
                 {currentOption.icon && (
                   <currentOption.icon className="size-4 shrink-0" />
@@ -104,7 +135,11 @@ export function Select<T extends string | null>({
                   disabled={isDisabled}
                   onClick={() => {
                     if (!isDisabled) {
-                      onChange(option.value);
+                      if (!required && isSelected) {
+                        onChange(null as T);
+                      } else {
+                        onChange(option.value);
+                      }
                       setIsOpen(false);
                     }
                   }}
@@ -167,14 +202,14 @@ export function Select<T extends string | null>({
               return button;
             })}
             {allowCustomInput && (
-              <div className="relative flex items-center gap-2 rounded-md text-sm">
+              <div className="relative flex items-center gap-2 p-1 text-sm">
                 <input
                   type="text"
                   value={customInputValue}
                   onChange={(e) => onChange((e.target.value || null) as T)}
                   placeholder={customInputPlaceholder}
                   disabled={disabled}
-                  className="w-full rounded-md border border-black/20 bg-white px-2 py-1.75 text-sm text-black placeholder:text-black/40 transition-transform duration-150 hover:border-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border border-black/20 bg-white px-2 py-2 text-sm text-black placeholder:text-black/40 transition-transform duration-150 hover:border-black/40 focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
             )}

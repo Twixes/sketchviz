@@ -1,9 +1,17 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { isValidRedirectPath } from "@/lib/auth-utils";
 import { extractFirstName } from "@/lib/language-utils";
 import { ensurePolarProvisioned } from "@/lib/polar";
 import { posthogNode } from "@/lib/posthog/server";
+import {
+  buildSignupDiscoveryMetadata,
+  getSignupDiscoveryFromMetadata,
+  parseSignupDiscoveryCookie,
+  resolveSignupDiscovery,
+  SIGNUP_DISCOVERY_COOKIE_NAME,
+} from "@/lib/signup-discovery";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -15,12 +23,16 @@ async function ensurePolarCustomer(
   userId: string,
   email: string,
   fullName?: string,
+  discoverySource?: string,
+  discoveryDetail?: string,
 ): Promise<boolean> {
   const { wasAlreadyProvisioned } = await ensurePolarProvisioned({
     userId,
     email,
     name: fullName ?? email,
   });
+  const resolvedDiscoverySource = discoverySource ?? discoveryDetail;
+  const resolvedDiscoveryDetail = discoverySource ? discoveryDetail : undefined;
 
   if (!wasAlreadyProvisioned) {
     posthogNode?.capture({
@@ -31,6 +43,8 @@ async function ensurePolarCustomer(
           email,
           name: fullName ?? email,
           first_name: fullName ? extractFirstName(fullName) : undefined,
+          discovery_source: resolvedDiscoverySource,
+          discovery_source_detail: resolvedDiscoveryDetail,
         },
       },
     });
@@ -45,6 +59,10 @@ export async function GET(request: Request) {
   const tokenHash = requestUrl.searchParams.get("token_hash");
   const type = requestUrl.searchParams.get("type") as EmailOtpType | null;
   const origin = requestUrl.origin;
+  const cookieStore = await cookies();
+  const googleSignupDiscovery = parseSignupDiscoveryCookie(
+    cookieStore.get(SIGNUP_DISCOVERY_COOKIE_NAME)?.value,
+  );
   let isSignup = false;
 
   const supabase = await createClient();
@@ -57,14 +75,48 @@ export async function GET(request: Request) {
       const userId = data?.claims?.sub;
       const userEmail = data?.claims?.email as string | undefined;
       const userMetadata = data?.claims?.user_metadata as
-        | Record<string, string>
+        | Record<string, unknown>
         | undefined;
+      const metadataDiscovery = getSignupDiscoveryFromMetadata(userMetadata);
+      const resolvedSignupDiscovery = resolveSignupDiscovery(
+        googleSignupDiscovery.discoverySource ??
+          metadataDiscovery.discoverySource,
+        googleSignupDiscovery.discoveryDetail ??
+          metadataDiscovery.discoveryDetail,
+      );
       if (userId && userEmail) {
         isSignup = await ensurePolarCustomer(
           userId,
           userEmail,
-          userMetadata?.full_name,
+          typeof userMetadata?.full_name === "string"
+            ? userMetadata.full_name
+            : undefined,
+          resolvedSignupDiscovery.discoverySource,
+          resolvedSignupDiscovery.discoveryDetail,
         );
+
+        if (
+          isSignup &&
+          (resolvedSignupDiscovery.discoverySource ||
+            resolvedSignupDiscovery.discoveryDetail)
+        ) {
+          const { error: updateError } = await supabase.auth.updateUser({
+            data: {
+              ...userMetadata,
+              ...buildSignupDiscoveryMetadata(
+                resolvedSignupDiscovery.discoverySource,
+                resolvedSignupDiscovery.discoveryDetail,
+              ),
+            },
+          });
+          if (updateError) {
+            console.error(
+              "Failed to persist signup discovery metadata:",
+              updateError,
+            );
+            posthogNode?.captureException(updateError);
+          }
+        }
       }
     } else if (tokenHash && type) {
       // Email verification or password reset flow
@@ -87,8 +139,17 @@ export async function GET(request: Request) {
         const fullName = data.user?.user_metadata?.full_name as
           | string
           | undefined;
+        const resolvedSignupDiscovery = getSignupDiscoveryFromMetadata(
+          data.user?.user_metadata as Record<string, unknown> | undefined,
+        );
         if (userId && userEmail) {
-          isSignup = await ensurePolarCustomer(userId, userEmail, fullName);
+          isSignup = await ensurePolarCustomer(
+            userId,
+            userEmail,
+            fullName,
+            resolvedSignupDiscovery.discoverySource,
+            resolvedSignupDiscovery.discoveryDetail,
+          );
         }
       }
 
@@ -115,5 +176,7 @@ export async function GET(request: Request) {
   if (isSignup) {
     redirectUrl.searchParams.set("signup", "true");
   }
-  return NextResponse.redirect(redirectUrl);
+  const response = NextResponse.redirect(redirectUrl);
+  response.cookies.delete(SIGNUP_DISCOVERY_COOKIE_NAME);
+  return response;
 }

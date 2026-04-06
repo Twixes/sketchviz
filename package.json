@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "node --experimental-strip-types --test src/lib/signup-discovery.test.ts",
     "lint": "biome check",
     "format": "biome format --write"
   },
