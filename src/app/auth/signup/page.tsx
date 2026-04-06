@@ -8,6 +8,13 @@ import { AuthGoogleButton } from "@/components/AuthGoogleButton";
 import { useValidatedRedirect } from "@/hooks/use-validated-redirect";
 import { Button } from "@/lib/components/ui/Button";
 import { Input } from "@/lib/components/ui/Input";
+import { Select } from "@/lib/components/ui/Select";
+import {
+  buildSignupDiscoveryMetadata,
+  getSignupDiscoveryOption,
+  SIGNUP_DISCOVERY_DETAIL_PLACEHOLDER,
+  SIGNUP_DISCOVERY_OPTIONS,
+} from "@/lib/signup-discovery";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
@@ -17,6 +24,8 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [discoverySource, setDiscoverySource] = useState<string | null>(null);
+  const [discoveryDetail, setDiscoveryDetail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -46,7 +55,10 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: {
+            full_name: fullName,
+            ...buildSignupDiscoveryMetadata(discoverySource, discoveryDetail),
+          },
           emailRedirectTo: callbackUrl,
         },
       });
@@ -57,8 +69,21 @@ export default function SignupPage() {
       }
       router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
     },
-    [email, password, fullName, callbackUrl, router],
+    [
+      email,
+      password,
+      fullName,
+      discoverySource,
+      discoveryDetail,
+      callbackUrl,
+      router,
+    ],
   );
+
+  const handleDiscoverySourceChange = useCallback((value: string | null) => {
+    setDiscoverySource(value);
+    setDiscoveryDetail(null);
+  }, []);
 
   return (
     <AuthFormShell>
@@ -75,6 +100,7 @@ export default function SignupPage() {
           placeholder="Jane Doe"
           required
           autoComplete="name"
+          className="rounded-lg"
         />
         <Input
           label="Email"
@@ -84,6 +110,7 @@ export default function SignupPage() {
           placeholder="you@example.com"
           required
           autoComplete="email"
+          className="rounded-lg"
         />
         <Input
           label="Password"
@@ -94,7 +121,31 @@ export default function SignupPage() {
           required
           autoComplete="new-password"
           minLength={6}
+          className="rounded-lg"
         />
+        <Select
+          label="How did you find out about SketchViz? (optional)"
+          value={discoverySource}
+          options={SIGNUP_DISCOVERY_OPTIONS}
+          onChange={handleDiscoverySourceChange}
+          required={false}
+          placeholder="Select an option"
+          layout="vertical"
+        />
+        {discoverySource !== null && (
+          <Input
+            label={
+              getSignupDiscoveryOption(discoverySource)?.detailLabel ??
+              "Where did you find us? (optional)"
+            }
+            type="text"
+            value={discoveryDetail ?? ""}
+            onChange={(e) => setDiscoveryDetail(e.target.value || null)}
+            placeholder={SIGNUP_DISCOVERY_DETAIL_PLACEHOLDER}
+            autoComplete="off"
+            className="rounded-lg"
+          />
+        )}
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
@@ -111,6 +162,8 @@ export default function SignupPage() {
       <AuthGoogleButton
         redirectTo={validatedRedirect}
         label="Sign up with Google"
+        signupDiscoverySource={discoverySource}
+        signupDiscoveryDetail={discoveryDetail}
       />
 
       <p className="mt-6 text-center text-sm text-black/50">

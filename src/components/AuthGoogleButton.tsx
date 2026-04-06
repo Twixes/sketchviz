@@ -3,14 +3,25 @@
 import { useCallback, useMemo } from "react";
 import GoogleIcon from "@/icons/google.svg";
 import { Button } from "@/lib/components/ui/Button";
+import {
+  SIGNUP_DISCOVERY_COOKIE_NAME,
+  serializeSignupDiscoveryCookie,
+} from "@/lib/signup-discovery";
 import { createClient } from "@/lib/supabase/client";
 
 interface AuthGoogleButtonProps {
   redirectTo?: string | null;
   label: string;
+  signupDiscoverySource?: string | null;
+  signupDiscoveryDetail?: string | null;
 }
 
-export function AuthGoogleButton({ redirectTo, label }: AuthGoogleButtonProps) {
+export function AuthGoogleButton({
+  redirectTo,
+  label,
+  signupDiscoverySource,
+  signupDiscoveryDetail,
+}: AuthGoogleButtonProps) {
   const callbackUrl = useMemo(() => {
     const url = new URL("/auth/callback", window.location.origin);
     if (redirectTo) {
@@ -19,7 +30,29 @@ export function AuthGoogleButton({ redirectTo, label }: AuthGoogleButtonProps) {
     return url.toString();
   }, [redirectTo]);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback(async () => {
+    const discoveryCookie = serializeSignupDiscoveryCookie(
+      signupDiscoverySource,
+      signupDiscoveryDetail,
+    );
+
+    if ("cookieStore" in window) {
+      if (discoveryCookie) {
+        await window.cookieStore.set({
+          name: SIGNUP_DISCOVERY_COOKIE_NAME,
+          value: discoveryCookie,
+          path: "/",
+          sameSite: "lax",
+          expires: Date.now() + 10 * 60 * 1000,
+        });
+      } else {
+        await window.cookieStore.delete({
+          name: SIGNUP_DISCOVERY_COOKIE_NAME,
+          path: "/",
+        });
+      }
+    }
+
     const supabase = createClient();
     supabase.auth.signInWithOAuth({
       provider: "google",
@@ -27,7 +60,7 @@ export function AuthGoogleButton({ redirectTo, label }: AuthGoogleButtonProps) {
         redirectTo: callbackUrl,
       },
     });
-  }, [callbackUrl]);
+  }, [callbackUrl, signupDiscoverySource, signupDiscoveryDetail]);
 
   return (
     <>

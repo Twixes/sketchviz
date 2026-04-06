@@ -62,6 +62,7 @@ export default function LoginPage() {
           placeholder="you@example.com"
           required
           autoComplete="email"
+          className="rounded-lg"
         />
         <Input
           label="Password"
@@ -72,6 +73,7 @@ export default function LoginPage() {
           required
           autoComplete="current-password"
           minLength={6}
+          className="rounded-lg"
         />
 
         <div className="flex items-baseline justify-between">
