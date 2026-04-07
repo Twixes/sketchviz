@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { LAYOUT_TRANSITION } from "@/lib/animation-constants";
@@ -31,11 +32,6 @@ const gapClasses = {
   large: "gap-16",
 } as const;
 
-const maxWidthClasses = {
-  normal: "max-w-6xl",
-  narrow: "max-w-5xl",
-} as const;
-
 export function PageWrapper({
   user,
   children,
@@ -49,41 +45,43 @@ export function PageWrapper({
   // documentTitle is used for type-safety; actual title is set via layout metadata
   void documentTitle;
 
-  // Outer main always uses gap-12 (consistent Header-to-content spacing)
-  // The gap prop controls spacing within the content section
-  const className = `relative z-10 mx-auto flex grow w-full ${maxWidthClasses[maxWidth]} flex-col gap-12 px-6 pb-24 pt-10 lg:px-10`;
-
-  const content = (
-    <>
-      <Header user={user} />
-      <section className={`flex grow flex-col ${gapClasses[gap]}`}>
-        {(title || description) && (
-          <div>
-            {title &&
-              (onTitleSave && typeof title === "string" ? (
-                <EditableTitle title={title} onSave={onTitleSave} />
-              ) : typeof title === "string" ? (
-                <h1 className="text-2xl lg:text-3xl font-semibold text-black">
-                  {title}
-                </h1>
-              ) : (
-                title
-              ))}
-            {description && (
-              <p className="mt-2 text-lg text-black/70">{description}</p>
-            )}
-          </div>
-        )}
-        {children}
-      </section>
-    </>
-  );
-
   return (
     <NeonBackground>
-      <motion.main transition={LAYOUT_TRANSITION} className={className}>
-        {content}
-      </motion.main>
+      <div
+        className={
+          // Outer main always uses gap-12 (consistent Header-to-content spacing)
+          // The gap prop controls spacing within the content section
+          "flex flex-col items-center mx-auto grow max-w-6xl w-full gap-12 px-6 pb-24 pt-10 lg:px-10"
+        }
+      >
+        <Header user={user} />
+        <motion.main
+          transition={LAYOUT_TRANSITION}
+          className={clsx(
+            `flex grow flex-col w-full ${gapClasses[gap]}`,
+            maxWidth === "narrow" ? "max-w-4xl" : "max-w-6xl",
+          )}
+        >
+          {(title || description) && (
+            <div>
+              {title &&
+                (onTitleSave && typeof title === "string" ? (
+                  <EditableTitle title={title} onSave={onTitleSave} />
+                ) : typeof title === "string" ? (
+                  <h1 className="text-2xl lg:text-3xl font-semibold text-black">
+                    {title}
+                  </h1>
+                ) : (
+                  title
+                ))}
+              {description && (
+                <p className="mt-2 text-lg text-black/70">{description}</p>
+              )}
+            </div>
+          )}
+          {children}
+        </motion.main>
+      </div>
     </NeonBackground>
   );
 }
