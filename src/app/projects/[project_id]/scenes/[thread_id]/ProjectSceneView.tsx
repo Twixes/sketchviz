@@ -27,6 +27,7 @@ import {
   PENDING_GENERATION_POLL_MS,
 } from "@/lib/constants";
 import { determineCreditCostOfImageGeneration } from "@/lib/credits";
+import { isLatestGenerationActivelyPending } from "@/lib/pending-generation";
 import type { Model } from "@/lib/schemas";
 import {
   type Generation,
@@ -103,20 +104,24 @@ export function ProjectSceneView({
 
       return data as Thread;
     },
-    // Poll while the latest generation is still pending (output_url is null)
+    // Poll while the latest generation is still actively pending (no output, within stale window)
     refetchInterval: (query) => {
       const thread = query.state.data;
       if (!thread?.generations?.length) return false;
       const latest = thread.generations[thread.generations.length - 1];
-      return latest.output_url === null ? PENDING_GENERATION_POLL_MS : false;
+      return isLatestGenerationActivelyPending(latest)
+        ? PENDING_GENERATION_POLL_MS
+        : false;
     },
   });
 
   // Track whether a generation is pending from the server (e.g. after page refresh)
-  const hasPendingGeneration =
-    !!fetchedThread?.generations?.length &&
-    fetchedThread.generations[fetchedThread.generations.length - 1]
-      .output_url === null;
+  const latestFetchedGeneration = fetchedThread?.generations?.length
+    ? fetchedThread.generations[fetchedThread.generations.length - 1]
+    : undefined;
+  const hasPendingGeneration = isLatestGenerationActivelyPending(
+    latestFetchedGeneration,
+  );
 
   useEffect(() => {
     if (fetchedThread) {

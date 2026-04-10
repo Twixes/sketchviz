@@ -20,6 +20,7 @@ import {
   DropdownMenu,
   DropdownMenuItem,
 } from "@/lib/components/ui/DropdownMenu";
+import { isPendingGenerationPastThreshold } from "@/lib/pending-generation";
 import type { Generation, Thread } from "@/stores/thread-editor-store";
 import { useThreadEditorStore } from "@/stores/thread-editor-store";
 
@@ -29,6 +30,15 @@ function toKebabCase(str: string): string {
     .replace(/[^\w\s-:]/g, "") // Remove punctuation
     .replace(/:/g, "--") // Replace colons with double hyphens
     .replace(/\s+/g, "-"); // Replace spaces with hyphens
+}
+
+/** Iteration deletable if it has output, or if it has no output but is older than the pending threshold. */
+function canDeleteGenerationIteration(
+  outputUrl: string | null | undefined,
+  createdAt: string | undefined,
+): boolean {
+  if (outputUrl) return true;
+  return isPendingGenerationPastThreshold(createdAt);
 }
 
 interface Layer {
@@ -67,6 +77,7 @@ function LayerImage({
   estimatedSeconds,
   isOwner,
   generationId,
+  generationCreatedAt,
   onDeleted,
 }: {
   layer: Layer;
@@ -80,9 +91,19 @@ function LayerImage({
   estimatedSeconds: number;
   isOwner?: boolean;
   generationId?: string;
+  /** ISO timestamp for this generation; used to allow deleting stale layers with no output */
+  generationCreatedAt?: string;
   onDeleted?: () => void;
 }) {
   const signedUrl = useSignedUrl(layer.imageUrl);
+  const canDeleteIteration = canDeleteGenerationIteration(
+    layer.imageUrl,
+    generationCreatedAt,
+  );
+  const isStaleFailedIteration =
+    layer.index > 0 &&
+    !layer.imageUrl &&
+    isPendingGenerationPastThreshold(generationCreatedAt);
   const config = TIME_MACHINE_CONFIG;
   const setInputImageDimensions = useThreadEditorStore(
     (state) => state.setInputImageDimensions,
@@ -213,7 +234,11 @@ function LayerImage({
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-black/5">
             <span className="text-black/30 text-sm">
-              {isGenerating && isActive ? "Generating..." : "No image"}
+              {isStaleFailedIteration
+                ? "No output was produced"
+                : isGenerating && isActive
+                  ? "Generating..."
+                  : "No image"}
             </span>
           </div>
         )}
@@ -229,9 +254,9 @@ function LayerImage({
             {layer.label}
           </div>
         </div>
-        {signedUrl && layer.index > 0 && (
+        {layer.index > 0 && canDeleteIteration && (
           <div className="absolute bottom-2 right-2 flex gap-2">
-            {signedUrl && layer.index > 0 && isOwner && generationId && (
+            {isOwner && generationId && canDeleteIteration && (
               <DropdownMenu buttonVariant="secondary" dropdownAlign="start">
                 <DropdownMenuItem
                   onClick={handleDelete}
@@ -245,21 +270,25 @@ function LayerImage({
                 </DropdownMenuItem>
               </DropdownMenu>
             )}
-            <ShareButton threadId={threadId} />
-            <ExportButton
-              imageUrl={signedUrl}
-              filename={
-                threadTitle
-                  ? layer.index > 1
-                    ? `${toKebabCase(threadTitle)}-${layer.index}.jpeg`
-                    : `${toKebabCase(threadTitle)}.jpeg`
-                  : `${toKebabCase(layer.label)}.jpeg`
-              }
-            />
+            {signedUrl && (
+              <>
+                <ShareButton threadId={threadId} />
+                <ExportButton
+                  imageUrl={signedUrl}
+                  filename={
+                    threadTitle
+                      ? layer.index > 1
+                        ? `${toKebabCase(threadTitle)}-${layer.index}.jpeg`
+                        : `${toKebabCase(threadTitle)}.jpeg`
+                      : `${toKebabCase(layer.label)}.jpeg`
+                  }
+                />
+              </>
+            )}
           </div>
         )}
       </div>
-      {isActive && isGenerating && (
+      {isActive && isGenerating && !isStaleFailedIteration && (
         <div
           className="loading-ring"
           style={
@@ -387,8 +416,10 @@ export function TimeMachineViewer({
           {layers.map((layer) => {
             const relativePosition = layer.index - activeLayerIndex;
             // Get the generation ID for this layer (layer 0 is original, no generation)
-            const generationId =
-              layer.index > 0 ? generations[layer.index - 1]?.id : undefined;
+            const gen =
+              layer.index > 0 ? generations[layer.index - 1] : undefined;
+            const generationId = gen?.id;
+            const generationCreatedAt = gen?.created_at;
             return (
               <LayerImage
                 key={layer.id}
@@ -403,6 +434,7 @@ export function TimeMachineViewer({
                 estimatedSeconds={estimatedSeconds}
                 isOwner={isOwner}
                 generationId={generationId}
+                generationCreatedAt={generationCreatedAt}
                 onDeleted={() => {
                   // Navigate to previous layer if we're on the deleted one
                   if (layer.index === activeLayerIndex && layer.index > 0) {
