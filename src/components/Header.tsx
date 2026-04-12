@@ -38,7 +38,7 @@ export function Header({ user }: HeaderProps) {
     <motion.header
       initial={false}
       transition={FADE_TRANSITION}
-      className="flex flex-wrap items-center justify-between z-10 gap-4"
+      className="flex flex-wrap items-center justify-between w-full z-10 gap-4"
     >
       <Logo />
       <div className="flex items-center flex-wrap-reverse grow gap-2 lg:gap-3 whitespace-nowrap">

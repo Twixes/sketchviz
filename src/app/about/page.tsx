@@ -4,10 +4,10 @@ import { motion } from "motion/react";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import { PageWrapper } from "@/components/PageWrapper";
 import { useSession } from "@/components/SessionProvider";
-import termsContent from "@/content/terms.md";
+import aboutContent from "@/content/about.md";
 import { FADE_TRANSITION } from "@/lib/animation-constants";
 
-export default function TermsPage() {
+export default function AboutPage() {
   const { user } = useSession();
 
   return (
@@ -18,7 +18,7 @@ export default function TermsPage() {
         transition={FADE_TRANSITION}
         className="space-y-8"
       >
-        <MarkdownContent content={termsContent} />
+        <MarkdownContent content={aboutContent} />
       </motion.div>
     </PageWrapper>
   );
