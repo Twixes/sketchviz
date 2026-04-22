@@ -144,7 +144,7 @@ legend {
 
 .loading-ring {
   --ring-size: 6px;
-  --ring-radius: 16px;
+  --ring-radius: 12px;
   --ring-estimated-seconds: 30; /* Estimated time to reach 98% */
   position: absolute;
   border-radius: calc(var(--ring-radius) + var(--ring-size));
