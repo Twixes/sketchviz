@@ -11,6 +11,7 @@ declare global {
       NEXT_PUBLIC_POSTHOG_HOST: string;
       BLOB_READ_WRITE_TOKEN: string;
       GOOGLE_GENERATIVE_AI_API_KEY: string;
+      OPENAI_API_KEY: string;
       POLAR_ACCESS_TOKEN: string;
     }
   }

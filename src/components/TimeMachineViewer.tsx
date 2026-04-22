@@ -327,7 +327,13 @@ export function TimeMachineViewer({
   );
   const isComparing = useThreadEditorStore((state) => state.isComparing);
   const model = useThreadEditorStore((state) => state.model);
-  const estimatedSeconds = model.startsWith("bfl/") ? 7 : 30;
+  const estimatedSeconds = model.startsWith("openai/")
+    ? 90
+    : model.startsWith("google/gemini-3-pro")
+      ? 40
+      : model.startsWith("bfl/")
+        ? 10
+        : 30;
 
   // Build layers array: original input (index 0) + generation outputs (index 1+)
   const layers = useMemo<Layer[]>(() => {

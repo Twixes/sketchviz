@@ -12,6 +12,8 @@ const storageUrl = z
 
 // Model schema
 export const modelSchema = z.enum([
+  "openai/gpt-image-2",
+  "openai/gpt-image-2/4k",
   "google/gemini-3-pro-image-preview",
   "google/gemini-3-pro-image-preview/4k",
   "google/gemini-3.1-flash-image-preview",

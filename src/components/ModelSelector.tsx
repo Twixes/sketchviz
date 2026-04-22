@@ -2,13 +2,14 @@ import {
   ImageIcon,
   LightningBoltIcon,
   RocketIcon,
+  StarFilledIcon,
 } from "@radix-ui/react-icons";
 import type React from "react";
 import { Select } from "@/lib/components/ui/Select";
 import type { Model } from "@/lib/schemas";
 
 /** The abstract model tiers, independent of resolution. */
-export type BaseModel = "pro" | "standard" | "lite";
+export type BaseModel = "ultra" | "pro" | "standard" | "lite";
 
 /** Resolution tier that stays consistent across model switches. */
 export type ResolutionTier = "high" | "low";
@@ -23,12 +24,28 @@ interface ModelDefinition {
 
 export const MODEL_DEFINITIONS: ModelDefinition[] = [
   {
+    baseModel: "ultra",
+    label: "Ultra",
+    icon: StarFilledIcon,
+    description: (
+      <>
+        Best-in-class quality and detail.
+        <br />
+        22/42 credits. Powered by OpenAI.
+      </>
+    ),
+    models: {
+      high: "openai/gpt-image-2/4k",
+      low: "openai/gpt-image-2",
+    },
+  },
+  {
     baseModel: "pro",
     label: "Pro",
     icon: RocketIcon,
     description: (
       <>
-        Top-tier quality for targeted changes.
+        Great quality for targeted changes.
         <br />
         14/24 credits. Powered by Google.
       </>
@@ -127,8 +144,11 @@ export function ModelSelector({
   }));
 
   if (proOnly) {
+    const allowedForProOnly: BaseModel[] = ["ultra", "pro"];
     options = options.map((opt) =>
-      opt.value === "pro" ? opt : { ...opt, disabledReason: PRO_ONLY_REASON },
+      allowedForProOnly.includes(opt.value as BaseModel)
+        ? opt
+        : { ...opt, disabledReason: PRO_ONLY_REASON },
     );
   }
 

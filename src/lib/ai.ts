@@ -1,5 +1,6 @@
 import { createBlackForestLabs } from "@ai-sdk/black-forest-labs";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenAI } from "@ai-sdk/openai";
 import { withTracing } from "@posthog/ai";
 import { generateImage, generateText, type LanguageModel } from "ai";
 import sharp from "sharp";
@@ -12,6 +13,7 @@ import type { IndoorLight, Model, OutdoorLight } from "./schemas";
 
 const googleClient = createGoogleGenerativeAI();
 const bflClient = createBlackForestLabs();
+const openaiClient = createOpenAI();
 
 const IMAGE_DESCRIPTION_PROMPT = `
 Describe this SketchUp render in a brief plain-text title.
@@ -76,6 +78,11 @@ async function generateImageFromPrompt(
   // Handle BFL models separately as they use a different API
   if (modelProvider === "bfl") {
     return generateBflImage(params, prompt, modelName, imageSizeFromModel);
+  }
+
+  // Handle OpenAI models (gpt-image-2) via generateImage API
+  if (modelProvider === "openai") {
+    return generateOpenAIImage(params, prompt, modelName, imageSizeFromModel);
   }
 
   // Google Gemini models
@@ -227,6 +234,99 @@ async function generateBflImage(
 
   if (!result.images || result.images.length === 0) {
     throw new Error("No image returned by Black Forest Labs.");
+  }
+
+  const generatedImage = result.images[0];
+  const uint8Array = generatedImage.uint8Array;
+  const base64 = Buffer.from(uint8Array).toString("base64");
+
+  return {
+    mediaType: "image/png",
+    base64,
+    uint8Array,
+  };
+}
+
+async function generateOpenAIImage(
+  params: GenerateImageParams,
+  prompt: string,
+  modelName: string,
+  imageSizeFromModel: string | undefined,
+): Promise<GeneratedImage> {
+  // Determine aspect ratio: use provided or calculate from input image
+  let aspectRatio: AspectRatio | number;
+  if (params.aspectRatio) {
+    aspectRatio = params.aspectRatio;
+  } else {
+    const metadata = await sharp(params.imageBuffer).metadata();
+    if (!metadata.width || !metadata.height) {
+      throw new Error("Could not determine input image dimensions");
+    }
+    aspectRatio = metadata.width / metadata.height;
+  }
+
+  // Calculate dimensions: ~8MP for 4K, ~4MP for 2K
+  // gpt-image-2 constraints: max edge 3840px, both edges multiples of 16, ratio ≤3:1, 655K–8.3M total px
+  const megapixels = imageSizeFromModel === "4k" ? 8 : 4;
+  let { width, height } = calculateDimensionsForMegapixels({
+    aspectRatio,
+    megapixels,
+    maxDimension: 3840,
+  });
+  // OpenAI requires dimensions to be multiples of 16
+  width = Math.round(width / 16) * 16;
+  height = Math.round(height / 16) * 16;
+
+  // Enforce gpt-image-2 constraints: ratio ≤3:1, total pixels 655,360–8,294,400
+  const currentRatio = Math.max(width, height) / Math.min(width, height);
+  if (currentRatio > 3) {
+    // Shrink the long edge to satisfy the 3:1 constraint
+    if (width > height) {
+      width = Math.round((height * 3) / 16) * 16;
+    } else {
+      height = Math.round((width * 3) / 16) * 16;
+    }
+  }
+  const totalPixels = width * height;
+  if (totalPixels < 655_360) {
+    // Scale up proportionally to hit minimum
+    const scale = Math.sqrt(655_360 / totalPixels);
+    width = Math.ceil((width * scale) / 16) * 16;
+    height = Math.ceil((height * scale) / 16) * 16;
+  } else if (totalPixels > 8_294_400) {
+    // Scale down proportionally to hit maximum
+    const scale = Math.sqrt(8_294_400 / totalPixels);
+    width = Math.floor((width * scale) / 16) * 16;
+    height = Math.floor((height * scale) / 16) * 16;
+  }
+
+  // Build images array: reference images + input image
+  const images: Buffer[] = [];
+  if (params.referenceImages && params.referenceImages.length > 0) {
+    for (const refImage of params.referenceImages) {
+      images.push(refImage.buffer);
+    }
+  }
+  images.push(params.imageBuffer);
+
+  const openaiModel = openaiClient.image(modelName);
+
+  const result = await generateImage({
+    model: openaiModel,
+    prompt: {
+      text: prompt,
+      images,
+    },
+    size: `${width}x${height}`,
+    providerOptions: {
+      openai: {
+        quality: "high",
+      },
+    },
+  });
+
+  if (!result.images || result.images.length === 0) {
+    throw new Error("No image returned by OpenAI.");
   }
 
   const generatedImage = result.images[0];

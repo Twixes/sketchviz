@@ -44,6 +44,10 @@ const RESOLUTION_LABELS: Record<
   string,
   Record<ResolutionTier, { badge: "1K" | "1.5K" | "2K" | "4K"; mp: string }>
 > = {
+  ultra: {
+    high: { badge: "4K", mp: "8 megapixels" },
+    low: { badge: "2K", mp: "4 megapixels" },
+  },
   pro: {
     high: { badge: "4K", mp: "16 megapixels" },
     low: { badge: "2K", mp: "4 megapixels" },

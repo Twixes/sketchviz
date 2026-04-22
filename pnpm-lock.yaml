@@ -14,6 +14,9 @@ importers:
       '@ai-sdk/google':
         specifier: ^3.0.1
         version: 3.0.1(zod@4.2.1)
+      '@ai-sdk/openai':
+        specifier: ^3.0.53
+        version: 3.0.53(zod@4.2.1)
       '@next/third-parties':
         specifier: ^16.1.1
         version: 16.1.1(next@16.1.5(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
@@ -25,7 +28,7 @@ importers:
         version: 0.42.1
       '@posthog/ai':
         specifier: ^7.3.0
-        version: 7.5.4(@ai-sdk/provider@3.0.4)(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(posthog-node@5.24.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(ws@8.18.3)
+        version: 7.5.4(@ai-sdk/provider@3.0.8)(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(posthog-node@5.24.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(ws@8.18.3)
       '@radix-ui/react-dialog':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -168,8 +171,20 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  '@ai-sdk/openai@3.0.53':
+    resolution: {integrity: sha512-Wld+Rbc05KaUn08uBt06eEuwcgalcIFtIl32Yp+GxuZXUQwOb6YeAuq+C6da4ch6BurFoqEaLemJVwjBb7x+PQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/provider-utils@4.0.1':
     resolution: {integrity: sha512-de2v8gH9zj47tRI38oSxhQIewmNc+OZjYIOOaMoVWKL65ERSav2PYYZHPSPCrfOeLMkv+Dyh8Y0QGwkO29wMWQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider-utils@4.0.23':
+    resolution: {integrity: sha512-z8GlDaCmRSDlqkMF2f4/RFgWxdarvIbyuk+m6WXT1LYgsnGiXRJGTD2Z1+SDl3LqtFuRtGX1aghYvQLoHL/9pg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -186,6 +201,10 @@ packages:
 
   '@ai-sdk/provider@3.0.4':
     resolution: {integrity: sha512-5KXyBOSEX+l67elrEa+wqo/LSsSTtrPj9Uoh3zMbe/ceQX4ucHI3b9nUEfNkGF3Ry1svv90widAt+aiKdIJasQ==}
+    engines: {node: '>=18'}
+
+  '@ai-sdk/provider@3.0.8':
+    resolution: {integrity: sha512-oGMAgGoQdBXbZqNG0Ze56CHjDZ1IDYOwGYxYjO5KLSlz5HiNQ9udIXsPZ61VWaHGZ5XW/jyjmr6t2xz2jGVwbQ==}
     engines: {node: '>=18'}
 
   '@alloc/quick-lru@5.2.0':
@@ -3502,9 +3521,22 @@ snapshots:
       '@ai-sdk/provider-utils': 4.0.1(zod@4.2.1)
       zod: 4.2.1
 
+  '@ai-sdk/openai@3.0.53(zod@4.2.1)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.23(zod@4.2.1)
+      zod: 4.2.1
+
   '@ai-sdk/provider-utils@4.0.1(zod@4.2.1)':
     dependencies:
       '@ai-sdk/provider': 3.0.0
+      '@standard-schema/spec': 1.1.0
+      eventsource-parser: 3.0.6
+      zod: 4.2.1
+
+  '@ai-sdk/provider-utils@4.0.23(zod@4.2.1)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
       '@standard-schema/spec': 1.1.0
       eventsource-parser: 3.0.6
       zod: 4.2.1
@@ -3521,6 +3553,10 @@ snapshots:
       json-schema: 0.4.0
 
   '@ai-sdk/provider@3.0.4':
+    dependencies:
+      json-schema: 0.4.0
+
+  '@ai-sdk/provider@3.0.8':
     dependencies:
       json-schema: 0.4.0
 
@@ -4633,7 +4669,7 @@ snapshots:
       standardwebhooks: 1.0.0
       zod: 4.2.1
 
-  '@posthog/ai@7.5.4(@ai-sdk/provider@3.0.4)(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(posthog-node@5.24.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(ws@8.18.3)':
+  '@posthog/ai@7.5.4(@ai-sdk/provider@3.0.8)(@opentelemetry/api@1.9.0)(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(posthog-node@5.24.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(ws@8.18.3)':
     dependencies:
       '@anthropic-ai/sdk': 0.71.2(zod@4.2.1)
       '@google/genai': 1.38.0
@@ -4645,7 +4681,7 @@ snapshots:
       uuid: 11.1.0
       zod: 4.2.1
     optionalDependencies:
-      '@ai-sdk/provider': 3.0.4
+      '@ai-sdk/provider': 3.0.8
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
       - '@opentelemetry/api'

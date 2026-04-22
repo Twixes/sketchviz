@@ -11,8 +11,9 @@
     "format": "biome format --write"
   },
   "dependencies": {
-    "@ai-sdk/google": "^3.0.1",
     "@ai-sdk/black-forest-labs": "^1.0.8",
+    "@ai-sdk/google": "^3.0.1",
+    "@ai-sdk/openai": "^3.0.53",
     "@next/third-parties": "^16.1.1",
     "@polar-sh/nextjs": "^0.9.3",
     "@polar-sh/sdk": "^0.42.1",
@@ -38,10 +39,10 @@
     "react": "19.2.3",
     "react-confetti": "^6.4.0",
     "react-dom": "19.2.3",
-    "sonner": "^1.7.1",
     "react-markdown": "^10.1.0",
     "react-textarea-autosize": "^8.5.9",
     "sharp": "^0.34.5",
+    "sonner": "^1.7.1",
     "tailwind-merge": "^3.4.0",
     "uuidv7": "^1.1.0",
     "zod": "^4.2.1",

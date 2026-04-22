@@ -7,6 +7,12 @@ export function determineCreditCostOfImageGeneration({
   referenceImageCount?: number;
 }): number {
   // Each credit costs the user 0.015 USD, but our calculation is `cost_of_image_output / 0.01` for a general 50% margin
+  if (model === "openai/gpt-image-2") {
+    return 22; // Each 2K output image at high quality is ~0.211 USD
+  }
+  if (model === "openai/gpt-image-2/4k") {
+    return 42; // Each 4K output image at high quality is ~0.42 USD (estimated, ~8MP)
+  }
   if (model === "google/gemini-3-pro-image-preview") {
     return 14; // Each 2K output image is 0.139 USD
   }
